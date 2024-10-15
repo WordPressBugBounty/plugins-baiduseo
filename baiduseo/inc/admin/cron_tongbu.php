@@ -2,9 +2,9 @@
 class baiduseo_crons{
     public function init(){
         add_action( 'baiduseo_cronhook1', [$this,'baiduseo_tongbu'] );
-        if(isset($_GET['planss'])){
-        $this->baiduseo_tongbu();exit;
-        }
+        // if(isset($_GET['planss'])){
+        // $this->baiduseo_tongbu();exit;
+        // }
         if(!wp_next_scheduled( 'baiduseo_cronhook1' )){
             wp_schedule_event( strtotime(current_time('Y-m-d H:i:00',1)), 'daily', 'baiduseo_cronhook1' );
         }
@@ -166,7 +166,7 @@ class baiduseo_crons{
                 foreach($content as $key=>$val){
                     $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_long where keywords=%s ',sanitize_text_field($val['keywords'])),ARRAY_A);
                     if(!empty($res)){
-                         $wpdb->update($wpdb->prefix . 'baiduseo_long',['link'=>sanitize_text_field($val['link'])],['id'=>$val['id']]);
+                         $wpdb->update($wpdb->prefix . 'baiduseo_long',['link'=>sanitize_text_field($val['link'])],['id'=>$res[0]['id']]);
                     }
                 }
             }
