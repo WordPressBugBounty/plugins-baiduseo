@@ -17,6 +17,9 @@ class baiduseo_common{
                 add_action('publish_post',[$this,'baiduseo_articlepublish']);
                 add_action('publish_future_post',[$this,'baiduseo_articlepublish']);
             }
+        }else{
+            add_action('publish_post',[$this,'baiduseo_articlepublish']);
+                add_action('publish_future_post',[$this,'baiduseo_articlepublish']);
         }
         if(is_admin()){
             add_action( 'admin_enqueue_scripts', [$this,'baiduseo_enqueue'] );
@@ -1174,7 +1177,7 @@ class baiduseo_common{
                 $urls =explode(',',$url);
                 
                 $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
-               
+               if(isset($baiduseo_zz['status']) && strpos($baiduseo_zz['status'],'2') !== false){
                 if(isset($baiduseo_zz['indexnow_pingtai'])){
                     $data = array(
                             'host' =>baiduseo_common::baiduseo_url(2) ,
@@ -1386,31 +1389,31 @@ class baiduseo_common{
                 
                
                
-                
-                $url = get_permalink($post_ID);
-                $urls =explode(',',$url);
-                
-                if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'1')!==false){
-                
-                    if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'1')!==false){
-                        baiduseo_zz::bdts($urls);
+                    
+                    $url = get_permalink($post_ID);
+                    $urls =explode(',',$url);
+                    
+                    if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'1')!==false){
+                    
+                        if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'1')!==false){
+                            baiduseo_zz::bdts($urls);
+                        }
+                        if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'2')!==false){
+                            baiduseo_zz::bing($urls);
+                        }
+                        // if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'3')!==false){
+                        //     baiduseo_zz::sm($urls);
+                        // }
+                        if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4')!==false){
+                    
+                            baiduseo_zz::google(['url'=>$url,'type'=>"URL_UPDATED"]);
+                        }
                     }
-                    if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'2')!==false){
-                        baiduseo_zz::bing($urls);
+                   
+                    if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'2')!==false){
+                        baiduseo_zz::bddayts($urls);
                     }
-                    // if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'3')!==false){
-                    //     baiduseo_zz::sm($urls);
-                    // }
-                    if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4')!==false){
-                
-                        baiduseo_zz::google(['url'=>$url,'type'=>"URL_UPDATED"]);
-                    }
-                }
-               
-                if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'2')!==false){
-                    baiduseo_zz::bddayts($urls);
-                }
-                
+               }
                 $baiduseo_tag = get_option('baiduseo_tag');
                 
                 $types = get_post($post_ID)->post_type;
