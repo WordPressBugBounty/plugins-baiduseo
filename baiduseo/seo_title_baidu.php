@@ -10,7 +10,6 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 */
 if(!defined('ABSPATH'))exit;
 global $baiduseo_wzt_log;
-
 $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
 define('BAIDUSEO_VERSION','2.0.5');
 define('BAIDUSEO_FILE',__FILE__);

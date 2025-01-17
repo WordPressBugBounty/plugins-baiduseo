@@ -248,32 +248,138 @@ class baiduseo_youhua{
             $categories=get_categories($args);
             echo json_encode(['code'=>1,'cate'=>$categories]);exit;
         }elseif($data['BaiduSEO']==49){
+            global $wp_rewrite,$wp_filesystem;
+            if (null === $wp_rewrite) {
+                $wp_rewrite = new WP_Rewrite();
+            }
             require_once(ABSPATH . 'wp-includes/pluggable.php');
-            global $wpdb;
-           
-            $my_post = array(
-                'post_title' => $data['title'],
-                'post_content' => $data['con'],
-                'post_status' => 'publish',
-                'post_category' => array($data['cate'])
-               
-            );
-            $id = wp_insert_post($my_post,0);
             
-            if($id){
-                
-                //  $terms = $wpdb->get_results($wpdb->prepare('select term_taxonomy_id  from '.$wpdb->prefix . 'term_taxonomy  where taxonomy="category" and term_id=%d',$data['cate']),ARRAY_A);
-                
-                // if(isset($terms[0])){
-                //      $wpdb->insert($wpdb->prefix."term_relationships", ['object_id'=>$id,'term_taxonomy_id'=>$terms[0]['term_taxonomy_id']]);
-                // }
-                echo json_encode(['code'=>1]);exit;
-            }else{
-                echo json_encode(['code'=>0]);exit;
+            global $wpdb;
+            //查重
+            if($data['is_chachong']==1){
+              $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_title="%s" and post_status="publish" and post_type="post"',$data['title']),ARRAY_A);
+                if(!empty($article)){
+                    exit;  
+                }
             }
             
+           
+            if($data['img']){
+                
+                $attach_id = self::download_remote_image_to_media_library($data['img']);
+               
+                if($data['is_tuku_header']){
+                    $image_html = wp_get_attachment_image($attach_id, 'full',false,array( 'class' => 'aligncenter' ));
+                   
+                    $data['con'] = '<div>'.$image_html.'</div>'.$data['con'];
+                }
+                if($data['is_tuku_footer']){
+                    $attach_id1 = self::download_remote_image_to_media_library($data['img1']);
+                    $image_html = wp_get_attachment_image($attach_id1, 'full',false,array( 'class' => 'aligncenter' ));
+                    $data['con'] = $data['con'].'<div>'.$image_html.'</div>';
+                }
+                
+                 $my_post = array(
+                    'post_title' => $data['title'],
+                    'post_content' => $data['con'],
+                    'post_status' => 'publish',
+                    'post_category' => array($data['cate']),
+                    'post_author'=>$data['author']
+                   
+                );
+                $id = wp_insert_post($my_post,0);
+                if($data['is_tese']){
+                    
+                    set_post_thumbnail($id, $attach_id);
+                }
+                if($id){
+                    
+                   
+                    echo json_encode(['code'=>1]);exit;
+                }else{
+                    echo json_encode(['code'=>0]);exit;
+                }
+            }else{
+                $my_post = array(
+                    'post_title' => $data['title'],
+                    'post_content' => $data['con'],
+                    'post_status' => 'publish',
+                    'post_category' => array($data['cate']),
+                    'post_author'=>$data['author']
+                   
+                );
+                $id = wp_insert_post($my_post,0);
+                if($id){
+                    echo json_encode(['code'=>1]);exit;
+                }else{
+                    echo json_encode(['code'=>0]);exit;
+                }
+            }
+        }elseif($data['BaiduSEO']==50){
+            $args = array(
+                'role'    => 'Administrator'
+            );
+            $administrators = get_users($args);
+            $arr = [];
+            //只返回id和昵称，不返回敏感信息
+            foreach($administrators as $key=>$val){
+                $arr[$key]['id'] = $val->ID;
+                $arr[$key]['nick'] = $val->user_login;
+            }
+            echo json_encode(['code'=>1,'data'=>$arr]);exit;
         }
         
+    }
+    public static function download_remote_image_to_media_library( $image_url ) {
+         global $wp_rewrite,$wp_filesystem;
+        if (null === $wp_rewrite) {
+            $wp_rewrite = new WP_Rewrite();
+        }
+         // 初始化 WP_Filesystem
+        if ( empty( $wp_filesystem ) ) {
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+            WP_Filesystem();
+        }
+    
+        // 下载远程图片
+        $response = wp_remote_get( $image_url );
+     
+    
+        // 获取图片内容
+        $image_data = wp_remote_retrieve_body( $response );
+        
+    
+        // 计算 MD5 哈希值作为文件名
+        $md5_filename = md5( $image_data );
+        $file_extension = pathinfo( $image_url, PATHINFO_EXTENSION ); // 获取文件扩展名
+        $file_name = $md5_filename . '.' . $file_extension;
+    
+        // 确定上传目录
+        $upload_dir = wp_upload_dir();
+        $file_path = trailingslashit( $upload_dir['path'] ) . $file_name;
+    
+        // 使用 WP_Filesystem 保存图片
+         $wp_filesystem->put_contents( $file_path, $image_data, FS_CHMOD_FILE ); 
+    
+        // 准备附件数据
+        $file_type = wp_check_filetype( $file_name, null );
+        $attachment = array(
+            'post_mime_type' => $file_type['type'],
+            'post_title'     => sanitize_file_name( $file_name ),
+            'post_content'   => '',
+            'post_status'    => 'inherit',
+        );
+    
+        // 插入附件到媒体库
+        $attach_id = wp_insert_attachment( $attachment, $file_path );
+       
+    
+        // 生成附件的元数据并更新媒体库
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
+        $attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+        wp_update_attachment_metadata( $attach_id, $attach_data );
+    
+        return $attach_id;
     }
     
 }

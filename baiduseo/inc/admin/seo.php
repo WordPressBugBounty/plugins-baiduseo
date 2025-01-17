@@ -36,10 +36,10 @@ class baiduseo_seo{
     public static function seo_index($key,$des){
         $seo_init = get_option('seo_init');
         if($seo_init!==false){
-        	update_option('seo_init',['keywords'=>$key,'description'=>$des]);
+            update_option('seo_init',['keywords'=>$key,'description'=>$des]);
         }else{
-        	add_option('seo_init',['keywords'=>$key,'description'=>$des]);
-    	}  
+            add_option('seo_init',['keywords'=>$key,'description'=>$des]);
+        }  
     }
     public static function sanitizing_json($data){
         $arr = [];
@@ -118,7 +118,16 @@ class baiduseo_seo{
                     $arr['title'] = sanitize_text_field($data['title']);
                     $arr['con'] = sanitize_textarea_field($data['content']);
                     $arr['cate'] = (int)$data['cate'];
-                    
+                    $arr['is_chachong'] =(int)$data['is_chachong'];
+                    $arr['is_tese'] =isset($data['is_tese'])?(int)$data['is_tese']:0;
+                    $arr['is_tuku_header'] =isset($data['is_tuku_header'])?(int)$data['is_tuku_header']:0;
+                    $arr['is_tuku_footer'] =isset($data['is_tuku_footer'])?(int)$data['is_tuku_footer']:0;
+                    $arr['img'] = isset($data['img'])?sanitize_url($data['img']):'';
+                    $arr['img1'] = isset($data['img1'])?sanitize_url($data['img1']):'';
+                    $arr['author'] =  (int)$data['author'];
+                    break;
+                case 50:
+                    $arr['BaiduSEO'] = 50;
                     break;
                 default:
                     return 0;
@@ -132,12 +141,12 @@ class baiduseo_seo{
     }
     public static function cate_seo($key,$des,$cate){
         $seo_init = get_option('baiduseo_cate_'.$cate);
-		$seo = ['keywords'=>$key,'description'=>$des];   
+        $seo = ['keywords'=>$key,'description'=>$des];   
         if($seo_init!==false){
-        	update_option('baiduseo_cate_'.$cate,$seo);
+            update_option('baiduseo_cate_'.$cate,$seo);
         }else{
-        	add_option('baiduseo_cate_'.$cate,$seo);
-    	} 
+            add_option('baiduseo_cate_'.$cate,$seo);
+        } 
     }
     public static function page_seo($key,$des,$page){
         $baiduseo_page = get_post_meta( $page, 'baiduseo_page', true );
@@ -395,26 +404,26 @@ class baiduseo_seo{
             </html>' );
         
         $seo_301_404_url = get_option('seo_301_404_url');
-		if($seo_301_404_url!=false){
-			update_option('seo_301_404_url',['404_url'=>1]);
-		}else{
-			add_option('seo_301_404_url',['404_url'=>1]);
-		}
+        if($seo_301_404_url!=false){
+            update_option('seo_301_404_url',['404_url'=>1]);
+        }else{
+            add_option('seo_301_404_url',['404_url'=>1]);
+        }
     }
     public static function robots($roobots){
         $url =trim(get_option('siteurl'),'/').'/robots.txt';   
         $currnetTime= current_time( 'Y/m/d H:i:s');
-        $robot = [        				     		 	  	
-            'robot'=>$roobots,     			   	     							
-            'time'=>$currnetTime,    	 	 			       			 	 
-            'url'=>$url,     	   	     			 		 	
+        $robot = [                                          
+            'robot'=>$roobots,                                                  
+            'time'=>$currnetTime,                                            
+            'url'=>$url,                                        
         ];    
          WP_Filesystem();
         global $wp_filesystem;
        
         $wp_filesystem->put_contents( ABSPATH .'/robots.txt',$roobots);
         $rootbot = get_option('seo_robots_sc');
-	    if($rootbot){
+        if($rootbot){
            update_option('seo_robots_sc',$robot); 
         }else{
             add_option('seo_robots_sc',$robot);
@@ -430,76 +439,78 @@ class baiduseo_seo{
             $sitemap = [];
         }
         $currnetTime= current_time( 'Y/m/d H:i:s');
-    	$currnetTime1= current_time( 'Y-m-d H:i:s');
-    	
-    	$art_num = wp_count_posts()->publish;
-    	
-    	if($art_num>10000){
-    	    $sitemap['sitemap_htmlurl'] = [];
-    	    $baiduseo_sitemap_num = get_option('baiduseo_sitemap_num');
-    	    if($baiduseo_sitemap_num!==false){
-    	        $baiduseo_sitemap_num  = $baiduseo_sitemap_num+1;
-    	        update_option('baiduseo_sitemap_num',$baiduseo_sitemap_num);
-    	    }else{
-    	        $baiduseo_sitemap_num =1;
-    	        update_option('baiduseo_sitemap_num',$baiduseo_sitemap_num);
-    	    }
-    	}else{
-    	    $sitemap['sitemap_url'] = [];
-        	$sitemap['sitemap_htmlurl'] = [];
-    	    $baiduseo_sitemap_num=1;
-    	}
-    	if(is_array($sitemap)){
+        $currnetTime1= current_time( 'Y-m-d H:i:s');
+        
+        $art_num = wp_count_posts()->publish;
+        
+        if($art_num>10000){
+            $sitemap['sitemap_htmlurl'] = [];
+            $baiduseo_sitemap_num = get_option('baiduseo_sitemap_num');
+            if($baiduseo_sitemap_num!==false){
+                $baiduseo_sitemap_num  = $baiduseo_sitemap_num+1;
+                update_option('baiduseo_sitemap_num',$baiduseo_sitemap_num);
+            }else{
+                $baiduseo_sitemap_num =1;
+                update_option('baiduseo_sitemap_num',$baiduseo_sitemap_num);
+            }
+        }else{
+            $sitemap['sitemap_url'] = [];
+            $sitemap['sitemap_htmlurl'] = [];
+            $baiduseo_sitemap_num=1;
+        }
+        if(is_array($sitemap)){
             $data = $sitemap;
-    	}
+        }
         $data['time'] = $currnetTime;
-       
+        
         if($baiduseo_sitemap_num == 1){
-        // 	$data['sitemap_url'] = [];
-        // 	$data['sitemap_htmlurl'] = [];
+        //  $data['sitemap_url'] = [];
+        //  $data['sitemap_htmlurl'] = [];
             if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
-            	$data['sitemap_tag'] = get_option('siteurl'). '/tag.html';
-            	if($tag_sl){
-            	    $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 500',ARRAY_A);
-            	}else{
-            	    $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 9995',ARRAY_A);
-            	}
+                $data['sitemap_tag'] = get_option('siteurl'). '/tag.html';
+                if($tag_sl){
+                    $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 500',ARRAY_A);
+                }else{
+                    $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 9995',ARRAY_A);
+                }
             
-            	$html_tag = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<style>\nbody {\nbackground-color: #f3f3f3;\n}\nul li {\ndisplay: inline-block;\npadding: 5px 10px;\nmargin: 5px 0px;\nbackground-color: #fff;\nborder-radius: 25px;\n}\n* {\nmargin: 0;\npadding: 0;\n}\na {\ntext-decoration: none;\ncolor: #111;\nfont-weight: 300;\n}\na:hover{\ncolor: skyblue;\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul>";
-            	foreach($tags as $k=>$val){
-            	    $html_tag .="<li><a href='".get_tag_link($val["term_id"])."' title='{$val['name']}'>{$val['name']}</a></li>\n";
-            	}
-            	$html_tag .="</ul>\n</body>\n</html>";
+                $html_tag = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<style>\nbody {\nbackground-color: #f3f3f3;\n}\nul li {\ndisplay: inline-block;\npadding: 5px 10px;\nmargin: 5px 0px;\nbackground-color: #fff;\nborder-radius: 25px;\n}\n* {\nmargin: 0;\npadding: 0;\n}\na {\ntext-decoration: none;\ncolor: #111;\nfont-weight: 300;\n}\na:hover{\ncolor: skyblue;\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul>";
+                foreach($tags as $k=>$val){
+                    $html_tag .="<li><a href='".get_tag_link($val["term_id"])."' title='{$val['name']}'>{$val['name']}</a></li>\n";
+                }
+                $html_tag .="</ul>\n</body>\n</html>";
             }
         }
        
         if($baiduseo_sitemap_num>1){
-        	$page1 = $baiduseo_sitemap_num-1;
-        	$add_address = 0;
-        	foreach($data['sitemap_url'] as $key=>$val){
-        	    if($val==get_option('siteurl'). '/sitemap'.$page1.'.xml'){
-        	        $add_address =1;
-        	    }
-        	}
-        	if($add_address==0){
-    	        $data['sitemap_url'][] = get_option('siteurl'). '/sitemap'.$page1.'.xml';
-    	        
-        	}
-        	$data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
+            $page1 = $baiduseo_sitemap_num-1;
+            $add_address = 0;
+            foreach($data['sitemap_url'] as $key=>$val){
+                if($val==get_option('siteurl'). '/sitemap'.$page1.'.xml'){
+                    $add_address =1;
+                }
+            }
+            if($add_address==0){
+                $data['sitemap_url'][] = get_option('siteurl'). '/sitemap'.$page1.'.xml';
+                
+            }
+            $data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
         }else{
             $add_address1 =0;
             foreach($data['sitemap_url'] as $key=>$val){
-        	    if($val==get_option('siteurl'). '/sitemap.xml'){
-        	        $add_address1 =1;
-        	    }
-        	}
-        	if($add_address1==0){
-        	    $data['sitemap_url'][] = get_option('siteurl'). '/sitemap.xml';
-        	}
-        	$data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
+                if($val==get_option('siteurl'). '/sitemap.xml'){
+                    $add_address1 =1;
+                }
+            }
+            if($add_address1==0){
+                $data['sitemap_url'][] = get_option('siteurl'). '/sitemap.xml';
+            }
+            $data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
         }
         $data['sitemap_url'] = array_unique($data['sitemap_url']);
         $data['sitemap_htmlurl'] = array_unique($data['sitemap_htmlurl']);
+        
+        
         $start = 9995*($baiduseo_sitemap_num-1);
         if(($sitemap['type1']==1)&&($sitemap['type2']==1)&&($sitemap['type3']==1)&&($sitemap['type4']==1)&&($sitemap['type5']==1)){
             $type = 31;
@@ -1089,7 +1100,7 @@ class baiduseo_seo{
                  $xml .= "<urlset>\n";
                  
                    if($baiduseo_sitemap_num==1){
-                		$xml .= "<url>\n";
+                        $xml .= "<url>\n";
                         $xml .= "<loc>".get_option('siteurl')."</loc>\n";
                         $xml .= "<lastmod>{$currnetTime1}</lastmod>\n";
                         $xml .= "<changefreq>daily</changefreq>\n";
@@ -1110,160 +1121,163 @@ class baiduseo_seo{
                 if($tongguo){
                     
                     $page1 = $baiduseo_sitemap_num-1;
+                    
                     foreach($data['sitemap_url'] as $key=>$val){
                         $s = str_replace(get_option('siteurl'). '/sitemap','',$val);
-                        $s = str_replace('.xml','',$s);   
-                        if($s>=$page1){
+                        $s = str_replace('.xml','',$s);
+                        
+                        if($s>=$page1 && $page1>0){
                             unset($data['sitemap_url'][$key]);
                         }
-                	}
-                	foreach($sitemap['sitemap_htmlurl'] as $key=>$val){
-                	    $s = str_replace(get_option('siteurl'). '/sitemap','',$val);
+                    }
+                    foreach($sitemap['sitemap_htmlurl'] as $key=>$val){
+                        $s = str_replace(get_option('siteurl'). '/sitemap','',$val);
                         $s = str_replace('.html','',$s);   
-                        if($s>=$page1){
+                        if($s>=$page1  && $page1>0){
                             unset($data['sitemap_htmlurl'][$key]);
                         }
-                	}
-                	update_option('seo_baidu_sitemap',$data);
+                    }
+                    update_option('seo_baidu_sitemap',$data);
                     update_option('baiduseo_sitemap_num',0);
                 }else{
                     if($article){
-            	        foreach($article as $key=>$val){
-            	                if($val['post_type']=='post'){
-            	                    $level1 = $sitemap['level1']/10;
-            	                    if($level1==1){
-            	                        $level1 = '1.0';
-            	                    }
-            	                    $pinlv = $sitemap['post_time'];
-            	                }elseif($val['post_type']=='page'){
-            	                    $level1 = $sitemap['level2']/10;
-            	                     if($level1==1){
-            	                        $level1 = '1.0';
-            	                    }
-            	                    $pinlv = $sitemap['page_time'];
-            	                }else{
-            	                   $level1 = $sitemap['level4']/10; 
-            	                   if($level1==1){
-            	                        $level1 = '1.0';
-            	                    }
-            	                   $pinlv = $sitemap['other_time'];
-            	                }
-            	                $xml .= "<url>\n";
-            	                $xml .= "<loc>".htmlspecialchars(get_permalink($val["ID"]))."</loc>\n";
-            	                $xml .= "<lastmod>{$val['post_date']}</lastmod>\n";
-            	                $xml .= "<changefreq>{$pinlv}</changefreq>\n";
-            	                $xml .= "<priority>{$level1}</priority>\n";
-            	                $xml .= "</url>\n";
-            	           
-            	           
-            	        }
+                        foreach($article as $key=>$val){
+                                if($val['post_type']=='post'){
+                                    $level1 = $sitemap['level1']/10;
+                                    if($level1==1){
+                                        $level1 = '1.0';
+                                    }
+                                    $pinlv = $sitemap['post_time'];
+                                }elseif($val['post_type']=='page'){
+                                    $level1 = $sitemap['level2']/10;
+                                     if($level1==1){
+                                        $level1 = '1.0';
+                                    }
+                                    $pinlv = $sitemap['page_time'];
+                                }else{
+                                   $level1 = $sitemap['level4']/10; 
+                                   if($level1==1){
+                                        $level1 = '1.0';
+                                    }
+                                   $pinlv = $sitemap['other_time'];
+                                }
+                                $xml .= "<url>\n";
+                                $xml .= "<loc>".htmlspecialchars(get_permalink($val["ID"]))."</loc>\n";
+                                $xml .= "<lastmod>{$val['post_date']}</lastmod>\n";
+                                $xml .= "<changefreq>{$pinlv}</changefreq>\n";
+                                $xml .= "<priority>{$level1}</priority>\n";
+                                $xml .= "</url>\n";
+                           
+                           
+                        }
                     }
                     if($tag){
                         foreach($tag as $key=>$val){
-        	                $level3 = $sitemap['level3']/10;
-        	                 if($level3==1){
-    	                        $level3 = '1.0';
-    	                    }
-        	                $xml .= "<url>\n";
-        	                $xml .= "<loc>".htmlspecialchars(get_tag_link($val["term_id"]))."</loc>\n";
-        	                $xml .= "<changefreq>{$sitemap['tag_time']}</changefreq>\n";
-        	                $xml .= "<priority>{$level3}</priority>\n";
-        	                $xml .= "</url>\n";
-        	                
-            	           
-            	        }
+                            $level3 = $sitemap['level3']/10;
+                             if($level3==1){
+                                $level3 = '1.0';
+                            }
+                            $xml .= "<url>\n";
+                            $xml .= "<loc>".htmlspecialchars(get_tag_link($val["term_id"]))."</loc>\n";
+                            $xml .= "<changefreq>{$sitemap['tag_time']}</changefreq>\n";
+                            $xml .= "<priority>{$level3}</priority>\n";
+                            $xml .= "</url>\n";
+                            
+                           
+                        }
                     }
                     
                     if($cate){
                         foreach($cate as $key=>$val){
                             $level5 = $sitemap['level5']/10;
                              if($level5==1){
-    	                        $level5 = '1.0';
-    	                    }
-        	                $xml .= "<url>\n";
-        	                $xml .= "<loc>".htmlspecialchars(get_category_link($val["term_id"]))."</loc>\n";
-        	                $xml .= "<changefreq>{$sitemap['cate_time']}</changefreq>\n";
-        	                $xml .= "<priority>{$level5}</priority>\n";
-        	                $xml .= "</url>\n";
+                                $level5 = '1.0';
+                            }
+                            $xml .= "<url>\n";
+                            $xml .= "<loc>".htmlspecialchars(get_category_link($val["term_id"]))."</loc>\n";
+                            $xml .= "<changefreq>{$sitemap['cate_time']}</changefreq>\n";
+                            $xml .= "<priority>{$level5}</priority>\n";
+                            $xml .= "</url>\n";
                         }
                     }
-        	        $xml .='</urlset>';
-        	       
-        	        if(file_exists('WP_Filesystem')){
-        	         WP_Filesystem();
-        	        }else{
-        	             require_once(ABSPATH . 'wp-admin/includes/file.php');
-        	             WP_Filesystem();
-        	        }
-        	        $html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'><style>\nbody {\nbackground-color: #f3f3f3;\n}\nul {\nbackground-color: #fff;\nmax-width: 1200px;\nmargin: 0 auto;\nbox-sizing: border-box;\npadding: 15px 125px;\n}\nul li {\npadding: 15px 0;\n}\nul li a {\ncolor: #333;\npadding-left: 25px;\ntext-decoration: none;\n}\nbody>ul>li>a{\nfont-weight:bold\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul >";
-        	        $category = $wpdb->get_results('select a.* from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category" and b.parent=0 order by a.term_id desc limit 1000',ARRAY_A);
-        	        $html .="<li><a href='/' target='_blank'>首 页</a></li>\n";
-        	        foreach($category as $key=>$val){
-        	            $category1 = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category"  and b.parent=%d order by a.term_id desc limit 1000',$val['term_id']),ARRAY_A);
-        	            
-        	            if(!empty($category1)){
-        	                $html.="<li><a href='".get_category_link($val['term_id'])."' target='_blank'>".$val['name']."</a>\n<ul>";
-        	                foreach($category1 as $k=>$v){
-        	                    $category2 = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category" and b.parent=%d order by a.term_id desc limit 1000',$v['term_id']),ARRAY_A);
-        	                    if(!empty($category2)){
-        	                        $html.="<li><a href='".get_category_link($v['term_id'])."' target='_blank'>".$v['name']."</a>\n<ul>";
-        	                        foreach($category2 as $ke=>$va){
-        	                            $html.="<li><a href='".get_category_link($va['term_id'])."' target='_blank'>".$va['name']."</a></li>\n";
-        	                        }
-        	                        $html.="</ul>\n</li>";
-        	                    }else{
-        	                        $html.="<li><a href='".get_category_link($v['term_id'])."' target='_blank'>".$v['name']."</a></li>\n";
-        	                    }
-        	                }
-        	                $html.="</ul>\n</li>\n";
-        	            }else{
-        	                $html.="<li><a href='".get_category_link($val['term_id'])."' target='_blank'>".$val['name']."</a></li>\n";
-        	            }
-        	        }
-        	        $html.="</ul>\n</body>\n</html>";
+                    $xml .='</urlset>';
+                   
+                    if(file_exists('WP_Filesystem')){
+                     WP_Filesystem();
+                    }else{
+                         require_once(ABSPATH . 'wp-admin/includes/file.php');
+                         WP_Filesystem();
+                    }
+                    $html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'><style>\nbody {\nbackground-color: #f3f3f3;\n}\nul {\nbackground-color: #fff;\nmax-width: 1200px;\nmargin: 0 auto;\nbox-sizing: border-box;\npadding: 15px 125px;\n}\nul li {\npadding: 15px 0;\n}\nul li a {\ncolor: #333;\npadding-left: 25px;\ntext-decoration: none;\n}\nbody>ul>li>a{\nfont-weight:bold\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul >";
+                    $category = $wpdb->get_results('select a.* from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category" and b.parent=0 order by a.term_id desc limit 1000',ARRAY_A);
+                    $html .="<li><a href='/' target='_blank'>首 页</a></li>\n";
+                    foreach($category as $key=>$val){
+                        $category1 = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category"  and b.parent=%d order by a.term_id desc limit 1000',$val['term_id']),ARRAY_A);
+                        
+                        if(!empty($category1)){
+                            $html.="<li><a href='".get_category_link($val['term_id'])."' target='_blank'>".$val['name']."</a>\n<ul>";
+                            foreach($category1 as $k=>$v){
+                                $category2 = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category" and b.parent=%d order by a.term_id desc limit 1000',$v['term_id']),ARRAY_A);
+                                if(!empty($category2)){
+                                    $html.="<li><a href='".get_category_link($v['term_id'])."' target='_blank'>".$v['name']."</a>\n<ul>";
+                                    foreach($category2 as $ke=>$va){
+                                        $html.="<li><a href='".get_category_link($va['term_id'])."' target='_blank'>".$va['name']."</a></li>\n";
+                                    }
+                                    $html.="</ul>\n</li>";
+                                }else{
+                                    $html.="<li><a href='".get_category_link($v['term_id'])."' target='_blank'>".$v['name']."</a></li>\n";
+                                }
+                            }
+                            $html.="</ul>\n</li>\n";
+                        }else{
+                            $html.="<li><a href='".get_category_link($val['term_id'])."' target='_blank'>".$val['name']."</a></li>\n";
+                        }
+                    }
+                    $html.="</ul>\n</body>\n</html>";
                     global $wp_filesystem;
-        	        if($two==2){
-        	            if($baiduseo_sitemap_num>1){
-                    		$page1 = $baiduseo_sitemap_num-1;
-                		    $wp_filesystem->put_contents (ABSPATH.'/sitemap'.$page1.'.xml',$xml);
-        	        	    
-            	        }else{
-            	            if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
-            	                $wp_filesystem->put_contents (ABSPATH.'/tag.html',$html_tag);
-            	            }
-        	                 $wp_filesystem->put_contents (ABSPATH.'/sitemap.xml',$xml);
-        	        	    
-            	        }
-        	        }else{
-            	        if($baiduseo_sitemap_num>1){
-                    		$page1 = $baiduseo_sitemap_num-1;
-                		     $wp_filesystem->put_contents (ABSPATH.'/sitemap'.$page1.'.xml',$xml);
-        	        	     
-            	        }else{
-            	            if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
-            	                $wp_filesystem->put_contents (ABSPATH.'/tag.html',$html_tag);
-            	            }
-        	                 $wp_filesystem->put_contents (ABSPATH.'/sitemap.xml',$xml);
-        	        	     
-            	        }
-            	        
-        	        }
-        	        $wp_filesystem->put_contents(ABSPATH.'/sitemap.html',$html);
-        	        update_option('seo_baidu_sitemap',$data);
-        	       // baiduseo_seo::sitemap(++$page,$two);
+                    if($two==2){
+                        if($baiduseo_sitemap_num>1){
+                            $page1 = $baiduseo_sitemap_num-1;
+                            $wp_filesystem->put_contents (ABSPATH.'/sitemap'.$page1.'.xml',$xml);
+                            
+                        }else{
+                            if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
+                                $wp_filesystem->put_contents (ABSPATH.'/tag.html',$html_tag);
+                            }
+                             $wp_filesystem->put_contents (ABSPATH.'/sitemap.xml',$xml);
+                            
+                        }
+                    }else{
+                        if($baiduseo_sitemap_num>1){
+                            $page1 = $baiduseo_sitemap_num-1;
+                             $wp_filesystem->put_contents (ABSPATH.'/sitemap'.$page1.'.xml',$xml);
+                             
+                        }else{
+                            if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
+                                $wp_filesystem->put_contents (ABSPATH.'/tag.html',$html_tag);
+                            }
+                             $wp_filesystem->put_contents (ABSPATH.'/sitemap.xml',$xml);
+                             
+                        }
+                        
+                    }
+                    $wp_filesystem->put_contents(ABSPATH.'/sitemap.html',$html);
+                   
+                    update_option('seo_baidu_sitemap',$data);
+                   // baiduseo_seo::sitemap(++$page,$two);
         }
-	       
+           
     }
     public static function silian($two,$sl=0){
          global $wpdb;
         //$two==2后端$two==1前端 
         $silian = get_option('seo_baidu_silian');
         $currnetTime= current_time( 'Y/m/d H:i:s');
-        	
-            $data = [      	 	 		    		 	 			
-                'silian_url'=>[],      	 		      							 
-                'silian_htmlurl'=>[],     	 			 	     		 	   
-                'time'=>$currnetTime    	 	 		     	 	   	 
+            
+            $data = [                                               
+                'silian_url'=>[],                                                
+                'silian_htmlurl'=>[],                                          
+                'time'=>$currnetTime                                     
             ];
             if($sl){
                 $count = $wpdb->query('select * from '.$wpdb->prefix . 'baiduseo_zhizhu where  type="404" group by address limit 500',ARRAY_A);
@@ -1279,14 +1293,20 @@ class baiduseo_seo{
                     $zhizhu = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_zhizhu where  type="404"  group by address limit %d , 50000',$start),ARRAY_A);
                 }
                 
-            	$xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+                $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
                 $xml .= "<urlset>\n";
                 $txt = '';
-            	foreach($zhizhu as $key=>$val){
-                    $xml .= "<url>\n";
-                    $xml .= "<loc>".htmlspecialchars($val['address'])."</loc>\n";
-                    $xml .= "</url>\n";
-                    $txt .=$val['address']."\n";
+                foreach($zhizhu as $key=>$val){
+                    $url = get_option('siteurl');
+                    $url1 = trim($url,'/');
+                    if(strpos($val['address'], $url1) !== false) {
+                        $xml .= "<url>\n";
+                        $xml .= "<loc>".htmlspecialchars($val['address'])."</loc>\n";
+                        $xml .= "</url>\n";
+                        $txt .=$val['address']."\n";
+                  
+                    }
+                    
                 }
                  WP_Filesystem();
                 global $wp_filesystem;
@@ -1339,69 +1359,69 @@ class baiduseo_seo{
         }
         $data =  baiduseo_common::baiduseo_url(0);
         
-    	$url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
-    	$defaults = array(
+        $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
+        $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,
             'redirection' => 3,
             'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
             'sslverify' => FALSE,
         );
-    	$result = wp_remote_get($url,$defaults);
-    	
-    	if(!is_wp_error($result)){
-    	    
+        $result = wp_remote_get($url,$defaults);
+        
+        if(!is_wp_error($result)){
+            
             $content = wp_remote_retrieve_body($result);
             
-        	$content = json_decode($content,true);
+            $content = json_decode($content,true);
             
-        	if(isset($content['status']) && $content['status']==1){
-        	    return 1;
-        	}elseif(isset($content['status']) && $content['status']==0){
-        	    return 0;
-        	}else{
-        	    $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
-        	
-            	$result = wp_remote_get($url,$defaults);
-            	
-            	if(!is_wp_error($result)){
+            if(isset($content['status']) && $content['status']==1){
+                return 1;
+            }elseif(isset($content['status']) && $content['status']==0){
+                return 0;
+            }else{
+                $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+            
+                $result = wp_remote_get($url,$defaults);
+                
+                if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
                     
-                	$content = json_decode($content,true);
-                	if(isset($content['status']) && $content['status']==1){
-                	    return 1;
-                	}elseif(isset($content['status']) && $content['status']==0){
-        	            return 0;
-                	}else{
-                	    return baiduseo_zhizhu::pay_money();
-                	}
-            	}else{
-            	    return baiduseo_zhizhu::pay_money();
-            	}
-        	}
-    	}else{
-    	    
+                    $content = json_decode($content,true);
+                    if(isset($content['status']) && $content['status']==1){
+                        return 1;
+                    }elseif(isset($content['status']) && $content['status']==0){
+                        return 0;
+                    }else{
+                        return baiduseo_zhizhu::pay_money();
+                    }
+                }else{
+                    return baiduseo_zhizhu::pay_money();
+                }
+            }
+        }else{
+            
         
-        	$url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
-        	
-            	$result = wp_remote_get($url,$defaults);
-            	
-            	if(!is_wp_error($result)){
+            $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+            
+                $result = wp_remote_get($url,$defaults);
+                
+                if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
                     
-                	$content = json_decode($content,true);
-                	if(isset($content['status']) && $content['status']==1){
-                	    return 1;
-                	}elseif(isset($content['status']) && $content['status']==0){
-        	            return 0;
-                	}else{
-                	    return baiduseo_zhizhu::pay_money();
-                	}
-            	}else{
-            	    return baiduseo_zhizhu::pay_money();
-            	}
-    	}
-    	    
+                    $content = json_decode($content,true);
+                    if(isset($content['status']) && $content['status']==1){
+                        return 1;
+                    }elseif(isset($content['status']) && $content['status']==0){
+                        return 0;
+                    }else{
+                        return baiduseo_zhizhu::pay_money();
+                    }
+                }else{
+                    return baiduseo_zhizhu::pay_money();
+                }
+        }
+            
     }
     public static function baiduseo_friends_hh($key){
         if(md5(baiduseo_common::baiduseo_url(0))==$key){
@@ -1490,8 +1510,8 @@ class baiduseo_seo{
                         </ul>
                         <script>
                             function isMobile(){
-                    			return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
-                    		}
+                                return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+                            }
                             if (isMobile()) {
                                 document.querySelector(".baiduseo_linkhh_box").style = "width:'.$wztkj_linkhh['mobilewidth'].'";
                                 document.querySelectorAll(".baiduseo_linkhh_box li").forEach(li => {
@@ -1560,8 +1580,8 @@ class baiduseo_seo{
                         </div>
                         <script>
                             function isMobile(){
-                    			return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
-                    		}
+                                return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+                            }
                             if (isMobile()) {
                                 document.querySelector(".baiduseo_linkhh_box").style = "width:'.$wztkj_linkhh['mobilewidth'].'";
                             }

@@ -33,6 +33,7 @@ class baiduseo_common{
         if(isset($_POST['data']) && is_string($_POST['data'])){
             //过滤json数据
             $BaiduSEO = baiduseo_seo::sanitizing_json($_POST['data']);
+            
             if(is_array($BaiduSEO) && isset($BaiduSEO['BaiduSEO'])){
                 baiduseo_youhua::post($BaiduSEO);
             }
@@ -83,12 +84,6 @@ class baiduseo_common{
     public function baiduseo_wztkjseo(){
        
         global $baiduseo_wzt_log;
-        
-        if(!$baiduseo_wzt_log){
-         echo '<script>
-            console.log("\n%c 沃之涛科技 %c https://rbzzz.com \n", "color: #fff;background-image: linear-gradient(90deg, red 0%, red 100%);padding:5px 1px;", "color: #fff;background-image: linear-gradient(90deg, red 0%, rgb(255, 255, 255) 100%);padding:5px 0;width: 200px;display: inline-block;");
-            </script>';
-        }
         $baiduseo_liuliang = get_option('baiduseo_liuliang');
     
         if(isset($baiduseo_liuliang['open']) && $baiduseo_liuliang['open']){
@@ -211,9 +206,9 @@ class baiduseo_common{
             
              // 每5秒执行一次请求
              baiduseo_sendRequest();
-             setInterval(baiduseo_sendRequest, 6000);
+             setInterval(baiduseo_sendRequest, '<?php if(isset($baiduseo_liuliang['pinci']) && $baiduseo_liuliang['pinci']){echo (int)$baiduseo_liuliang['pinci']*1000;}else{echo 6000;}?>');
              </script>
-             <?php   
+             <?php 
         }
     }
     public function baiduseo_yuanchuang_column($columns) {
@@ -715,33 +710,33 @@ class baiduseo_common{
                                     
                                     $val['url'] =get_tag_link($val['term_id']);
                                     if(isset($Tag_manage['hremove']) && $Tag_manage['hremove']==1){
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$content,$matches))
+                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$content,$matches))
                                             {
                                                 if(isset($Tag_manage['bold']) &&isset($Tag_manage['color']) && $Tag_manage['color']){
                                                     if($Tag_manage['bold']==1){
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'"><b style="color:'.$Tag_manage['color'].'">'.$val['name'].'</b></a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'"><b style="color:'.$Tag_manage['color'].'">'.$val['name'].'</b></a>',$content,1);
                                                         
                                                     }else{
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'" style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'" style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
                                                         
                                                     }
                                                     
                                                 }elseif(isset($Tag_manage['bold']) && (!isset($Tag_manage['color'])||(!$Tag_manage['color']))){
                                                     if($Tag_manage['bold']==1){
                                                             
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'"><b>'.$val['name'].'</b></a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'"><b>'.$val['name'].'</b></a>',$content,1);
                                                     }else{
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'">'.$val['name'].'</a>',$content,1);
                                                         
                                                     }
                                                 }elseif(!isset($Tag_manage['bold']) && isset($Tag_manage['color']) && $Tag_manage['color']){
                                                     
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'" style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'" style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
                                                 }else{
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['url'].'">'.$val['name'].'</a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['url'].'">'.$val['name'].'</a>',$content,1);
                                                     
                                                 }
                                                 
@@ -791,36 +786,36 @@ class baiduseo_common{
                                 foreach ($tags as $val)
                                 {
                                     if(isset($Tag_manage['hremove']) && $Tag_manage['hremove']==1){
-                                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$content,$matches))
+                                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$content,$matches))
                                         { 
                                             if(isset($Tag_manage['bold']) && isset($Tag_manage['color']) &&$Tag_manage['color']){
                                                 if($Tag_manage['bold']==1){
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<b style="color:'.$Tag_manage['color'].'">'.$val['name'].'</b>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<b style="color:'.$Tag_manage['color'].'">'.$val['name'].'</b>',$content,1);
                                                 }else{
                                                     if($val['tag_target'] && $val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" rel="nofollow">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" rel="nofollow">'.$val['name'].'</a>',$content,1);
                                                     }elseif($val['tag_target'] && !$val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank">'.$val['name'].'</a>',$content,1);
                                                     }elseif(!$val['tag_target'] && $val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'"  rel="nofollow">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'"  rel="nofollow">'.$val['name'].'</a>',$content,1);
                                                     }else{
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
                                                     }
                                                 }
                                                 
                                             }elseif(isset($Tag_manage['bold']) && (!isset($Tag_manage['color']) || !$Tag_manage['color'])){
                                                 if($Tag_manage['bold']==1){
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<b>'.$val['name'].'</b>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<b>'.$val['name'].'</b>',$content,1);
                                                 }
                                             }elseif(!isset($Tag_manage['bold']) && isset($Tag_manage['color']) && $Tag_manage['color']){
                                                     if($val['tag_target'] && $val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" rel="nofollow">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" rel="nofollow">'.$val['name'].'</a>',$content,1);
                                                     }elseif($val['tag_target'] && !$val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" >'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'" target="_blank" >'.$val['name'].'</a>',$content,1);
                                                     }elseif(!$val['tag_target'] && $val['tag_nofollow']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'" rel="nofollow">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'" rel="nofollow">'.$val['name'].'</a>',$content,1);
                                                     }else{
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a  style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a  style="color:'.$Tag_manage['color'].'">'.$val['name'].'</a>',$content,1);
                                                     }
                                             }
                                             
@@ -880,16 +875,16 @@ class baiduseo_common{
                                         $sql.='"'.$v['name'].'",';
                                     }
                                     $sql = trim($sql,',');
-                                    $sql .=')  order by sort desc';
+                                    $sql .=')  order by sort desc where sort>0';
                                   
                                     $post1 = $wpdb->get_results($sql,ARRAY_A);
                                 }else{
-                                    $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian   order by sort desc",ARRAY_A);
+                                    $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian   order by sort desc where sort>0",ARRAY_A);
                                 }
                             }else{
-                                $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian  order by sort desc",ARRAY_A);
+                                $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian  order by sort desc where sort>0",ARRAY_A);
                             }
-                            
+                           
                             if(!empty($post1)){
                                 foreach($post1 as $key=>$val){
                                     
@@ -904,34 +899,34 @@ class baiduseo_common{
                                         $nofollow = '';
                                     }
                                      if(isset($Tag_manage['hremove']) && $Tag_manage['hremove']==1){
-                                         if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$content,$matches)){
+                                         if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$content,$matches)){
                                             $nladdnum++;
                                             if(isset($Tag_manage['bold']) &&isset($Tag_manage['color']) && $Tag_manage['color']){
                                                 
                                                 if($Tag_manage['bold']==1){
                                                     
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b style="color:'.$Tag_manage['color'].'">'.$val['keywords'].'</b></a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b style="color:'.$Tag_manage['color'].'">'.$val['keywords'].'</b></a>',$content,1);
                                                     
                                                 }else{
                                                     
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                     
                                                 }
                                                 
                                             }elseif(isset($Tag_manage['bold']) && (!isset($Tag_manage['color'])||(!$Tag_manage['color']))){
                                                 if($Tag_manage['bold']==1){
                                                         
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b>'.$val['keywords'].'</b></a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b>'.$val['keywords'].'</b></a>',$content,1);
                                                     
                                                 }else{
                                                     
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                     
                                                 }
                                             }elseif(!isset($Tag_manage['bold']) && isset($Tag_manage['color']) && $Tag_manage['color']){
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                             }else{
-                                                $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>))('.baiduseo_tag::BaiduSEO_preg($val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                             }
                                             if( isset($Tag_manage['nlnum']) && $Tag_manage['nlnum']!=11 && $nladdnum>=$Tag_manage['nlnum'] ){
                                                 break;
@@ -1040,34 +1035,34 @@ class baiduseo_common{
                                             $nofollow = '';
                                         }
                                         if(isset($Tag_manage['hremove']) && $Tag_manage['hremove']==1){
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$content,$matches)){
+                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$content,$matches)){
                                                  $nladdnum++;
                                                 if(isset($Tag_manage['bold']) &&isset($Tag_manage['color']) && $Tag_manage['color']){
                                                     
                                                     if($Tag_manage['bold']==1){
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b style="color:'.$Tag_manage['color'].'">'.$val['keywords'].'</b></a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b style="color:'.$Tag_manage['color'].'">'.$val['keywords'].'</b></a>',$content,1);
                                                         
                                                     }else{
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                         
                                                     }
                                                     
                                                 }elseif(isset($Tag_manage['bold']) && (!isset($Tag_manage['color'])||(!$Tag_manage['color']))){
                                                     if($Tag_manage['bold']==1){
                                                             
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b>'.$val['keywords'].'</b></a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'><b>'.$val['keywords'].'</b></a>',$content,1);
                                                         
                                                     }else{
                                                         
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                         
                                                     }
                                                 }elseif(!isset($Tag_manage['bold']) && isset($Tag_manage['color']) && $Tag_manage['color']){
-                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                        $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg( $val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" style="color:'.$Tag_manage['color'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                 }else{
-                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
+                                                    $content=preg_replace('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val['keywords']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i','<a href="'.$val['link'].'" '.$target.' '.$nofollow.'>'.$val['keywords'].'</a>',$content,1);
                                                 }
                                             }
                                         }else{
@@ -1432,7 +1427,7 @@ class baiduseo_common{
                         }
                         foreach($tags as $k=>$v){
                             if(isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove']==1){
-                                if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($post_ID)->post_content,$matches))
+                                if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($post_ID)->post_content,$matches))
                                 {
                                     $res = $wpdb->get_results('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id='.$v['term_id'],ARRAY_A);
                                     if($res){
@@ -1479,7 +1474,7 @@ class baiduseo_common{
                                     $shu = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix .'term_relationships as a left join '.$wpdb->prefix .'term_taxonomy as b on a.term_taxonomy_id=b.term_taxonomy_id where b.taxonomy="post_tag" and a.object_id=%d' ,$post_ID));
                                     if($shu<$baiduseo_tag['num']){
                                         if(isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove']==1){
-                                              if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($post_ID)->post_content,$matches))
+                                              if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($post_ID)->post_content,$matches))
                                                 {
                                                     $res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id=%d' ,$v['term_id']),ARRAY_A);
                                                     if($res){

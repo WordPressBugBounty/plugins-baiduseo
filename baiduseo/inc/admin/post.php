@@ -89,6 +89,10 @@ class baiduseo_post{
     }
     public function baiduseo_liuliang_delete(){
         if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            $ss  = baiduseo_zz::pay_money();
+            if(!$ss){
+                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+            }
             global $wpdb;
             $res = $wpdb->query("DELETE FROM " . $wpdb->prefix . "baiduseo_liuliang");
             echo json_encode(['msg'=>'操作成功','code'=>1]);exit;
@@ -125,12 +129,13 @@ class baiduseo_post{
             }
             $open = (int)$_POST['open'];
             $log = (int)$_POST['log'];
+            $pinci = (int)$_POST['pinci'];
             
             $baiduseo_wyc = get_option('baiduseo_liuliang');
             if($baiduseo_wyc!==false){
-                $res = update_option('baiduseo_liuliang',['open'=>$open,'log'=>$log]);
+                $res = update_option('baiduseo_liuliang',['open'=>$open,'log'=>$log,'pinci'=>$pinci]);
             }else{
-                $res = add_option('baiduseo_liuliang',['open'=>$open,'log'=>$log]);
+                $res = add_option('baiduseo_liuliang',['open'=>$open,'log'=>$log,'pinci'=>$pinci]);
             }
             
             echo json_encode(['msg'=>'保存成功','code'=>1]);exit;
@@ -1376,7 +1381,7 @@ class baiduseo_post{
                                    
                                     if($nos<($tag_num-$count)){
                                         if(isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove']==1){
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($val['ID'])->post_content,$matches))
+                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($val['ID'])->post_content,$matches))
                                             {
                                                 
                                                 $re = $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$val['ID'],'term_taxonomy_id'=>$term_taxonomy[0]['term_taxonomy_id']]);
@@ -1466,7 +1471,7 @@ class baiduseo_post{
                                         
                                         foreach($article as $k=>$v){
                                            if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                                 if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                                 if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                                 {
                                                     $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                                     $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d' ,$id_1),ARRAY_A);
@@ -1491,7 +1496,7 @@ class baiduseo_post{
                                                 break;
                                             }else{
                                                 if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                                    if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                                    if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($val).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                                     {
                                                         $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                                         $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d'  ,$id_1),ARRAY_A);
@@ -1566,7 +1571,7 @@ class baiduseo_post{
                                 
                                 foreach($article as $k=>$v){
                                     if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                          if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($keyword).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                          if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($keyword).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                         {
                                             $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                             $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d' ,$id_1),ARRAY_A);
@@ -1590,7 +1595,7 @@ class baiduseo_post{
                                         break;
                                     }else{
                                         if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($keyword).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($keyword).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                             {
                                                 $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                                 $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d'  ,$id_1),ARRAY_A);
@@ -1672,7 +1677,7 @@ class baiduseo_post{
                                             
                                             foreach($article as $k=>$v){
                                                if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                                    if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($tag[0]).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                                    if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($tag[0]).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                                     {
                                                         $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                                         $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d' ,$id_1),ARRAY_A);
@@ -1697,7 +1702,7 @@ class baiduseo_post{
                                                     break;
                                                 }else{
                                                     if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($tag[0]).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',$v['post_content'],$matches))
+                                                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($tag[0]).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',$v['post_content'],$matches))
                                                         {
                                                             $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$v['ID'],'term_taxonomy_id'=>$id_1]);    
                                                             $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d'  ,$id_1),ARRAY_A);

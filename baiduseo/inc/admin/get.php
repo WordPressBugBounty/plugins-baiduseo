@@ -110,8 +110,10 @@
             }
         }
         public  function baiduseo_get_zhizhu_tongji_2(){
+           
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
                 global $wpdb;
+                
                 $sql = 'select * from '.$wpdb->prefix . 'baiduseo_zhizhu where type=200 order by num desc limit 20';
                 $list = $wpdb->get_results($sql,ARRAY_A);
                 foreach($list as $k=>$v){
@@ -640,6 +642,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_liuliang_sf(){
+          
              if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
                 global $wpdb;
                  $res = $wpdb->get_results('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang  group by url order by a desc limit 10',ARRAY_A);
@@ -657,6 +660,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_liuliang_source(){
+           
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
                 global $wpdb;
                  $res = $wpdb->get_results('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang group by source order by a desc limit 10',ARRAY_A);

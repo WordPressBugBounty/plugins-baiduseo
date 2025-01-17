@@ -82,7 +82,7 @@ class baiduseo_tag{
             $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix .'terms as a left join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="post_tag" ',ARRAY_A);
             foreach($tags as $k=>$v){
                  if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($post_ID)->post_content,$matches))
+                        if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($post_ID)->post_content,$matches))
                 		{
                 			$res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id=%d',$v['term_id']),ARRAY_A);
                 			if($res){
@@ -124,7 +124,7 @@ class baiduseo_tag{
                        
                         if($shu<$baiduseo_tag_manage['num']){
                             if(isset($baiduseo_tag_manage['hremove']) && $baiduseo_tag_manage['hremove']==1){
-                                if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($post_ID)->post_content,$matches))
+                                if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($post_ID)->post_content,$matches))
                         		{
                         			$res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id=%d',$v['term_id']),ARRAY_A);
                         			if($res){
