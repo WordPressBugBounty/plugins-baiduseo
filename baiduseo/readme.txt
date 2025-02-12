@@ -1,5 +1,4 @@
 === 百度站长SEO合集(支持百度/神马/Bing/头条推送) ===
-Contributors: kelerkgibo
 Donate link: https://www.rbzzz.com
 Tags:baidu, Bing, 今日头条, bing站长, 谷歌站长, IndexNow, 百度, 百度站长平台, Google地图, 天级推送, 谷歌地图, tag标签内链,  友情链接, baiduseo, 关键词排名查询监控, 死链查询, 网站蜘蛛, robots, 百度推送, 百度搜索推送, category隐藏, SEO优化, sitemap, 百度收录查询, 图片alt, 文章原创率检测, 图片title,301/404, 一键推送, AI文章助手, 流量监控。
 Requires at least: 4.8

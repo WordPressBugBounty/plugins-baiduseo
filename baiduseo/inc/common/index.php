@@ -875,7 +875,7 @@ class baiduseo_common{
                                         $sql.='"'.$v['name'].'",';
                                     }
                                     $sql = trim($sql,',');
-                                    $sql .=')  order by sort desc where sort>0';
+                                    $sql .=') and sort>0 order by sort desc  ';
                                   
                                     $post1 = $wpdb->get_results($sql,ARRAY_A);
                                 }else{
@@ -978,7 +978,7 @@ class baiduseo_common{
                                                 $sql.='"'.$v['name'].'",';
                                             }
                                             $sql = trim($sql,',');
-                                            $sql .=') where sort=0  order by LENGTH(keywords) desc';
+                                            $sql .=') and  sort=0  order by LENGTH(keywords) desc';
                                             $post1 = $wpdb->get_results($sql,ARRAY_A);
                                         }else{
                                             $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort=0    order by LENGTH(keywords) desc",ARRAY_A);
