@@ -1,16 +1,16 @@
 === 百度站长SEO合集(支持百度/神马/Bing/头条推送) ===
 Contributors: kelerkgibo
 Donate link: https://www.rbzzz.com
-Tags:baidu, 360, 神马, Bing, 今日头条, 360站长, bing站长, 谷歌站长, IndexNow, 百度, 百度站长平台, Google地图, 谷歌地图, tag标签内链,  友情链接, baiduseo, 关键词排名查询监控, 死链查询, 网站蜘蛛, robots, 百度推送, 百度搜索推送, category隐藏, SEO优化, sitemap, 百度收录查询, 图片alt, 文章原创率检测, 图片title,301/404, 一键推送, AI文章助手, 流量监控。
+Tags:baidu, Bing, 今日头条, bing站长, 谷歌站长, IndexNow, 百度, 百度站长平台, Google地图, 天级推送, 谷歌地图, tag标签内链,  友情链接, baiduseo, 关键词排名查询监控, 死链查询, 网站蜘蛛, robots, 百度推送, 百度搜索推送, category隐藏, SEO优化, sitemap, 百度收录查询, 图片alt, 文章原创率检测, 图片title,301/404, 一键推送, AI文章助手, 流量监控。
 Requires at least: 4.8
-Tested up to:  6.7.1
-Stable tag: 2.0.5
+Tested up to:  6.7.2
+Stable tag: 2.0.6
 License: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-含百度站长、tag标签内链、今日头条、Bing站长、360站长、百度地图sitemap、关键词排名查询监控、网站蜘蛛、robots、图片alt标签、天级推送、category隐藏、死链查询、百度自动推送、批量提交URL到站长、百度收录查询、文章原创率检测、批量推送未收录、301/404等功能、AI文章助手、流量监控。
+含百度站长、tag标签内链、今日头条、Bing站长、谷歌站长、IndexNow、百度地图sitemap、关键词排名查询监控、天级推送、网站蜘蛛、robots、图片alt标签、category隐藏、死链查询、百度自动推送、批量提交URL到站长、友情链接、文章原创率检测、友情链接、301/404等功能、AI文章助手、流量监控。
 == Description ==
-含百度站长、360站长、Bing站长、今日头条站长、tag标签内链、百度地图sitemap、关键词排名查询监控、360站长JS自动推送、 网站蜘蛛、robots、图片alt标签、天级推送、category隐藏、死链查询、百度自动推送、批量提交URL到站长、百度收录查询、文章原创率检测、批量推送未收录、301/404等功能、AI文章助手、流量监控。
+含百度站长、tag标签内链、今日头条、Bing站长、谷歌站长、IndexNow、百度地图sitemap、关键词排名查询监控、天级推送、网站蜘蛛、robots、图片alt标签、category隐藏、死链查询、百度自动推送、批量提交URL到站长、友情链接、文章原创率检测、友情链接、301/404等功能、AI文章助手、流量监控。
 
 1、首页关键词
 
@@ -172,6 +172,16 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 16.文章原创率检测
 17.文章伪原创
 == Changelog ==
+= 2.0.6 =（2025/02/12）
+*新增快速收录
+*流量监控和蜘蛛清空功能优化
+*ai智能dk优化
+*蜘蛛列表展示数据异常修复
+*评分海报优化
+*404非本站地址屏蔽
+*流量监控列表优化
+*新增流量监控频率选择
+*公告异常修复
 = 2.0.5 =（2024/09/03）
 *批量tag导入加进度条
 *海报图导出样式调整
