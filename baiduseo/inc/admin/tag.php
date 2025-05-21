@@ -23,8 +23,7 @@ class baiduseo_tag{
                 ) $charset_collate;";
                 dbDelta($sql15);
             }
-             $sql3 = 'Describe '.$wpdb->prefix.'baiduseo_neilian sort' ;
-            $res = $wpdb->query($sql3);
+            $res = $wpdb->query('Describe '.$wpdb->prefix.'baiduseo_neilian sort');
             
             if($res){
                  
@@ -86,7 +85,7 @@ class baiduseo_tag{
                 		{
                 			$res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id=%d',$v['term_id']),ARRAY_A);
                 			if($res){
-                				$re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id='.$post_ID.' and term_taxonomy_id=%d',$res[0]['term_taxonomy_id']),ARRAY_A);
+                				$re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id=%d and term_taxonomy_id=%d',$res[0]['term_taxonomy_id'],$post_ID),ARRAY_A);
                 				if(!$re){
                 					$wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$post_ID,'term_taxonomy_id'=>$res[0]['term_taxonomy_id']]);
                 					$term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d',$res[0]['term_taxonomy_id']),ARRAY_A);
@@ -101,7 +100,7 @@ class baiduseo_tag{
                 		{
                 			$res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id=%d',$v['term_id']),ARRAY_A);
                 			if($res){
-                				$re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id='.$post_ID.' and term_taxonomy_id=%d',$res[0]['term_taxonomy_id']),ARRAY_A);
+                				$re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id=%d and term_taxonomy_id=%d',$res[0]['term_taxonomy_id'],$post_ID),ARRAY_A);
                 				if(!$re){
                 					$wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$post_ID,'term_taxonomy_id'=>$res[0]['term_taxonomy_id']]);
                 					$term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where  term_taxonomy_id=%d',$res[0]['term_taxonomy_id']),ARRAY_A);

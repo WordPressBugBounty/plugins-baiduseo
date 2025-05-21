@@ -23,8 +23,7 @@ class baiduseo_seo{
                 ) $charset_collate;";
                 dbDelta($sql15);
             }
-            $sql3 = 'Describe '.$wpdb->prefix.'baiduseo_ai_lishi jifen';
-            $res = $wpdb->query($sql3);
+            $res = $wpdb->query('Describe '.$wpdb->prefix.'baiduseo_ai_lishi jifen');
             
             if($res){
                  
@@ -430,8 +429,6 @@ class baiduseo_seo{
         }
     }
     public static function sitemap($page,$two,$tag_sl=0){
-        
-        ini_set('memory_limit','-1');
         global $wpdb;
         //$two==2后端$two==1前端
         $sitemap = get_option('seo_baidu_sitemap');
@@ -1432,7 +1429,7 @@ class baiduseo_seo{
             }else{
                 $friends = $wpdb->get_results('select * from '.$wpdb->prefix . 'wztkj_friends where (status1=0 and status2=0) or status1=5',ARRAY_A);
             }
-            echo '<span style="display:none">'.md5(baiduseo_common::baiduseo_url(0)).'</span>';
+            echo '<span style="display:none">'.esc_attr(md5(baiduseo_common::baiduseo_url(0))).'</span>';
             $wztkj_linkhh = get_option('baiduseo_linkhh');
             
             if (isset($wztkj_linkhh['ystype']) && $wztkj_linkhh['ystype'] == 1) {
@@ -1496,15 +1493,15 @@ class baiduseo_seo{
                                 }
                             }
                         </style>
-                        <ul class="baiduseo_linkhh_box" style="--container-width: '.$wztkj_linkhh['yswidth'].'">
+                        <ul class="baiduseo_linkhh_box" style="--container-width: '.esc_attr($wztkj_linkhh['yswidth']).'">
                     ';
                     if(!empty($friends)){
                         foreach($friends as $key=>$val){
-                            echo '<li><a href="'.$val['link'].'" target="_blank">'.$val['keywords'].'</a></li>';
+                            echo '<li><a href="'.esc_url($val['link']).'" target="_blank">'.esc_attr($val['keywords']).'</a></li>';
                         }
                     }else{
                         $keywords = explode(',',$wztkj_linkhh['keywords']);
-                        echo '<li><a href="/" target="_blank">'.$keywords[0].'</a></li>';
+                        echo '<li><a href="/" target="_blank">'.esc_attr($keywords[0]).'</a></li>';
                     }
                     echo '
                         </ul>
@@ -1513,7 +1510,7 @@ class baiduseo_seo{
                                 return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
                             }
                             if (isMobile()) {
-                                document.querySelector(".baiduseo_linkhh_box").style = "width:'.$wztkj_linkhh['mobilewidth'].'";
+                                document.querySelector(".baiduseo_linkhh_box").style = "width:'.esc_attr($wztkj_linkhh['mobilewidth']).'";
                                 document.querySelectorAll(".baiduseo_linkhh_box li").forEach(li => {
                                     li.style.width = "50%";
                                 });
@@ -1563,17 +1560,17 @@ class baiduseo_seo{
                             }
                         </style>
                         <div class="baiduseo_linkhh_box_container">
-                            <div class="baiduseo_linkhh_box" style="--container-width: '.$wztkj_linkhh['yswidth'].'">
+                            <div class="baiduseo_linkhh_box" style="--container-width: '.esc_attr($wztkj_linkhh['yswidth']).'">
                                 <span>友情链接：</span>
                     ';
                    
                     if(!empty($friends)){
                         foreach($friends as $key=>$val){
-                            echo '<a href="'.$val['link'].'" target="_blank">'.$val['keywords'].'</a>';
+                            echo '<a href="'.esc_url($val['link']).'" target="_blank">'.esc_attr($val['keywords']).'</a>';
                         }
                     }else{
                         $keywords = explode(',',$wztkj_linkhh['keywords']);
-                        echo '<a href="/" target="_blank">'.$keywords[0].'</a>';
+                        echo '<a href="/" target="_blank">'.esc_attr($keywords[0]).'</a>';
                     }
                     echo '
                             </div>
@@ -1583,7 +1580,7 @@ class baiduseo_seo{
                                 return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
                             }
                             if (isMobile()) {
-                                document.querySelector(".baiduseo_linkhh_box").style = "width:'.$wztkj_linkhh['mobilewidth'].'";
+                                document.querySelector(".baiduseo_linkhh_box").style = "width:'.esc_attr($wztkj_linkhh['mobilewidth']).'";
                             }
                         </script>    
                     ';

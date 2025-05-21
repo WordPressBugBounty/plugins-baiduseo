@@ -517,7 +517,11 @@ class baiduseo_zz{
         if($num>1){
             $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
             $api = 'https://www.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey='.$baidu['bing_key'];
-            $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url($http_type.$_SERVER['HTTP_HOST']),'urlList'=>$urls))));
+            if(isset($_SERVER['HTTP_HOST'])){
+                $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
+            }else{
+                return;
+            }
             if(is_wp_error($http)){
                 return;
             }

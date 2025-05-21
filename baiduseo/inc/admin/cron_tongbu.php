@@ -237,7 +237,7 @@ class baiduseo_crons{
      public function baiduseo_sitebaidu(){
         $yuming = baiduseo_common::baiduseo_url(0);
         $ua = $this->getua();
-        $uaRandNum = rand(0,(count($ua['pc'])-1));
+        $uaRandNum = wp_rand(0,(count($ua['pc'])-1));
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,

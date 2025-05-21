@@ -54,26 +54,56 @@ class baiduseo_common{
         }
     }
      public function baiduseo_liuliang_log(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $currnetTime = current_time('Y-m-d H:i:s');
-            $shibie = md5($_POST['userAgent'].$_POST['allCookies'].$_POST['ip'].$_POST['currentUrl'].$_POST['referrer'].$_POST['baiduseo_time']);
-            $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where shibie="%s"',$shibie),ARRAY_A);
+            if(!isset($_POST['userAgent'])){
+                $_POST['userAgent'] = '';
+            }
+            if(!isset($_POST['allCookies'])){
+                $_POST['allCookies'] = '';
+            }
+            if(!isset($_POST['ip'])){
+                $_POST['ip'] = '';
+            }
+            if(!isset($_POST['currentUrl'])){
+                $_POST['currentUrl'] = '';
+            }
+             if(!isset($_POST['referrer'])){
+                $_POST['referrer'] = '';
+            }
+             if(!isset($_POST['baiduseo_time'])){
+                $_POST['baiduseo_time'] = '';
+            }
+             if(!isset($_POST['session'])){
+                $_POST['session'] = '';
+            }
+              if(!isset($_POST['baiduseo_language'])){
+                $_POST['baiduseo_language'] = '';
+            }
+              if(!isset($_POST['baiduseo_pla'])){
+                $_POST['baiduseo_pla'] = '';
+            }
+                 if(!isset($_POST['baiduseo_liulanqi'])){
+                $_POST['baiduseo_liulanqi'] = '';
+            }
+            $shibie = md5(sanitize_text_field(wp_unslash($_POST['userAgent'])).sanitize_text_field(wp_unslash($_POST['allCookies'])).sanitize_text_field(wp_unslash($_POST['ip'])).sanitize_url(wp_unslash($_POST['currentUrl'])).sanitize_text_field(wp_unslash($_POST['referrer'])).sanitize_text_field(wp_unslash($_POST['baiduseo_time'])));
+            $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where shibie=%s',$shibie),ARRAY_A);
             if(!empty($res[0])){
                 $wpdb->update($wpdb->prefix . 'baiduseo_liuliang',['updatetime'=>$currnetTime],['id'=>$res[0]['id']]);
             }else{
-                if(!sanitize_url($_POST['referrer'])){
-                    $res = $wpdb->get_results($wpdb->prepare(' select id from  '.$wpdb->prefix.'baiduseo_liuliang where session="%s" and status=1 order by id desc limit 1',sanitize_text_field($_POST['session'])),ARRAY_A);
-                    $count = $wpdb->query($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session="%s" and status=1',sanitize_text_field($_POST['session'])),ARRAY_A);
+                if(!sanitize_url(wp_unslash($_POST['referrer']))){
+                    $res = $wpdb->get_results($wpdb->prepare(' select id from  '.$wpdb->prefix.'baiduseo_liuliang where session=%s and status=1 order by id desc limit 1',sanitize_text_field(wp_unslash($_POST['session']))),ARRAY_A);
+                    $count = $wpdb->query($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session=%s and status=1',sanitize_text_field(wp_unslash($_POST['session']))),ARRAY_A);
                     if(!empty($res[0])){
-                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>$_POST['referrer']?sanitize_url($_POST['referrer']):'直接访问','url'=>sanitize_url($_POST['currentUrl']),'time'=>$currnetTime,'ip'=>sanitize_text_field($_POST['ip'])=='unknown'?'':sanitize_text_field($_POST['ip']),'shibie'=>$shibie,'session'=>sanitize_text_field($_POST['session']),'type'=>(int)$_POST['baiduseo_type'],'status'=>1,'lan'=>sanitize_text_field($_POST['baiduseo_language']),'pla'=>sanitize_text_field($_POST['baiduseo_pla']),'liulanqi'=>sanitize_text_field($_POST['baiduseo_liulanqi']),'is_new'=>1,'pinci'=>$count]);
+                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>sanitize_url(wp_unslash($_POST['referrer']))?sanitize_url(wp_unslash($_POST['referrer'])):'直接访问','url'=>sanitize_url(wp_unslash($_POST['currentUrl'])),'time'=>$currnetTime,'ip'=>sanitize_text_field(wp_unslash($_POST['ip']))=='unknown'?'':sanitize_text_field(wp_unslash($_POST['ip'])),'shibie'=>$shibie,'session'=>sanitize_text_field(wp_unslash($_POST['session'])),'type'=>isset($_POST['baiduseo_type'])?(int)$_POST['baiduseo_type']:'','status'=>1,'lan'=>sanitize_text_field(wp_unslash($_POST['baiduseo_language'])),'pla'=>sanitize_text_field(wp_unslash($_POST['baiduseo_pla'])),'liulanqi'=>sanitize_text_field(wp_unslash($_POST['baiduseo_liulanqi'])),'is_new'=>1,'pinci'=>$count]);
                     }else{
-                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>$_POST['referrer']?sanitize_url($_POST['referrer']):'直接访问','url'=>sanitize_url($_POST['currentUrl']),'time'=>$currnetTime,'ip'=>sanitize_text_field($_POST['ip'])=='unknown'?'':sanitize_text_field($_POST['ip']),'shibie'=>$shibie,'session'=>sanitize_text_field($_POST['session']),'type'=>(int)$_POST['baiduseo_type'],'status'=>1,'lan'=>sanitize_text_field($_POST['baiduseo_language']),'pla'=>sanitize_text_field($_POST['baiduseo_pla']),'liulanqi'=>sanitize_text_field($_POST['baiduseo_liulanqi']),'is_new'=>0]);
+                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>sanitize_url(wp_unslash($_POST['referrer']))?sanitize_url(wp_unslash($_POST['referrer'])):'直接访问','url'=>sanitize_url(wp_unslash($_POST['currentUrl'])),'time'=>$currnetTime,'ip'=>sanitize_text_field(wp_unslash($_POST['ip']))=='unknown'?'':sanitize_text_field(wp_unslash($_POST['ip'])),'shibie'=>$shibie,'session'=>sanitize_text_field(wp_unslash($_POST['session'])),'type'=>(int)$_POST['baiduseo_type'],'status'=>1,'lan'=>sanitize_text_field(wp_unslash($_POST['baiduseo_language'])),'pla'=>sanitize_text_field(wp_unslash($_POST['baiduseo_pla'])),'liulanqi'=>sanitize_text_field(wp_unslash($_POST['baiduseo_liulanqi'])),'is_new'=>0]);
                     }
                 }else{
-                    $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session="%s" and status=1 order by id desc limit 1',sanitize_text_field($_POST['session'])),ARRAY_A);
+                    $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session=%s and status=1 order by id desc limit 1',sanitize_text_field(wp_unslash($_POST['session']))),ARRAY_A);
                     if(isset($res[0])){
-                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>$_POST['referrer']?sanitize_url($_POST['referrer']):'直接访问','url'=>sanitize_url($_POST['currentUrl']),'time'=>$currnetTime,'ip'=>sanitize_text_field($_POST['ip'])=='unknown'?'':sanitize_text_field($_POST['ip']),'shibie'=>$shibie,'session'=>sanitize_text_field($_POST['session']),'type'=>(int)$_POST['baiduseo_type'],'pid'=>$res[0]['id'],'lan'=>sanitize_text_field($_POST['baiduseo_language']),'pla'=>sanitize_text_field($_POST['baiduseo_pla']),'liulanqi'=>sanitize_text_field($_POST['baiduseo_liulanqi'])]);
+                        $wpdb->insert($wpdb->prefix . 'baiduseo_liuliang',['source'=>sanitize_url(wp_unslash($_POST['referrer']))?sanitize_url(wp_unslash($_POST['referrer'])):'直接访问','url'=>sanitize_url(wp_unslash($_POST['currentUrl'])),'time'=>$currnetTime,'ip'=>sanitize_text_field(wp_unslash($_POST['ip']))=='unknown'?'':sanitize_text_field(wp_unslash($_POST['ip'])),'shibie'=>$shibie,'session'=>sanitize_text_field(wp_unslash($_POST['session'])),'type'=>(int)$_POST['baiduseo_type'],'pid'=>$res[0]['id'],'lan'=>sanitize_text_field(wp_unslash($_POST['baiduseo_language'])),'pla'=>sanitize_text_field(wp_unslash($_POST['baiduseo_pla'])),'liulanqi'=>sanitize_text_field(wp_unslash($_POST['baiduseo_liulanqi']))]);
                         $wpdb->update($wpdb->prefix . 'baiduseo_liuliang',['shendu'=>$res[0]['shendu']+1],['id'=>$res[0]['id']]);
                     }
                 }
@@ -88,15 +118,15 @@ class baiduseo_common{
     
         if(isset($baiduseo_liuliang['open']) && $baiduseo_liuliang['open']){
             if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-                $baiduseo_ip = sanitize_text_field($_SERVER['HTTP_X_FORWARDED_FOR']);
+                $baiduseo_ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
             }elseif(isset($_SERVER['REMOTE_ADDR'])){
-                $baiduseo_ip = sanitize_text_field($_SERVER['REMOTE_ADDR']);
+                $baiduseo_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
             }else{
                 $baiduseo_ip = '';
             }
             $baiduseo_time = time();
             if(!isset($_SESSION['baiduseo_liulan'])){
-                $_SESSION['baiduseo_liulan'] = md5($baiduseo_ip.rand(1000000,999999));
+                $_SESSION['baiduseo_liulan'] = md5($baiduseo_ip.wp_rand(1000000,999999));
             }
             
             ?>
@@ -178,15 +208,15 @@ class baiduseo_common{
                  }
              // 定义发送请求的函数
              function baiduseo_sendRequest() {
-                      var baiduseo_ip = '<?php echo $baiduseo_ip?>'
+                      var baiduseo_ip = '<?php echo esc_attr($baiduseo_ip);?>'
                     var baiduseo_nonce = '<?php echo esc_attr(wp_create_nonce('baiduseo'));?>'
                       var baiduseo_action = 'baiduseo_liuliang_log'
                     var baiduseo_userAgent = navigator.userAgent
                       var baiduseo_referrer = document.referrer;
                      var baiduseo_currentUrl = window.location.href;
                       var baiduseo_allCookies = document.cookie;
-                     var baiduseo_session ='<?php echo $_SESSION['baiduseo_liulan'];?>';
-                     var baiduseo_time = '<?php echo $baiduseo_time;?>';
+                     var baiduseo_session ='<?php echo esc_attr(sanitize_text_field(wp_unslash($_SESSION['baiduseo_liulan'])));?>';
+                     var baiduseo_time = '<?php echo esc_attr($baiduseo_time);?>';
                       var baiduseo_language = navigator.language || navigator.userLanguage;
                      var baiduseo_pla = baiduseo_getUserOsInfo();
                       var baiduseo_liulanqi = baiduseo_getBrowserType();
@@ -566,7 +596,10 @@ class baiduseo_common{
                 })(window)
                 </script>';
         }
-         $shouye = sanitize_text_field($_SERVER['REQUEST_URI']);
+        if(!isset($_SERVER['REQUEST_URI'])){
+            $_SERVER['REQUEST_URI'] ='';
+        }
+         $shouye = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']));
         if($shouye=='/' || $shouye==''){
             
             if (is_front_page() && is_home()) {
@@ -870,19 +903,20 @@ class baiduseo_common{
                             //处理优先级
                              if(isset($Tag_manage['bqgl']) && is_string($Tag_manage['bqgl']) &&strpos($Tag_manage['bqgl'],'2')!==false){
                                 if(!empty($tags)){
-                                    $sql ="SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where keywords not in(";
-                                    foreach($tags as $k=>$v){
-                                        $sql.='"'.$v['name'].'",';
-                                    }
-                                    $sql = trim($sql,',');
-                                    $sql .=') and sort>0 order by sort desc  ';
-                                  
-                                    $post1 = $wpdb->get_results($sql,ARRAY_A);
+                                    $placeholders = array_fill(0, count($tags), '%s');
+                                    $placeholder_string = implode(',', $placeholders);
+                                    $tag_names = wp_list_pluck($tags, 'name');
+                                    
+                                    $sql = "SELECT * FROM {$wpdb->prefix}baiduseo_neilian WHERE keywords NOT IN({$placeholder_string}) AND sort > 0 ORDER BY sort DESC";
+                                    $post1 = $wpdb->get_results(
+                                        $wpdb->prepare($sql, $tag_names),
+                                        ARRAY_A
+                                    );
                                 }else{
-                                    $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian   order by sort desc where sort>0",ARRAY_A);
+                                    $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort>0   order by sort desc ",ARRAY_A);
                                 }
                             }else{
-                                $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian  order by sort desc where sort>0",ARRAY_A);
+                                $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort>0 order by sort desc ",ARRAY_A);
                             }
                            
                             if(!empty($post1)){
@@ -973,13 +1007,19 @@ class baiduseo_common{
                                 if(isset($Tag_manage['pp']) && $Tag_manage['pp']==1){
                                      if(isset($Tag_manage['bqgl']) && is_string($Tag_manage['bqgl']) && strpos($Tag_manage['bqgl'],'2')!==false){
                                         if(!empty($tags)){
-                                            $sql ="SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where keywords not in(";
-                                            foreach($tags as $k=>$v){
-                                                $sql.='"'.$v['name'].'",';
-                                            }
-                                            $sql = trim($sql,',');
-                                            $sql .=') and  sort=0  order by LENGTH(keywords) desc';
-                                            $post1 = $wpdb->get_results($sql,ARRAY_A);
+                                           $placeholders = array_fill(0, count($tags), '%s');
+                                            $placeholder_string = implode(',', $placeholders);
+                                            $tag_names = wp_list_pluck($tags, 'name');
+                                            
+                                            $sql = "SELECT * FROM {$wpdb->prefix}baiduseo_neilian 
+                                                    WHERE keywords NOT IN({$placeholder_string}) 
+                                                    AND sort = 0 
+                                                    ORDER BY LENGTH(keywords) DESC";
+                                            
+                                            $post1 = $wpdb->get_results(
+                                                $wpdb->prepare($sql, $tag_names),
+                                                ARRAY_A
+                                            );
                                         }else{
                                             $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort=0    order by LENGTH(keywords) desc",ARRAY_A);
                                         }
@@ -990,13 +1030,19 @@ class baiduseo_common{
                                 }elseif(isset($Tag_manage['pp']) && $Tag_manage['pp']==2){
                                      if(isset($Tag_manage['bqgl']) && is_string($Tag_manage['bqgl']) && strpos($Tag_manage['bqgl'],'2')!==false){
                                         if(!empty($tags)){
-                                            $sql ="SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where keywords not in(";
-                                            foreach($tags as $k=>$v){
-                                                $sql.='"'.$v['name'].'",';
-                                            }
-                                            $sql = trim($sql,',');
-                                            $sql .=') where sort=0  order by LENGTH(keywords) asc';
-                                            $post1 = $wpdb->get_results($sql,ARRAY_A);
+                                            $placeholders = array_fill(0, count($tags), '%s');
+                                            $placeholder_string = implode(',', $placeholders);
+                                            $tag_names = wp_list_pluck($tags, 'name');
+                                            
+                                            $sql = "SELECT * FROM {$wpdb->prefix}baiduseo_neilian 
+                                                    WHERE keywords NOT IN({$placeholder_string}) 
+                                                    AND sort = 0 
+                                                    ORDER BY LENGTH(keywords) ASC";
+                                            
+                                            $post1 = $wpdb->get_results(
+                                                $wpdb->prepare($sql, $tag_names),
+                                                ARRAY_A
+                                            );
                                         }else{
                                             $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort=0   order by LENGTH(keywords) asc",ARRAY_A);
                                         }
@@ -1007,13 +1053,19 @@ class baiduseo_common{
                                 }else{
                                     if(isset($Tag_manage['bqgl']) && is_string($Tag_manage['bqgl'])&&strpos($Tag_manage['bqgl'],'2')!==false){
                                         if(!empty($tags)){
-                                            $sql ="SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where keywords not in(";
-                                            foreach($tags as $k=>$v){
-                                                $sql.='"'.$v['name'].'",';
-                                            }
-                                            $sql = trim($sql,',');
-                                            $sql .=') and sort=0 order by id desc';
-                                            $post1 = $wpdb->get_results($sql,ARRAY_A);
+                                            $placeholders = array_fill(0, count($tags), '%s');
+                                            $placeholder_string = implode(',', $placeholders);
+                                            $tag_names = wp_list_pluck($tags, 'name');
+                                            
+                                            $sql = "SELECT * FROM {$wpdb->prefix}baiduseo_neilian 
+                                                    WHERE keywords NOT IN({$placeholder_string}) 
+                                                    AND sort = 0 
+                                                    ORDER BY id DESC";
+                                            
+                                            $post1 = $wpdb->get_results(
+                                                $wpdb->prepare($sql, $tag_names),
+                                                ARRAY_A
+                                            );
                                         }else{
                                             $post1 = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where sort=0  order by id desc",ARRAY_A);
                                         }
@@ -1112,7 +1164,7 @@ class baiduseo_common{
         return $content;
     }
     public  function baiduseo_addpages() {
-        add_menu_page(__('SEO合集','seo_title_baidu_html'), __('SEO合集','seo_title_baidu_html'), 'manage_options', 'baiduseo', [$this,'baiduseo_toplevelpage'] );
+        add_menu_page(__('SEO合集','baiduseo'), __('SEO合集','baiduseo'), 'manage_options', 'baiduseo', [$this,'baiduseo_toplevelpage'] );
     }
     public function baiduseo_toplevelpage(){
         echo "<div id='baiduseo_wztkj-app'></div>";
@@ -1122,12 +1174,12 @@ class baiduseo_common{
         require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/assets.php';
         foreach($assets as $key=>$val){
             if($val['type']=='css'){
-                 wp_enqueue_style( $val['name'],  plugin_dir_url( BAIDUSEO_FILE ).'inc/admin/'.$val['url'],false,'','all');
+                 wp_enqueue_style( $val['name'],  plugin_dir_url( BAIDUSEO_FILE ).'inc/admin/'.$val['url'],array(),BAIDUSEO_VERSION,'all');
             }elseif($val['type']=='js'){
-                wp_enqueue_script( $val['name'], plugin_dir_url( BAIDUSEO_FILE ).'inc/admin/'.$val['url'], '', '', true);
+                wp_enqueue_script( $val['name'], plugin_dir_url( BAIDUSEO_FILE ).'inc/admin/'.$val['url'], array(), BAIDUSEO_VERSION, true);
             }
         }
-        wp_register_script('baiduseo.js', false, null, false);
+        wp_register_script('baiduseo.js', false, array(), BAIDUSEO_VERSION);
         wp_enqueue_script('baiduseo.js');
         $url1 = baiduseo_common::baiduseo_url(0);
         $baiduseo_yindao = get_option('baiduseo_yindao');
@@ -1156,8 +1208,7 @@ class baiduseo_common{
         }
     }
     public function  baiduseo_articlepublish($post_ID){
-        ini_set('memory_limit','-1');
-        set_time_limit(0);
+        
         global $wpdb,$baiduseo_wzt_log;
         
         if($baiduseo_wzt_log){
@@ -1388,7 +1439,7 @@ class baiduseo_common{
                     $url = get_permalink($post_ID);
                     $urls =explode(',',$url);
                     
-                    if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'1')!==false){
+                    // if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'1')!==false){
                     
                         if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'1')!==false){
                             baiduseo_zz::bdts($urls);
@@ -1403,11 +1454,11 @@ class baiduseo_common{
                     
                             baiduseo_zz::google(['url'=>$url,'type'=>"URL_UPDATED"]);
                         }
-                    }
+                    // }
                    
-                    if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'2')!==false){
-                        baiduseo_zz::bddayts($urls);
-                    }
+                    // if(isset($baiduseo_zz['baiduseo_type']) && strpos($baiduseo_zz['baiduseo_type'],'2')!==false){
+                    //     baiduseo_zz::bddayts($urls);
+                    // }
                }
                 $baiduseo_tag = get_option('baiduseo_tag');
                 
@@ -1429,7 +1480,7 @@ class baiduseo_common{
                             if(isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove']==1){
                                 if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($post_ID)->post_content,$matches))
                                 {
-                                    $res = $wpdb->get_results('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id='.$v['term_id'],ARRAY_A);
+                                    $res = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}term_taxonomy WHERE taxonomy = %s AND term_id = %d",'post_tag',$v['term_id']),ARRAY_A);
                                     if($res){
                                         $re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id=%d and term_taxonomy_id=%d',$post_ID,$res[0]['term_taxonomy_id']),ARRAY_A);
                                         if(!$re){
@@ -1444,7 +1495,7 @@ class baiduseo_common{
                             }else{
                                 if(preg_match('{(?!((<.*?)|(<a.*?)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($post_ID)->post_content,$matches))
                                 {
-                                    $res = $wpdb->get_results('select * from '.$wpdb->prefix . 'term_taxonomy where taxonomy="post_tag" and term_id='.$v['term_id'],ARRAY_A);
+                                    $res = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}term_taxonomy WHERE taxonomy = %s AND term_id = %d",'post_tag',$v['term_id']),ARRAY_A);
                                     if($res){
                                         $re = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id=%d and term_taxonomy_id=%d',$post_ID,$res[0]['term_taxonomy_id']),ARRAY_A);
                                         if(!$re){
@@ -1521,7 +1572,7 @@ class baiduseo_common{
     public static function baiduseo_url($type=0){
         if($type==1){
             $url1 = get_option('siteurl');
-            $url1 = parse_url($url1);
+            $url1 = wp_parse_url($url1);
             $url1 = $url1['scheme'].'://'.$url1['host'];
             return $url1;
         }else{
@@ -1539,7 +1590,7 @@ class baiduseo_common{
             return $baiduseo_tongxun;
         }else{
             $siteurl = get_option('siteurl');
-            $code = time().rand(1,999999).$siteurl;
+            $code = time().wp_rand(1,999999).$siteurl;
             $code = md5($code);
             add_option('baiduseo_tongxun',$code);
             return $code;

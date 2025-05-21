@@ -28,8 +28,8 @@ class baiduseo_zhizhu{
                 ) $charset_collate;";
                 dbDelta($sql1);
             }
-            $sql3 = 'Describe '.$wpdb->prefix.'baiduseo_zhizhu num';
-            $res = $wpdb->query($sql3);
+            
+            $res = $wpdb->query('Describe '.$wpdb->prefix.'baiduseo_zhizhu num');
             
             if($res){
                  
@@ -85,7 +85,7 @@ class baiduseo_zhizhu{
         $baiduseo_zhizhu = get_option('baiduseo_zhizhu');
         
         if(isset($_SERVER['HTTP_USER_AGENT'])){
-            $type = sanitize_text_field(strtolower($_SERVER['HTTP_USER_AGENT']));
+            $type = strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])));
             if(isset($baiduseo_zhizhu['open']) && $baiduseo_zhizhu['open']==1){
                 if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
                     if (strpos($type, 'googlebot') !== false){
@@ -125,17 +125,20 @@ class baiduseo_zhizhu{
                 
                 if(isset($data_array['name'])){
                      $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-                    $data_array['address'] = sanitize_url($http_type.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-                    
-                    if(strlen($data_array['address'])<1024){
-                        $zhizhu_is = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_zhizhu where address="%s" and name="%s" ',$data_array['address'],$data_array['name']),ARRAY_A);
+                     if(isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])){
+                        $data_array['address'] = sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+                     }else{
+                         $data_array['address'] =0;
+                     }
+                    if($data_array['address'] && strlen($data_array['address'])<1024){
+                        $zhizhu_is = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_zhizhu where address=%s and name=%s ',$data_array['address'],$data_array['name']),ARRAY_A);
                        
                         $status_code = http_response_code();
                         
                         if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-                            $data_array['ip'] = sanitize_text_field($_SERVER['HTTP_X_FORWARDED_FOR']);
+                            $data_array['ip'] = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
                         }elseif(isset($_SERVER['REMOTE_ADDR'])){
-                            $data_array['ip'] = sanitize_text_field($_SERVER['REMOTE_ADDR']);
+                            $data_array['ip'] = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
                         }else{
                             $data_array['ip'] = '';
                         }
@@ -144,7 +147,7 @@ class baiduseo_zhizhu{
                         if(isset($zhizhu_is[0]) && !empty($zhizhu_is[0])){
                             
                             if($data_array['type'] =='404'){
-                                if($_SERVER['REQUEST_URI']!='/' && $_SERVER['REQUEST_URI']!='' ){
+                                if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' && $_SERVER['REQUEST_URI']!='' ){
                                     $res = $wpdb->update($wpdb->prefix . 'baiduseo_zhizhu',['time'=>$data_array['time'],'num'=>$zhizhu_is[0]['num']+1],['id'=>$zhizhu_is[0]['id']]);
                                 }
                             }else{
@@ -153,7 +156,7 @@ class baiduseo_zhizhu{
                             
                         }else{
                             if($data_array['type'] =='404'){
-                                if($_SERVER['REQUEST_URI']!='/' && $_SERVER['REQUEST_URI']!='' ){
+                                if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/' && $_SERVER['REQUEST_URI']!='' ){
                                     $data_array['num'] =1;
                                     $res = $wpdb->insert($wpdb->prefix."baiduseo_zhizhu",$data_array);
                                 }
@@ -173,8 +176,6 @@ class baiduseo_zhizhu{
     }
     public static function baiduseo_zhizhu_data($page,$sta,$end,$search,$type,$type2,$orders){
          global $wpdb;
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
         //zhe
         $page = (int)$page;                             
         $limit = 15;
@@ -399,7 +400,7 @@ class baiduseo_zhizhu{
         if(!$baiduseo_wzt_log){
             return 0;
         }
-        $data =  sanitize_text_field($_SERVER['SERVER_NAME']);
+        $data =  isset($_SERVER['SERVER_NAME']) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])):baiduseo_common::baiduseo_url(0);
         $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
         $defaults = array(
             'timeout' => 4000,
@@ -421,8 +422,7 @@ class baiduseo_zhizhu{
     }
     public static function baiduseo_zhizhu_dangqian(){
         global $wpdb;
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
+        
         $year = current_time('Y');
         $month = current_time( 'm');
         $day = current_time( 'd');
@@ -476,9 +476,6 @@ class baiduseo_zhizhu{
     }
     public static function baiduseo_zhizhu_tubiao($year,$month){
         global $wpdb;
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
-        
         $year = $year?$year:current_time('Y');
         $month = $month?$month:current_time( 'm');
         $month_31 = ['01','03','05','07','08','10','12'];

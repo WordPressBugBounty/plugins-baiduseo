@@ -62,28 +62,29 @@
             add_action('wp_ajax_baiduseo_get_beian', [$this,'baiduseo_get_beian']);
         }
         public function baiduseo_get_beian(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                  $beian = get_option('baiduseo_beian');
                  echo wp_json_encode(['code'=>1,'data'=>$beian]);exit; 
              }
         }
         public function baiduseo_gonggao_read(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
-                $res = $wpdb->insert($wpdb->prefix."baiduseo_gonggao",['gid'=>(int)$_POST['id']]);
+                $res = $wpdb->insert($wpdb->prefix."baiduseo_gonggao",['gid'=>isset($_POST['id'])?(int)$_POST['id']:0]);
              }
         }
         public function baiduseo_get_gonggao(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
              global $wpdb;
+          
             $defaults = array(
-                'timeout' => 4000,
+                'timeout' => 5,
                 'connecttimeout'=>4000,
                 'redirection' => 3,
                 'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
                 'sslverify' => FALSE,
             );
-            $page = (int)$_POST['page'];
+            $page =isset($_POST['page'])?(int)$_POST['page']:0;
             $url = 'https://www.rbzzz.com/api/rank/gonggao?type=1&page='.$page;
             $result = wp_remote_get($url,$defaults);
             if(!is_wp_error($result)){
@@ -104,23 +105,23 @@
              }
         }
         public function baiduseo_get_pingfen(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_pingfen = get_option('baiduseo_pingfen');
                 echo wp_json_encode(['code'=>1,'data'=>$baiduseo_pingfen?$baiduseo_pingfen:0]);exit;
             }
         }
         public  function baiduseo_get_zhizhu_tongji_2(){
            
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 
-                $sql = 'select * from '.$wpdb->prefix . 'baiduseo_zhizhu where type=200 order by num desc limit 20';
-                $list = $wpdb->get_results($sql,ARRAY_A);
+                
+                $list = $wpdb->get_results('select * from '.$wpdb->prefix . 'baiduseo_zhizhu where type=200 order by num desc limit 20',ARRAY_A);
                 foreach($list as $k=>$v){
                     $list[$k]['id'] = $k+1;
                 }
-                $sql1 = 'select  * from '.$wpdb->prefix . 'baiduseo_zhizhu where type=404 order by num desc limit 20';
-                $list1 = $wpdb->get_results($sql1,ARRAY_A);
+               
+                $list1 = $wpdb->get_results('select  * from '.$wpdb->prefix . 'baiduseo_zhizhu where type=404 order by num desc limit 20',ARRAY_A);
                 foreach($list1 as $k=>$v){
                     $list1[$k]['id'] = $k+1;
                 }
@@ -128,17 +129,17 @@
             }
         }
         public function baiduseo_get_zhizhu_tongji(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
-                $sql = 'select sum(num) as nums from '.$wpdb->prefix . 'baiduseo_zhizhu where type=200';
-                $list = $wpdb->get_results($sql,ARRAY_A);
+               
+                $list = $wpdb->get_results('select sum(num) as nums from '.$wpdb->prefix . 'baiduseo_zhizhu where type=200',ARRAY_A);
                 $sql1 = 'select sum(num) as nums from '.$wpdb->prefix . 'baiduseo_zhizhu where type=404';
-                $list1 = $wpdb->get_results($sql1,ARRAY_A);
+                $list1 = $wpdb->get_results( 'select sum(num) as nums from '.$wpdb->prefix . 'baiduseo_zhizhu where type=404',ARRAY_A);
                 echo wp_json_encode(['code'=>1,'data'=>[['value'=>isset($list[0]['nums'])&& $list[0]['nums']?$list[0]['nums']:0,'name'=>200,'itemStyle'=>['color'=>'#009688']],['value'=>isset($list1[0]['nums'])&& $list1[0]['nums']?$list1[0]['nums']:0,'name'=>404,'itemStyle'=>['color'=>'#005796']]]]);exit;
             }
         }
         public function baiduseo_liuliang_ditu(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $arr = [];
                 $count = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_liuliang',ARRAY_A);
@@ -373,14 +374,14 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_key(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
                 echo wp_json_encode(['code'=>1,'data'=>$baiduseo_wzt_log]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_301(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $url_301['url'] = baiduseo_common::baiduseo_url(0).'/';
                 $site_url1 = baiduseo_common::baiduseo_url(1);
                 $defaults = array(
@@ -425,7 +426,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_vip(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                  $defaults = array(
                     'timeout' => 4000,
                     'connecttimeout'=>4000,
@@ -434,6 +435,7 @@
                     'sslverify' => FALSE,
                 );
                 $baiduseo_level = get_option('baiduseo_level');
+               
                 if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600){
                     $url = 'https://www.rbzzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                     $result = wp_remote_get($url,$defaults);
@@ -459,18 +461,34 @@
                     }
                 }
                 $level1[2] = $level['version'];
+                $level1[3] = BAIDUSEO_VERSION;
                 $data['level'] = $level1;
                 echo wp_json_encode(['code'=>1,'data'=>$data]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_liuliang_list(){
-             ini_set('memory_limit','500M');
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $where = [];
                 $con = [];
                 $sql ='select * from '.$wpdb->prefix . 'baiduseo_liuliang where status=1';
+                if(!isset($_POST['fangke'])){
+                    $_POST['fangke'] =1;
+                }
+                 if(!isset($_POST['pinci'])){
+                    $_POST['pinci'] =1;
+                }
+                  if(!isset($_POST['shendu'])){
+                    $_POST['shendu'] =1;
+                }
+                   if(!isset($_POST['shichang'])){
+                    $_POST['shichang'] =1;
+                }
+                if(!isset($_POST['time'])){
+                    $_POST['time'] =0;
+                }
                 if((int)$_POST['fangke']==1){
                     $sql .= '  and is_new=1';
                     
@@ -522,40 +540,45 @@
                 }elseif((int)$_POST['shichang']==7){
                     $sql .= ' and shichang>600';
                 }
-                if(sanitize_text_field($_POST['time'])){
+                if(sanitize_text_field(wp_unslash($_POST['time']))){
+                    $time = sanitize_text_field(wp_unslash($_POST['time']));
                     $timezone_offet = get_option( 'gmt_offset');
-                    $sta1 = strtotime($_POST['time']);
-                    $end1 = strtotime($_POST['time'])+24*3600;
+                    $sta1 = strtotime($time)-$timezone_offet*3600;
+                    $end1 = strtotime($time)+24*3600-$timezone_offet*3600;
                     $sql .=' and unix_timestamp(time)>%d and  unix_timestamp(time)<%d';
                     $con = [$sta1,$end1];
                 }
-                if(sanitize_text_field($_POST['rukou'])){
+                if(isset($_POST['rukou'])){
+                    $rukou = sanitize_text_field(wp_unslash($_POST['rukou']));
                     $sql .= ' and url=%s';
-                    $con[] = sanitize_text_field($_POST['rukou']);
+                    $con[] = $rukou;
                 }
-                if(sanitize_text_field($_POST['ip'])){
+                 if(isset($_POST['ip'])){
+                     $ip = sanitize_text_field(wp_unslash($_POST['ip']));
+                
                     $sql .= ' and ip=%s';
-                    $con[] = sanitize_text_field($_POST['ip']);
+                    $con[] = $ip;
                 }
-                if(sanitize_text_field($_POST['session'])){
+                 if(isset($_POST['session'])){
+                     $session = sanitize_text_field(wp_unslash($_POST['session']));
                     $sql .= ' and session=%s';
-                    $con[] = sanitize_text_field($_POST['session']);
+                    $con[] = $session;
                 }
                 
-                if((int)$_POST['source']==1){
+                if(isset($_POST['source']) && (int)$_POST['source']==1){
                     $sql .= '  and source="直接访问"';
-                }elseif((int)$_POST['source']==2){
+                }elseif(isset($_POST['source']) && (int)$_POST['source']==2){
                     $sql .= '  and source<>"直接访问"';
                 }
-                if((int)$_POST['type']==1){
+                if(isset($_POST['type']) && (int)$_POST['type']==1){
                     $sql .= ' and type=1';
-                }elseif((int)$_POST['type']==2){
+                }elseif(isset($_POST['type']) && (int)$_POST['type']==2){
                     $sql .= ' and type=2';
                 }
                 if(isset($group) && $group){
                     $sql .=$group;
                 }
-                $page = isset($_POST['page'])?$_POST['page']:1;
+                $page = isset($_POST['page'])?(int)$_POST['page']:1;
                 $start = ($page-1)*50;
                 $con1 = $con;
                 $con[] = $start;
@@ -623,7 +646,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_liuliang_sl(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $res = $wpdb->get_results('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang where status=1  group by session having a>1',ARRAY_A);
                  $res2 = $wpdb->query('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang where status=1  group by session having a>1',ARRAY_A);
@@ -643,7 +666,7 @@
         }
         public function baiduseo_get_liuliang_sf(){
           
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                  $res = $wpdb->get_results('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang  group by url order by a desc limit 10',ARRAY_A);
                  $count = 0;
@@ -661,7 +684,7 @@
         }
         public function baiduseo_get_liuliang_source(){
            
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                  $res = $wpdb->get_results('select *,count(id) as a from '.$wpdb->prefix . 'baiduseo_liuliang group by source order by a desc limit 10',ARRAY_A);
                 
@@ -680,8 +703,8 @@
         }
         public function baiduseo_get_liuliang_ip(){
             global $wpdb;
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                $type = (int)$_POST['type'];
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
                     $timezone_offet = get_option( 'gmt_offset');
                     $arr1 = [];
@@ -690,8 +713,8 @@
                     for($i=0;$i<=23;$i++){
                         if($i>=10){
                             $j=$i+1;
-                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'));
-                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'))-$timezone_offet*3600;
+                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $end2 = $end1-24*3600;
                             $sta3 = $sta1-24*3600*2;
@@ -699,15 +722,15 @@
                         }else{
                             $j=$i+1;
                             
-                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $sta3 = $sta1-24*3600*2;
                             if($j==10){
-                                $end1 = strtotime(current_time('Y-m-d 10:00'));
+                                $end1 = strtotime(current_time('Y-m-d 10:00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }else{
-                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'));
+                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }
@@ -716,10 +739,10 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'));
+                    $sta4 = strtotime(current_time('Y-m-d'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600;
                     $sta6 = $sta4-24*3600*2;
-                    $end4 = strtotime(current_time('Y-m-d 23:59:59'));
+                    $end4 = strtotime(current_time('Y-m-d 23:59:59'))-$timezone_offet*3600;
                     $end5 = $end4-24*3600;
                     $end6 = $end4-24*3600*2;
                     $arr4 =$wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta4,$end4));
@@ -748,7 +771,7 @@
                             'data'=>$arr3    
                         ],
                     ];
-                    $data5['xdata'] = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+                    $data5['xdata'] = ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
@@ -759,7 +782,7 @@
                     $n = current_time('N');
                     for($i=1;$i<=7;$i++){
                        
-                         $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600;
+                         $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600-$timezone_offet*3600;
                         $sta2 = $sta1-24*3600*7;
                         $sta3 = $sta1-24*3600*14;
                         $end1 = $sta1+24*3600;
@@ -769,7 +792,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600;
+                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*7;
                     $sta6 = $sta4-24*3600*14;
                     $end4 = $sta4+24*3600*7;
@@ -858,7 +881,7 @@
                     $arr2 = [];
                     $arr3 = [];
                     for($i=1;$i<=31;$i++){
-                        $sta1 = strtotime(current_time('Y-m-'.$i));
+                        $sta1 = strtotime(current_time('Y-m-'.$i))-$timezone_offet*3600;
                         $end1 = $sta1+24*3600;
                         $sta2 = $sta1-24*3600*($num1+$d);
                         $end2 = $sta2+24*3600;
@@ -868,7 +891,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by ip',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-01'));
+                    $sta4 = strtotime(current_time('Y-m-01'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*$num1;
                     $sta6 = $sta4-24*3600*($num1+$num2);
                     $end4 = $sta4+24*3600*$num;
@@ -910,8 +933,8 @@
         }
         public function baiduseo_get_liuliang_uv(){
             global $wpdb;
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                $type = (int)$_POST['type'];
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
                     $timezone_offet = get_option( 'gmt_offset');
                     $arr1 = [];
@@ -920,8 +943,8 @@
                     for($i=0;$i<=23;$i++){
                          if($i>=10){
                             $j=$i+1;
-                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'));
-                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'))-$timezone_offet*3600;
+                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $end2 = $end1-24*3600;
                             $sta3 = $sta1-24*3600*2;
@@ -929,15 +952,15 @@
                         }else{
                             $j=$i+1;
                             
-                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $sta3 = $sta1-24*3600*2;
                             if($j==10){
-                                $end1 = strtotime(current_time('Y-m-d 10:00'));
+                                $end1 = strtotime(current_time('Y-m-d 10:00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }else{
-                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'));
+                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }
@@ -946,10 +969,10 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'));
+                    $sta4 = strtotime(current_time('Y-m-d'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600;
                     $sta6 = $sta4-24*3600*2;
-                    $end4 = strtotime(current_time('Y-m-d 23:59:59'));
+                    $end4 = strtotime(current_time('Y-m-d 23:59:59'))-$timezone_offet*3600;
                     $end5 = $end4-24*3600;
                     $end6 = $end4-24*3600*2;
                     $arr4 =$wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta4,$end4));
@@ -978,7 +1001,7 @@
                             'data'=>$arr3    
                         ],
                     ];
-                    $data5['xdata'] = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+                    $data5['xdata'] = ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
@@ -989,7 +1012,7 @@
                     $n = current_time('N');
                     for($i=1;$i<=7;$i++){
                         $j=$i+1;
-                       $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600;
+                       $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600-$timezone_offet*3600;
                         $sta2 = $sta1-24*3600*7;
                         $sta3 = $sta1-24*3600*14;
                         $end1 = $sta1+24*3600;
@@ -999,7 +1022,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta3,$end3));
                     }
-                     $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600;
+                     $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*7;
                     $sta6 = $sta4-24*3600*14;
                     $end4 = $sta4+24*3600*7;
@@ -1088,7 +1111,7 @@
                     $arr2 = [];
                     $arr3 = [];
                     for($i=1;$i<=31;$i++){
-                        $sta1 = strtotime(current_time('Y-m-'.$i));
+                        $sta1 = strtotime(current_time('Y-m-'.$i))-$timezone_offet*3600;
                         $end1 = $sta1+24*3600;
                         $sta2 = $sta1-24*3600*($num1+$d);
                         $end2 = $sta2+24*3600;
@@ -1098,7 +1121,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d group by session',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-01'));
+                    $sta4 = strtotime(current_time('Y-m-01'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*$num1;
                     $sta6 = $sta4-24*3600*($num1+$num2);
                     $end4 = $sta4+24*3600*$num;
@@ -1141,8 +1164,8 @@
         }
         public function baiduseo_get_liuliang_pv(){
             global $wpdb;
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                $type = (int)$_POST['type'];
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
                     $timezone_offet = get_option( 'gmt_offset');
                     $arr1 = [];
@@ -1151,8 +1174,8 @@
                     for($i=0;$i<=23;$i++){
                         if($i>=10){
                             $j=$i+1;
-                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'));
-                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'))-$timezone_offet*3600;
+                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $end2 = $end1-24*3600;
                             $sta3 = $sta1-24*3600*2;
@@ -1160,29 +1183,29 @@
                         }else{
                             $j=$i+1;
                             
-                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'));
+                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'))-$timezone_offet*3600;
                             $sta2 = $sta1-24*3600;
                             $sta3 = $sta1-24*3600*2;
                             if($j==10){
-                                $end1 = strtotime(current_time('Y-m-d 10:00'));
+                                $end1 = strtotime(current_time('Y-m-d 10:00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }else{
-                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'));
+                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'))-$timezone_offet*3600;
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }
                         }
                     
-                        
+                       
                         $arr1[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta1,$end1));
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'));
+                    $sta4 = strtotime(current_time('Y-m-d'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600;
                     $sta6 = $sta4-24*3600*2;
-                    $end4 = strtotime(current_time('Y-m-d 23:59:59'));
+                    $end4 = strtotime(current_time('Y-m-d 23:59:59'))-$timezone_offet*3600;
                     $end5 = $end4-24*3600;
                     $end6 = $end4-24*3600*2;
                     $arr4 =$wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta4,$end4));
@@ -1212,7 +1235,7 @@
                             'data'=>$arr3    
                         ],
                     ];
-                    $data5['xdata'] = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+                    $data5['xdata'] = ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
@@ -1223,7 +1246,7 @@
                     $n = current_time('N');
                     for($i=1;$i<=7;$i++){
                         $j=$i+1;
-                        $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600;
+                        $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600-$timezone_offet*3600;
                         $sta2 = $sta1-24*3600*7;
                         $sta3 = $sta1-24*3600*14;
                         $end1 = $sta1+24*3600;
@@ -1233,7 +1256,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600;
+                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*7;
                     $sta6 = $sta4-24*3600*14;
                     $end4 = $sta4+24*3600*7;
@@ -1325,7 +1348,7 @@
                     $arr2 = [];
                     $arr3 = [];
                     for($i=1;$i<=31;$i++){
-                        $sta1 = strtotime(current_time('Y-m-'.$i));
+                        $sta1 = strtotime(current_time('Y-m-'.$i))-$timezone_offet*3600;
                         $end1 = $sta1+24*3600;
                         $sta2 = $sta1-24*3600*($num1+$d);
                         $end2 = $sta2+24*3600;
@@ -1335,7 +1358,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-01'));
+                    $sta4 = strtotime(current_time('Y-m-01'))-$timezone_offet*3600;
                     $sta5 = $sta4-24*3600*$num1;
                     $sta6 = $sta4-24*3600*($num1+$num2);
                     $end4 = $sta4+24*3600*$num;
@@ -1377,14 +1400,14 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_liuliang(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_wyc = get_option('baiduseo_liuliang');
                 echo wp_json_encode(['code'=>1,'data'=>$baiduseo_wyc]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_tongxun(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $tongxun = baiduseo_common::baiduseo_tongxun();
                 $siteurl = trim(get_option('siteurl'),'/');;
                 echo wp_json_encode(['code'=>1,'data'=>['key'=>$tongxun,'url'=>$siteurl]]);exit;
@@ -1392,7 +1415,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_titles(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $blogname = get_option('blogname');
                 $blogdescription = get_option('blogdescription');
                 echo wp_json_encode(['code'=>1,'data'=>['title'=>$blogname,'futitle'=>$blogdescription]]);exit;
@@ -1400,7 +1423,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_friends_tongji(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                  global $wpdb;
                 $count = $wpdb->query("SELECT * FROM ".$wpdb->prefix ."wztkj_friends where status1=0 and status2=0 and status3=0 ",ARRAY_A);
                 
@@ -1420,7 +1443,7 @@
            
         }
         public function baiduseo_get_friends_open(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $str = '<?php if(class_exists("baiduseo_seo")){echo '.'baiduseo_seo::baiduseo_friends_hh("'.md5(baiduseo_common::baiduseo_url(0)).'");}?>';
                 $str2 = '';
                 echo wp_json_encode(['code'=>1,'data'=>['php'=>$str,'jianma'=>'[baiduseofriends]']]);exit;
@@ -1428,7 +1451,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_friends_sz(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                $wztkj_linkhh = get_option('baiduseo_linkhh');
                 echo wp_json_encode(['code'=>1,'data'=>$wztkj_linkhh]);exit;
             }
@@ -1436,7 +1459,7 @@
         } 
         public function baiduseo_get_long(){
              global $wpdb;
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $long = $wpdb->get_results('select * from  '.$wpdb->prefix.'baiduseo_long order by id desc',ARRAY_A);
                 $jifen = baiduseo_kp::get_jifen();
                 echo wp_json_encode(['code'=>1,'data'=>$long,'jifen'=>$jifen]);exit;
@@ -1444,7 +1467,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_tag(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_tag_manage = get_option('baiduseo_tag');
                 if($baiduseo_tag_manage===false){
                     $baiduseo_tag_manage = [
@@ -1462,7 +1485,7 @@
         }
         public function baiduseo_get_kp_jifen(){
             global $wpdb;
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $jifen = baiduseo_kp::get_jifen();
                 $kp_count =$wpdb->get_var("SELECT SUM(num) FROM {$wpdb->prefix}baiduseo_kp_log where num<0");
                 $kp_count = $kp_count?-$kp_count:0;
@@ -1471,7 +1494,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_keywords(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                  $keywords = $wpdb->get_results('select * from '.$wpdb->prefix . 'baiduseo_keywords',ARRAY_A);
                     foreach($keywords as $key=>$val){
@@ -1494,14 +1517,14 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public  function baiduseo_get_rank(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_rank = get_option('baiduseo_rank');
                 echo wp_json_encode(['code'=>1,'data'=>$baiduseo_rank]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_quanzhong(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_quanzhong = get_option('baiduseo_quanzhong');
                 if(!isset($baiduseo_quanzhong['time']) || $baiduseo_quanzhong['time']<time()-24*3600){
                     $url = 'http://wp.seohnzz.com/api/rank/quanzhong?url='.baiduseo_common::baiduseo_url(0);
@@ -1532,7 +1555,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public  function baiduseo_get_youhua(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baidu = get_option('baiduseo_youhua');;
                
                 echo wp_json_encode(['code'=>1,'data'=>$baidu]);exit;
@@ -1540,7 +1563,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_bingpe(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_cron = new baiduseo_cron();
                 $baidu = get_option('baiduseo_zz');
                 $num =  $baiduseo_cron->baiduseo_quota($baidu['bing_key']);
@@ -1549,7 +1572,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_bdpe(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $urls[] = get_option('siteurl');
                 baiduseo_zz::bdts($urls,0,0);
                 
@@ -1559,14 +1582,14 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_zz(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baidu = get_option('baiduseo_zz');
                  echo wp_json_encode(['code'=>1,'data'=>$baidu]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_cate_type(){
-            // if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $args       = array(
                     'public' => true,
                 );
@@ -1581,11 +1604,11 @@
                 }
                
                  echo wp_json_encode(['code'=>1,'data'=>$data,'post'=>$post_types]);exit;
-            // }
+            }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_wyc(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $baiduseo_wyc = get_option('baiduseo_wyc');
                 $baiduseo_wyc['jifen'] = baiduseo_kp::get_jifen();
@@ -1596,16 +1619,16 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_page_seo(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                $page=(int)$_POST['page'];
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                $page=isset($_POST['page'])?(int)$_POST['page']:0;
                 $baiduseo_page = get_post_meta( $page, 'baiduseo_page', true );
                  echo wp_json_encode(['code'=>1,'data'=>$baiduseo_page]);exit;
             }
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function baiduseo_get_cate_seo(){
-             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                $cate = (int)$_POST['cate'];
+             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                $cate = isset($_POST['cate'])?(int)$_POST['cate']:0;
                 $seo_init = get_option('baiduseo_cate_'.$cate);
                 echo wp_json_encode(['code'=>1,'data'=>$seo_init]);exit;
             }else{
@@ -1613,7 +1636,7 @@
             }
         }
         public function baiduseo_get_zhizhu_con(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_zhizhu = get_option('baiduseo_zhizhu');
                 echo wp_json_encode(['code'=>1,'data'=>$baiduseo_zhizhu]);exit;
             }else{
@@ -1621,7 +1644,7 @@
             }
         }
         public function baiduseo_get_seo(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 
                 $seo_init = get_option('seo_init');
                 if(!is_array($seo_init)){
@@ -1641,7 +1664,7 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public  function baiduseo_get_page(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $page = $wpdb->get_results('select ID,post_title from '.$wpdb->prefix . 'posts where post_status="publish" and post_type="page" order by ID desc ',ARRAY_A);
                 echo wp_json_encode(['code'=>1,'data'=>$page]);exit;
@@ -1650,7 +1673,7 @@
             }
         }
         public function baiduseo_get_cate(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $page = $wpdb->get_results('select a.term_id,a.name from '.$wpdb->prefix . 'terms as a join '.$wpdb->prefix . 'term_taxonomy as b on a .term_id=b.term_id where b.taxonomy NOT IN("post_tag","nav_menu","wp_theme","language","term_language","term_translations","protag","videotag","goodstag","apptag","booktag","sitetag") ',ARRAY_A);
                 echo wp_json_encode(['code'=>1,'data'=>$page]);exit;
@@ -1659,10 +1682,10 @@
             }
         }
         public function baiduseo_zhizhu_tubiao(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-                if(isset($_POST['time']) && $_POST['time']){
-                    $year = substr(sanitize_text_field($_POST['time']),0,4);
-                    $month = substr(sanitize_text_field($_POST['time']),5,2);
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+                if(isset($_POST['time']) && sanitize_text_field(wp_unslash($_POST['time']))){
+                    $year = substr(sanitize_text_field(wp_unslash($_POST['time'])),0,4);
+                    $month = substr(sanitize_text_field(wp_unslash($_POST['time'])),5,2);
                 }else{
                     $year = '';
                     $month = '';
@@ -1671,12 +1694,12 @@
             }
         }
         public function baiduseo_zhizhu_dangqian(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 baiduseo_zhizhu::baiduseo_zhizhu_dangqian();
             }
         }
         public function zhigai_log(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1690,7 +1713,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function kp_log(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1701,7 +1724,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function kp_delete(){
-           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1732,7 +1755,7 @@
              echo wp_json_encode(['code'=>0]);exit;
         }
         public function kp(){
-           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
             $start1 = ($p1-1)*20;
@@ -1770,9 +1793,8 @@
             echo wp_json_encode(['code'=>0]);exit;
         }
         public function yuanchuang(){
-             set_time_limit(0);
-            ini_set('memory_limit','-1');
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1850,14 +1872,14 @@
         }
         public function zhizhu(){
            
-           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $pages = isset($_POST['pages'])?(int)$_POST['pages']:1;
-                $sta = isset($_POST['start'])?sanitize_text_field($_POST['start']):'';
-                $end = isset($_POST['end'])?sanitize_text_field($_POST['end']):"";
-                $search = isset($_POST['search'])?sanitize_text_field($_POST['search']):'';
-                $type = isset($_POST['type'])?sanitize_text_field($_POST['type']):0;
-                $type2 = isset($_POST['type2'])?sanitize_text_field($_POST['type2']):0;
-                $orders = isset($_POST['orders'])?sanitize_text_field($_POST['orders']):1;
+                $sta = isset($_POST['start'])?sanitize_text_field(wp_unslash($_POST['start'])):'';
+                $end = isset($_POST['end'])?sanitize_text_field(wp_unslash($_POST['end'])):"";
+                $search = isset($_POST['search'])?sanitize_text_field(wp_unslash($_POST['search'])):'';
+                $type = isset($_POST['type'])?sanitize_text_field(wp_unslash($_POST['type'])):0;
+                $type2 = isset($_POST['type2'])?sanitize_text_field(wp_unslash($_POST['type2'])):0;
+                $orders = isset($_POST['orders'])?sanitize_text_field(wp_unslash($_POST['orders'])):1;
                 $data = baiduseo_zhizhu::baiduseo_zhizhu_data($pages,$sta,$end,$search,$type,$type2,$orders);
             
             }else{
@@ -1866,7 +1888,7 @@
             
         }
         public function bbpt(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1892,7 +1914,7 @@
             
         }
         public function  baiduseo_get_google(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1917,7 +1939,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function bbks(){
-           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1942,7 +1964,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function bing(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -1967,7 +1989,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function indexnow(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
             $start1 = ($p1-1)*20;
@@ -1992,7 +2014,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function shenma(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                  global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*20;
@@ -2017,11 +2039,11 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function neilian(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                
                 if(isset($_POST['keywords'])){
-                    $search = sanitize_text_field($_POST['keywords']);
+                    $search = sanitize_text_field(wp_unslash($_POST['keywords']));
                     $post1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."baiduseo_neilian where keywords like %s order by id desc ",'%'.$search.'%'),ARRAY_A);
                     echo wp_json_encode(['code'=>1,'msg'=>'','count'=>$count,'data'=>$post1,'pagesize'=>20,]);exit; 
                 }else{
@@ -2035,7 +2057,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit; 
         }
         public function friends1(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                 $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                 $start1 = ($p1-1)*30;
@@ -2070,7 +2092,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function friends2(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                
                
@@ -2115,7 +2137,7 @@
             echo wp_json_encode(['code'=>0,'msg'=>'获取失败']);exit;
         }
         public function friends3(){
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 global $wpdb;
                     $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
                     $start1 = ($p1-1)*30;

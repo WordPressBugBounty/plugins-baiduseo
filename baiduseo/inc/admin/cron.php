@@ -10,7 +10,7 @@ class baiduseo_cron{
         }
     }
     public function baiduseo_cronexec(){
-        ini_set('memory_limit','-1');
+        
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         $baiduseo_zhizhu = get_option('baiduseo_zhizhu');
         if(isset($baiduseo_zhizhu['open']) && $baiduseo_zhizhu['open']==1){
@@ -27,7 +27,7 @@ class baiduseo_cron{
         
         $baiduseo_auto = get_option('baiduseo_zz');
         
-	    if(isset($baiduseo_auto['baiduseo_type']) && strpos($baiduseo_auto['baiduseo_type'],'1')!==false && isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
+	    if( isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
 	        $this->baiduseo_zz();
 	    }
 	     if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'2')!==false){
@@ -37,7 +37,7 @@ class baiduseo_cron{
 	   // if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'3')!==false){
 	   //      $this->baiduseo_shenma();
 	   // }
-	    if(isset($baiduseo_auto['baiduseo_type']) && strpos($baiduseo_auto['baiduseo_type'],'2')!==false && isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
+	    if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
 	         $this->baiduseo_day();
 	    }
 	   
@@ -91,7 +91,7 @@ class baiduseo_cron{
                 $res = $wpdb->get_results('select * from '.$wpdb->prefix . 'baiduseo_liuliang where shichang=0',ARRAY_A);
                 foreach($res as $key=>$val){
                     if($val['status']==1){
-                        $count = $wpdb->query($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session="%s" and status=1',$val['session']),ARRAY_A);
+                        $count = $wpdb->query($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_liuliang where session=%s and status=1',$val['session']),ARRAY_A);
                         if($count){
                             $wpdb->update($wpdb->prefix . 'baiduseo_liuliang',['pinci'=>$count,'is_new'=>1],['session'=>$val['session']]);
                         }
@@ -214,7 +214,13 @@ class baiduseo_cron{
 	            }
 	            foreach($result as $key=>$val){
 	                //需要处理
-                    $res = $wpdb->get_results('select * from '.$wpdb->prefix . 'wztkj_friends where link="'.$val['link2'].'"',ARRAY_A);
+                    $res = $wpdb->get_results(
+                        $wpdb->prepare(
+                            "SELECT * FROM {$wpdb->prefix}wztkj_friends WHERE link = %s",
+                            $val['link2']
+                        ),
+                        ARRAY_A
+                    );
                     $currnetTime = current_time( 'Y-m-d H:i:s');
                     $status3 = $val['status3'];
                     $baiduseo_hh_count['count'] = $val['count'];
@@ -847,7 +853,11 @@ class baiduseo_cron{
                     }
                     $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
                     $api = 'https://www.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey='.$baidu['bing_key'];
-                    $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url($http_type.$_SERVER['HTTP_HOST']),'urlList'=>$urls))));
+                    if(isset($_SERVER['HTTP_HOST'])){
+                    $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
+                    }else{
+                        return;
+                    }
                     if(is_wp_error($http)){
                         return;
                     }
@@ -925,7 +935,11 @@ class baiduseo_cron{
                 }
                 $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
                 $api = 'https://www.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey='.$baidu['bing_key'];
-                $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url($http_type.$_SERVER['HTTP_HOST']),'urlList'=>$urls))));
+                if(isset($_SERVER['HTTP_HOST'])){
+                $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
+                }else{
+                    return;
+                }
                 if(is_wp_error($http)){
                     return;
                 }

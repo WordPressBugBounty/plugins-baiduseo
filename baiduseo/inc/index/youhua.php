@@ -26,81 +26,126 @@ class baiduseo_youhua{
         if(isset($baiduseo_youhua['category']) && $baiduseo_youhua['category']){
             $this->baiduseo_category();
         }
+          if(isset($baiduseo_youhua['wp_json']) && $baiduseo_youhua['wp_json']){
+            $this->baiduseo_wp_json();
+        }
+    }
+    public function  baiduseo_wp_json(){
+        add_filter('rest_pre_dispatch', [$this,'baiduseo_restrict_rest_api_to_same_origin'], 10, 3);
+        
+        
+        if(isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'wp-sitemap-users') !== false){
+                echo '<script>window.location.href="/"</script>';
+                exit;
+        }
+    }
+    public function baiduseo_restrict_rest_api_to_same_origin($result, $wp_rest_server, $request ){
+          // Check if it's a request to access users endpoint
+        if ( strpos( $request->get_route(), '/wp/v2/users' ) !== false ) {
+            // Check if current user can edit users (typically administrators)
+            if ( ! current_user_can( 'edit_users' ) ) {
+                // Return a permission denied error
+                 return '404 Forbidden';
+                
+            }
+        }
+        return $result;
     }
      public function baiduseo_thumb(){
-        add_filter('pre_option_thumbnail_size_w',	'__return_zero');
-    	add_filter('pre_option_thumbnail_size_h',	'__return_zero');
-    	add_filter('pre_option_medium_size_w',		'__return_zero');
-    	add_filter('pre_option_medium_size_h',		'__return_zero');
-    	add_filter('pre_option_large_size_w',		'__return_zero');
-    	add_filter('pre_option_large_size_h',		'__return_zero');
+        add_filter('pre_option_thumbnail_size_w',   '__return_zero');
+        add_filter('pre_option_thumbnail_size_h',   '__return_zero');
+        add_filter('pre_option_medium_size_w',      '__return_zero');
+        add_filter('pre_option_medium_size_h',      '__return_zero');
+        add_filter('pre_option_large_size_w',       '__return_zero');
+        add_filter('pre_option_large_size_h',       '__return_zero');
+    
+        add_filter('intermediate_image_sizes_advanced', [$this,'disable_image_sizes']);
+
+        
+      
+        add_filter('image_resize_dimensions', [$this,'disable_single_image_size'], 10, 6);
+    }
+    public  function disable_image_sizes($sizes) {
+        unset($sizes['thumbnail']);
+        unset($sizes['medium']);
+        unset($sizes['large']);
+        return $sizes;
+    }
+    //禁用特定图片尺寸生成
+    public  function disable_single_image_size($size) {
+        return false;
     }
     public function baiduseo_head_dy(){
         remove_action( 'wp_head', 'feed_links', 2 ); //移除feed
-    	remove_action( 'wp_head', 'feed_links_extra', 3 ); //移除feed
-    	remove_action( 'wp_head', 'rsd_link' ); //移除离线编辑器开放接口
-    	remove_action( 'wp_head', 'wlwmanifest_link' );  //移除离线编辑器开放接口
-    	remove_action( 'wp_head', 'index_rel_link' );//去除本页唯一链接信息
-    	remove_action('wp_head', 'parent_post_rel_link', 10, 0 );//清除前后文信息
-    	remove_action('wp_head', 'start_post_rel_link', 10, 0 );//清除前后文信息
-    	remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
-    	remove_action( 'wp_head', 'locale_stylesheet' );
-    	// remove_action('publish_future_post','check_and_publish_future_post',10, 1 );
-    	remove_action( 'wp_head', 'noindex', 1 );
-    	remove_action( 'wp_head', 'wp_generator' ); //移除WordPress版本
-    	remove_action( 'wp_head', 'rel_canonical' );
-    	remove_action( 'wp_head', 'wp_shortlink_wp_head', 10, 0 );
-    	remove_action( 'template_redirect', 'wp_shortlink_header', 11, 0 );
+        remove_action( 'wp_head', 'feed_links_extra', 3 ); //移除feed
+        remove_action( 'wp_head', 'rsd_link' ); //移除离线编辑器开放接口
+        remove_action( 'wp_head', 'wlwmanifest_link' );  //移除离线编辑器开放接口
+        remove_action( 'wp_head', 'index_rel_link' );//去除本页唯一链接信息
+        remove_action('wp_head', 'parent_post_rel_link', 10, 0 );//清除前后文信息
+        remove_action('wp_head', 'start_post_rel_link', 10, 0 );//清除前后文信息
+        remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
+        remove_action( 'wp_head', 'locale_stylesheet' );
+        // remove_action('publish_future_post','check_and_publish_future_post',10, 1 );
+        remove_action( 'wp_head', 'noindex', 1 );
+        remove_action( 'wp_head', 'wp_generator' ); //移除WordPress版本
+        remove_action( 'wp_head', 'rel_canonical' );
+        remove_action( 'wp_head', 'wp_shortlink_wp_head', 10, 0 );
+        remove_action( 'template_redirect', 'wp_shortlink_header', 11, 0 );
     }
     public function baiduseo_xml_rpc(){
         add_filter( 'xmlrpc_methods', [$this,'baiduseo_remove_xmlrpc_pingback_ping'] );
         
     }
     public function baiduseo_remove_xmlrpc_pingback_ping( $methods ) {
-    	unset( $methods['pingback.ping'] );
-    	return $methods;
+        unset( $methods['pingback.ping'] );
+        return $methods;
     }
     public function baiduseo_feed(){
-    	add_action('do_feed', [$this,'baiduseo_digwp_disable_feed'], 1);
-    	add_action('do_feed_rdf', [$this,'baiduseo_digwp_disable_feed'], 1);
-    	add_action('do_feed_rss', [$this,'baiduseo_digwp_disable_feed'], 1);
-    	add_action('do_feed_rss2', [$this,'baiduseo_digwp_disable_feed'], 1);
-    	add_action('do_feed_atom', [$this,'baiduseo_digwp_disable_feed'], 1);
+        add_action('do_feed', [$this,'baiduseo_digwp_disable_feed'], 1);
+        add_action('do_feed_rdf', [$this,'baiduseo_digwp_disable_feed'], 1);
+        add_action('do_feed_rss', [$this,'baiduseo_digwp_disable_feed'], 1);
+        add_action('do_feed_rss2', [$this,'baiduseo_digwp_disable_feed'], 1);
+        add_action('do_feed_atom', [$this,'baiduseo_digwp_disable_feed'], 1);
     }
     public function baiduseo_digwp_disable_feed(){
-        wp_die('<h1>Feed已经关闭, 请访问网站<a href="'.get_bloginfo('url').'">首页</a>!</h1>');
+        wp_die('<h1>Feed已经关闭, 请访问网站<a href="'.esc_url(get_bloginfo('url')).'">首页</a>!</h1>');
     }
     public function baiduseo_post_thumb(){
         add_action('before_delete_post', [$this,'baiduseo_delete_post_and_attachments']);
     }
     public function baiduseo_delete_post_and_attachments($post_ID){
-        global $wpdb;
-            //删除特色图片
-            $thumbnails = $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->postmeta WHERE meta_key = '_thumbnail_id' AND post_id = %d",$post_ID));
-            foreach ( $thumbnails as $thumbnail ) {
-            wp_delete_attachment( $thumbnail->meta_value, true );
+          // 删除特色图片
+            $thumbnail_id = get_post_meta($post_ID, '_thumbnail_id', true);
+            if ($thumbnail_id) {
+                wp_delete_attachment($thumbnail_id, true);
+                delete_post_meta($post_ID, '_thumbnail_id');
             }
-            //删除图片附件
-            $attachments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_parent = %d AND post_type = 'attachment'",$post_ID));
-            foreach ( $attachments as $attachment ) {
-            wp_delete_attachment( $attachment->ID, true );
+            
+            // 删除图片附件
+            $attachments = get_posts(array(
+                'post_parent'    => $post_ID,
+                'post_type'      => 'attachment',
+                'posts_per_page' => -1
+            ));
+            
+            foreach ($attachments as $attachment) {
+                wp_delete_attachment($attachment->ID, true);
             }
-            $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->postmeta WHERE meta_key = '_thumbnail_id' AND post_id = %d",$post_ID));
     }
     public function baiduseo_gravatar(){
         add_filter( 'get_avatar', function ($avatar) {
-    		return '';
-    	}, 10, 3 );
+            return '';
+        }, 10, 3 );
     }
     public function baiduseo_lan(){
         add_filter( 'locale', [$this,'baiduseo_language'] );
     }
     public function baiduseo_language($locale) {
-		$locale = ( is_admin() ) ? $locale : 'en_US';
-		return $locale;
-	}
-	public function baiduseo_category(){
-	    register_activation_hook(__FILE__,    [$this,'baiduseo_refresh_rules']);
+        $locale = ( is_admin() ) ? $locale : 'en_US';
+        return $locale;
+    }
+    public function baiduseo_category(){
+        register_activation_hook(__FILE__,    [$this,'baiduseo_refresh_rules']);
         register_deactivation_hook(__FILE__,  [$this,'baiduseo_deactivate']);
         
         /* actions */
@@ -113,82 +158,82 @@ class baiduseo_youhua{
         add_filter('category_rewrite_rules', [$this,'baiduseo_rewrite_rules']);
         add_filter('query_vars',             [$this,'baiduseo_query_vars']);    // Adds 'category_redirect' query variable
         add_filter('request',                [$this,'baiduseo_request']);
-	}
-	function baiduseo_refresh_rules() {
-    	global $wp_rewrite;
-    	$wp_rewrite->flush_rules();
+    }
+    function baiduseo_refresh_rules() {
+        global $wp_rewrite;
+        $wp_rewrite->flush_rules();
     }
     public function baiduseo_deactivate(){
         remove_filter( 'category_rewrite_rules', [$this,'baiduseo_rewrite_rules']); 
-	    $this->baiduseo_refresh_rules();
+        $this->baiduseo_refresh_rules();
     }
     public function baiduseo_permastruct()
     {
-    	global $wp_rewrite;
-    	global $wp_version;
+        global $wp_rewrite;
+        global $wp_version;
     
-    	if ( $wp_version >= 3.4 ) {
-    		$wp_rewrite->extra_permastructs['category']['struct'] = '%category%';
-    	} else {
-    		$wp_rewrite->extra_permastructs['category'][0] = '%category%';
-    	}
+        if ( $wp_version >= 3.4 ) {
+            $wp_rewrite->extra_permastructs['category']['struct'] = '%category%';
+        } else {
+            $wp_rewrite->extra_permastructs['category'][0] = '%category%';
+        }
     }
     public function baiduseo_query_vars($public_query_vars) {
-    	$public_query_vars[] = 'category_redirect';
-    	return $public_query_vars;
+        $public_query_vars[] = 'category_redirect';
+        return $public_query_vars;
     }
     function baiduseo_rewrite_rules($category_rewrite) {
-    	global $wp_rewrite;
-    	$category_rewrite=array();
+        global $wp_rewrite;
+        $category_rewrite=array();
     
-    	/* WPML is present: temporary disable terms_clauses filter to get all categories for rewrite */
-    	if ( class_exists( 'Sitepress' ) ) {
-    		global $sitepress;
+        /* WPML is present: temporary disable terms_clauses filter to get all categories for rewrite */
+        if ( class_exists( 'Sitepress' ) ) {
+            global $sitepress;
     
-    		remove_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
-    		$categories = get_categories( array( 'hide_empty' => false ) );
-    		//Fix provided by Albin here https://wordpress.org/support/topic/bug-with-wpml-2/#post-8362218
-    		//add_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
-    		add_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ), 10, 4 );
-    	} else {
-    		$categories = get_categories( array( 'hide_empty' => false ) );
-    	}
+            remove_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
+            $categories = get_categories( array( 'hide_empty' => false ) );
+            //Fix provided by Albin here https://wordpress.org/support/topic/bug-with-wpml-2/#post-8362218
+            //add_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ) );
+            add_filter( 'terms_clauses', array( $sitepress, 'terms_clauses' ), 10, 4 );
+        } else {
+            $categories = get_categories( array( 'hide_empty' => false ) );
+        }
     
-    	foreach( $categories as $category ) {
-    		$category_nicename = $category->slug;
+        foreach( $categories as $category ) {
+            $category_nicename = $category->slug;
     
-    		if ( $category->parent == $category->cat_ID ) {
-    			$category->parent = 0;
-    		} elseif ( $category->parent != 0 ) {
-    			$category_nicename = get_category_parents( $category->parent, false, '/', true ) . $category_nicename;
-    		}
+            if ( $category->parent == $category->cat_ID ) {
+                $category->parent = 0;
+            } elseif ( $category->parent != 0 ) {
+                $category_nicename = get_category_parents( $category->parent, false, '/', true ) . $category_nicename;
+            }
     
-    		$category_rewrite['('.$category_nicename.')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?category_name=$matches[1]&feed=$matches[2]';
-    		$category_rewrite["({$category_nicename})/{$wp_rewrite->pagination_base}/?([0-9]{1,})/?$"] = 'index.php?category_name=$matches[1]&paged=$matches[2]';
-    		$category_rewrite['('.$category_nicename.')/?$'] = 'index.php?category_name=$matches[1]';
-    	}
+            $category_rewrite['('.$category_nicename.')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?category_name=$matches[1]&feed=$matches[2]';
+            $category_rewrite["({$category_nicename})/{$wp_rewrite->pagination_base}/?([0-9]{1,})/?$"] = 'index.php?category_name=$matches[1]&paged=$matches[2]';
+            $category_rewrite['('.$category_nicename.')/?$'] = 'index.php?category_name=$matches[1]';
+        }
     
-    	// Redirect support from Old Category Base
-    	$old_category_base = get_option( 'category_base' ) ? get_option( 'category_base' ) : 'category';
-    	$old_category_base = trim( $old_category_base, '/' );
-    	$category_rewrite[$old_category_base.'/(.*)$'] = 'index.php?category_redirect=$matches[1]';
-    	return $category_rewrite;
+        // Redirect support from Old Category Base
+        $old_category_base = get_option( 'category_base' ) ? get_option( 'category_base' ) : 'category';
+        $old_category_base = trim( $old_category_base, '/' );
+        $category_rewrite[$old_category_base.'/(.*)$'] = 'index.php?category_redirect=$matches[1]';
+        return $category_rewrite;
     }
     public function baiduseo_request($query_vars) {
-    	if( isset( $query_vars['category_redirect'] ) ) {
-    		$catlink = trailingslashit( get_option( 'home' ) ) . user_trailingslashit( $query_vars['category_redirect'], 'category' );
-    		status_header( 301 );
-    		header( "Location: $catlink" );
-    		exit();
-    	}
-    	return $query_vars;
+        if( isset( $query_vars['category_redirect'] ) ) {
+            $catlink = trailingslashit( get_option( 'home' ) ) . user_trailingslashit( $query_vars['category_redirect'], 'category' );
+            status_header( 301 );
+            header( "Location: $catlink" );
+            exit();
+        }
+        return $query_vars;
     }
     public static  function BaiduSEO_keywords($keywords){
         global $wpdb;
-    	$keywords = json_decode($keywords,true);
-    	$type = isset($keywords[0]['type'])?$keywords[0]['type']:0;
-    	$res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where keywords=%s and type=%d',$keywords[0]['keywords'],$type),ARRAY_A);
-    	$wpdb->update($wpdb->prefix . 'baiduseo_keywords',['time'=>$keywords[0]['time'],'title'=>$keywords[0]['title'],'num'=>$keywords[0]['num'],'prev'=>$res[0]['num']],['id'=>$res[0]['id']]);
+        $keywords = json_decode($keywords,true);
+        $type = isset($keywords[0]['type'])?$keywords[0]['type']:0;
+        $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where keywords=%s and type=%d',$keywords[0]['keywords'],$type),ARRAY_A);
+        $wpdb->update($wpdb->prefix . 'baiduseo_keywords',['time'=>$keywords[0]['time'],'title'=>$keywords[0]['title'],'num'=>$keywords[0]['num'],'prev'=>$res[0]['num']],['id'=>$res[0]['id']]);
     }
     public static function post($data){
         if($data['BaiduSEO']==17){
@@ -212,22 +257,22 @@ class baiduseo_youhua{
             $wpdb->update($wpdb->prefix . 'posts',['post_content'=>wp_kses_post($content)],['id'=>$id]);
         }elseif($data['BaiduSEO']==44){
             global $wpdb;
-        	$keywords = $data['keywords'];
-        	
-        	$res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp where keywords=%s and type=%d',sanitize_text_field($keywords['keywords']),(int)$keywords['type']),ARRAY_A);
-        	if(!empty($res)){
-        	    $wpdb->update($wpdb->prefix . 'baiduseo_kp',$keywords,['id'=>$res[0]['id']]);
-        	}else{
-        	    $wpdb->insert($wpdb->prefix . 'baiduseo_kp',$keywords);
-        	}
+            $keywords = $data['keywords'];
+            
+            $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp where keywords=%s and type=%d',sanitize_text_field($keywords['keywords']),(int)$keywords['type']),ARRAY_A);
+            if(!empty($res)){
+                $wpdb->update($wpdb->prefix . 'baiduseo_kp',$keywords,['id'=>$res[0]['id']]);
+            }else{
+                $wpdb->insert($wpdb->prefix . 'baiduseo_kp',$keywords);
+            }
         }elseif($data['BaiduSEO']==45){
             global $wpdb;
-        	$keywords = $data['keywords'];
-        	$res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp_log where orderno=%d ',(int)$keywords['orderno']),ARRAY_A);
-        	if(!empty($res)){
-        	}else{
-        	    $wpdb->insert($wpdb->prefix."baiduseo_kp_log",$keywords);
-        	}
+            $keywords = $data['keywords'];
+            $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp_log where orderno=%d ',(int)$keywords['orderno']),ARRAY_A);
+            if(!empty($res)){
+            }else{
+                $wpdb->insert($wpdb->prefix."baiduseo_kp_log",$keywords);
+            }
         }elseif($data['BaiduSEO']==46){
             global $wpdb;
             $daochu = $data['daochu'];
@@ -257,24 +302,36 @@ class baiduseo_youhua{
             global $wpdb;
             //查重
             if($data['is_chachong']==1){
-              $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_title="%s" and post_status="publish" and post_type="post"',$data['title']),ARRAY_A);
+              $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_title=%s and post_status="publish" and post_type="post"',$data['title']),ARRAY_A);
                 if(!empty($article)){
-                    exit;  
+                    echo json_encode(['code'=>0]);exit;
                 }
             }
             
            
             if($data['img']){
-                
+                $validate = wp_check_filetype($data['img']);
+                if ( $validate['type'] == false ) {
+                    echo json_encode(['code'=>0]);exit;
+                }
                 $attach_id = self::download_remote_image_to_media_library($data['img']);
-               
+                if(!$attach_id){
+                    echo json_encode(['code'=>0]);exit;
+                }
                 if($data['is_tuku_header']){
                     $image_html = wp_get_attachment_image($attach_id, 'full',false,array( 'class' => 'aligncenter' ));
                    
                     $data['con'] = '<div>'.$image_html.'</div>'.$data['con'];
                 }
                 if($data['is_tuku_footer']){
+                     $validate = wp_check_filetype($data['img1']);
+                    if ( $validate['type'] == false ) {
+                        echo json_encode(['code'=>0]);exit;
+                    }
                     $attach_id1 = self::download_remote_image_to_media_library($data['img1']);
+                    if(!$attach_id1){
+                        echo json_encode(['code'=>0]);exit;
+                    }
                     $image_html = wp_get_attachment_image($attach_id1, 'full',false,array( 'class' => 'aligncenter' ));
                     $data['con'] = $data['con'].'<div>'.$image_html.'</div>';
                 }
@@ -331,6 +388,7 @@ class baiduseo_youhua{
         
     }
     public static function download_remote_image_to_media_library( $image_url ) {
+         
          global $wp_rewrite,$wp_filesystem;
         if (null === $wp_rewrite) {
             $wp_rewrite = new WP_Rewrite();
@@ -339,6 +397,10 @@ class baiduseo_youhua{
         if ( empty( $wp_filesystem ) ) {
             require_once( ABSPATH . 'wp-admin/includes/file.php' );
             WP_Filesystem();
+        }
+        $validate = wp_check_filetype($image_url);
+        if ( $validate['type'] == false ) {
+            return 0;
         }
     
         // 下载远程图片
@@ -359,10 +421,13 @@ class baiduseo_youhua{
         $file_path = trailingslashit( $upload_dir['path'] ) . $file_name;
     
         // 使用 WP_Filesystem 保存图片
-         $wp_filesystem->put_contents( $file_path, $image_data, FS_CHMOD_FILE ); 
+        $wp_filesystem->put_contents( $file_path, $image_data, FS_CHMOD_FILE ); 
     
         // 准备附件数据
-        $file_type = wp_check_filetype( $file_name, null );
+        $file_type = wp_check_filetype( $file_name);
+        if ( $file_type['type'] == false ) {
+            return 0;
+        }
         $attachment = array(
             'post_mime_type' => $file_type['type'],
             'post_title'     => sanitize_file_name( $file_name ),

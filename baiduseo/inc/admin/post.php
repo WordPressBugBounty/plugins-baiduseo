@@ -55,28 +55,28 @@ class baiduseo_post{
        
     }
     public function baiduseo_pingfen(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            $baiduseo_pingfen = get_option('baiduseo_pingfen');
             if($baiduseo_pingfen!==false){
-               update_option('baiduseo_pingfen',(int)$_POST['pingfen']);
+               update_option('baiduseo_pingfen',isset($_POST['pingfen'])?(int)$_POST['pingfen']:0);
             }else{
-               add_option('baiduseo_pingfen',(int)$_POST['pingfen']);
+               add_option('baiduseo_pingfen',isset($_POST['pingfen'])?(int)$_POST['pingfen']:0);
             }
             echo json_encode(['code'=>1]);exit;
         }
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_robots(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
              if(isset($_POST['robots'])){
-                baiduseo_seo::robots(sanitize_textarea_field($_POST['robots']));
+                baiduseo_seo::robots(sanitize_textarea_field(wp_unslash($_POST['robots'])));
             }
             echo json_encode(['code'=>1]);exit;
         }
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_yindao(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            $baiduseo_yindao = get_option('baiduseo_yindao');
            if($baiduseo_yindao!==false){
                update_option('baiduseo_yindao',1);
@@ -88,7 +88,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_liuliang_delete(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $ss  = baiduseo_zz::pay_money();
             if(!$ss){
                  echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -100,11 +100,9 @@ class baiduseo_post{
         echo json_encode(['msg'=>'操作失败','code'=>0]);exit;
     }
     public function baiduseo_aidk(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            set_time_limit(0);
-            ini_set('memory_limit','-1');
-            $codea = (int)$_POST['codea'];
-            $msg = sanitize_text_field($_POST['msg']);
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $codea = isset($_POST['codea'])?(int)$_POST['codea']:0;
+            $msg = isset($_POST['msg'])?sanitize_text_field(wp_unslash($_POST['msg'])):'';
             $defaults = array(
                 'timeout' => 10000,
                 'connecttimeout'=>10000,
@@ -116,20 +114,36 @@ class baiduseo_post{
             $result = wp_remote_get('https://www.rbzzz.com/index/index/zhongzhuan1?codea='.$codea.'&msg='.$msg.'&url='.$url1,$defaults);
             if(!is_wp_error($result)){
                 $content = wp_remote_retrieve_body($result);
-                echo $content;exit;
+                //验证
+                $content1 = json_decode($content,true);
+                if($content1['code']==0){
+                    echo wp_json_encode(['code'=>$content1['code'],'msg'=>esc_attr($content1['msg'])]);exit;
+                    exit;
+                }elseif($content1['code']==1){
+                    $content2 = '';
+                    foreach($content1['data'] as $k=>$v){
+                        $content2[] = sanitize_text_field($v);
+                    }
+                    echo wp_json_encode(['code'=>$content1['code'],'data'=>$content2]);exit;
+                    exit;
+                }else{
+                    echo wp_json_encode(['code'=>0,'msg'=>'请求失败']);exit;
+                    exit;
+                }
+                
             }
         }
         echo json_encode(['msg'=>'操作失败','code'=>0]);exit;
     }
     public function baiduseo_liuliang(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $ss  = baiduseo_zz::pay_money();
             if(!$ss){
                  echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $open = (int)$_POST['open'];
-            $log = (int)$_POST['log'];
-            $pinci = (int)$_POST['pinci'];
+            $open = isset($_POST['open'])?(int)$_POST['open']:0;
+            $log = isset($_POST['log'])?(int)$_POST['log']:0;
+            $pinci = isset($_POST['pinci'])?(int)$_POST['pinci']:0;
             
             $baiduseo_wyc = get_option('baiduseo_liuliang');
             if($baiduseo_wyc!==false){
@@ -144,10 +158,10 @@ class baiduseo_post{
         echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_wyc(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $wyc = (int)$_POST['wyc'];
-            $gx = (int)$_POST['gx'];
-            $wyc_min = (int)$_POST['wyc_min'];
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $wyc = isset($_POST['wyc'])?(int)$_POST['wyc']:0;
+            $gx = isset($_POST['gx'])?(int)$_POST['gx']:0;
+            $wyc_min = isset($_POST['wyc_min'])?(int)$_POST['wyc_min']:0;
             $baiduseo_wyc = get_option('baiduseo_wyc');
             if($baiduseo_wyc!==false){
                 $res = update_option('baiduseo_wyc',['wyc'=>$wyc,'gx'=>$gx,'wyc_min'=>$wyc_min]);
@@ -161,7 +175,7 @@ class baiduseo_post{
         echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_zhizhu(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
              global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
@@ -173,9 +187,9 @@ class baiduseo_post{
             }
            
             $list = [
-                'open'=>(int)$_POST['open'],
-                'log'=>(int)$_POST['log'],
-                'type'=>sanitize_text_field($_POST['type']),
+                'open'=>isset($_POST['open'])?(int)$_POST['open']:0,
+                'log'=>isset($_POST['log'])?(int)$_POST['log']:0,
+                'type'=>isset($_POST['type'])?sanitize_text_field(wp_unslash($_POST['type'])):0,
             ];
             $baiduseo_zhizhu = get_option('baiduseo_zhizhu');
             if($baiduseo_zhizhu!==false){
@@ -188,10 +202,19 @@ class baiduseo_post{
         echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_ai_lishi(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
              $current_time = current_time( 'Y/m/d H:i:s');
-            $res = $wpdb->insert($wpdb->prefix."baiduseo_ai_lishi",['hexin'=>sanitize_text_field($_POST['hexin']),'guangjianci'=>sanitize_text_field($_POST['guangjianci']),'neirong'=>sanitize_text_field($_POST['neirong']),'riqi'=>$current_time,'jifen'=>'0.2']);
+             if(!isset($_POST['hexin'])){
+                $_POST['hexin'] =''; 
+             }
+             if(!isset($_POST['guangjianci'])){
+                $_POST['guangjianci'] =''; 
+             }
+             if(!isset($_POST['neirong'])){
+                $_POST['neirong'] =''; 
+             }
+            $res = $wpdb->insert($wpdb->prefix."baiduseo_ai_lishi",['hexin'=>sanitize_text_field(wp_unslash($_POST['hexin'])),'guangjianci'=>sanitize_text_field(wp_unslash($_POST['guangjianci'])),'neirong'=>sanitize_text_field(wp_unslash($_POST['neirong'])),'riqi'=>$current_time,'jifen'=>'0.2']);
             if($res){
                 echo json_encode(['msg'=>'保存成功','code'=>1]);exit;
             }
@@ -200,7 +223,7 @@ class baiduseo_post{
         
     }
     public function baiduseo_ai_lishiz(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
             $start1 = ($p1-1)*20;
@@ -215,9 +238,9 @@ class baiduseo_post{
         
     }
       public function baiduseo_ai_lishis(){
-           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+           if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $id  = (int)$_POST['id'];
+            $id  = isset($_POST['id'])?(int)$_POST['id']:0;
              $res = $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_ai_lishi where id=  %d",(int)$id));
              
             if($res){
@@ -229,13 +252,13 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'删除失败']);exit;
       }
     public function baiduseo_5118_daochu(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $keywords = sanitize_text_field($_POST['keywords']);
-            $total = (int)$_POST['total'];
-            $long = (int)$_POST['long'];
+            $keywords = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
+            $total = isset($_POST['total'])?(int)$_POST['total']:0;
+            $long = isset($_POST['long'])?(int)$_POST['long']:0;
             $collect = 0;
-            $bidword = (int)$_POST['bidword'];
+            $bidword = isset($_POST['bidword'])?(int)$_POST['bidword']:0;
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -263,8 +286,8 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'申请失败，请稍后重试！']);exit;
     }
     public function baiduseo_5118(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $name = sanitize_text_field($_POST['name']);
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $name = isset($_POST['name'])?sanitize_text_field(wp_unslash($_POST['name'])):'';
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -283,8 +306,8 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'获取失败']);exit;
     }
     public function baiduseo_percent(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $type = (int)$_POST['type']; 
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $type = isset($_POST['type'])?(int)$_POST['type']:1; 
             if($type==1){
                 $defaults = array(
                     'timeout' => 4000,
@@ -646,7 +669,7 @@ class baiduseo_post{
         }
     }
     public function baiduseo_yindao_five(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
              global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  exit;
@@ -662,7 +685,7 @@ class baiduseo_post{
     }
     public function baiduseo_yindao_four(){
           global $wpdb,$baiduseo_wzt_log;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
@@ -670,31 +693,31 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $indexnow_key = sanitize_text_field($_POST['indexnow_key']);
+            $indexnow_key = isset($_POST['indexnow_key'])?sanitize_text_field(wp_unslash($_POST['indexnow_key'])):'';
             
             $seo_baidu_xzh =[                               
-                'zz_link'=>sanitize_url($_POST['zz_link']),                                   
-                'bing_key'=>sanitize_text_field($_POST['bing_key']), 
-                'shenma_key' =>sanitize_url($_POST['shenma_key']),
-                'toutiao_key'=>sanitize_text_field($_POST['toutiao_key']),
+                'zz_link'=>isset($_POST['zz_link'])?sanitize_url(wp_unslash($_POST['zz_link'])):'',                                   
+                'bing_key'=>isset($_POST['bing_key'])?sanitize_text_field(wp_unslash($_POST['bing_key'])):'', 
+                'shenma_key' =>isset($_POST['shenma_key'])?sanitize_url(wp_unslash($_POST['shenma_key'])):"",
+                'toutiao_key'=>isset($_POST['toutiao_key'])?sanitize_text_field(wp_unslash($_POST['toutiao_key'])):"",
                 'indexnow_key'=>$indexnow_key,
-                'google_api'=>sanitize_textarea_field(stripslashes($_POST['google_api'])),
-                'indexnow_pingtai'=>sanitize_text_field($_POST['indexnow_pingtai']),
-                'post_type'=>sanitize_text_field($_POST['post_type']),
-                'baiduseo_type'=>sanitize_text_field($_POST['baiduseo_type']),
-                'post_type'=>sanitize_text_field($_POST['post_type']),
-                'status'=>sanitize_text_field($_POST['status']),
-                'pingtai'=>sanitize_text_field($_POST['pingtai']),
-                'bdpt_num'=>(int)$_POST['bdpt_num'],
-                'bing_num'=>(int)$_POST['bing_num'],
-                'sm_num'=>(int)$_POST['sm_num'],
-                'log'=>sanitize_text_field($_POST['log']),
-                'bd_log'=>(int)$_POST['bd_log'],
-                'bdks_log'=>(int)$_POST['bdks_log'],
-                'bing_log'=>(int)$_POST['bing_log'],
-                'shenma_log'=>(int)$_POST['shenma_log'],
-                'indexNow_log'=>(int)$_POST['indexNow_log'],
-                'guge_log'=>(int)$_POST['guge_log'],
+                'google_api'=>isset($_POST['google_api'])?stripslashes(sanitize_textarea_field(wp_unslash($_POST['google_api']))):"",
+                'indexnow_pingtai'=>isset($_POST['indexnow_pingtai'])?sanitize_text_field(wp_unslash($_POST['indexnow_pingtai'])):"",
+                'post_type'=>isset($_POST['post_type'])?sanitize_text_field(wp_unslash($_POST['post_type'])):"",
+                // 'baiduseo_type'=>sanitize_text_field($_POST['baiduseo_type']),
+                // 'post_type'=>isset($_POST['bing_key'])?sanitize_text_field($_POST['post_type']),
+                'status'=>isset($_POST['status'])?sanitize_text_field(wp_unslash($_POST['status'])):'',
+                'pingtai'=>isset($_POST['pingtai'])?sanitize_text_field(wp_unslash($_POST['pingtai'])):'',
+                'bdpt_num'=>isset($_POST['bdpt_num'])?(int)$_POST['bdpt_num']:"",
+                'bing_num'=>isset($_POST['bing_num'])?(int)$_POST['bing_num']:"",
+                'sm_num'=>isset($_POST['sm_num'])?(int)$_POST['sm_num']:"",
+                'log'=>isset($_POST['log'])?sanitize_text_field(wp_unslash($_POST['log'])):"",
+                'bd_log'=>isset($_POST['bd_log'])?(int)$_POST['bd_log']:"",
+                'bdks_log'=>isset($_POST['bdks_log'])?(int)$_POST['bdks_log']:"",
+                'bing_log'=>isset($_POST['bing_log'])?(int)$_POST['bing_log']:"",
+                'shenma_log'=>isset($_POST['shenma_log'])?(int)$_POST['shenma_log']:"",
+                'indexNow_log'=>isset($_POST['indexNow_log'])?(int)$_POST['indexNow_log']:"",
+                'guge_log'=>isset($_POST['guge_log'])?(int)$_POST['guge_log']:"",
                 
             ];
             if($indexnow_key){
@@ -715,7 +738,7 @@ class baiduseo_post{
          echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_yindao_three(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
@@ -728,77 +751,77 @@ class baiduseo_post{
             $sitemap = get_option('seo_baidu_sitemap');
             if($sitemap!==false && !is_array($sitemap)){
                 // $data = $sitemap;
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
+                $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 // $data['tag_open'] = (int)$_POST['tag_open'];
                 
                 update_option('seo_baidu_sitemap',$data);
             }elseif($sitemap!==false && is_array($sitemap)){
                 $data = $sitemap;
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
+                $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 // $data['tag_open'] = (int)$_POST['tag_open'];
                 
                 update_option('seo_baidu_sitemap',$data);
             }else{
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                 $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
+                $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 // $data['tag_open'] = (int)$_POST['tag_open'];
                 add_option('seo_baidu_sitemap',$data);  
             }
             
-            baiduseo_seo::alt((int)$_POST['alt'],(int)$_POST['title']);
-            if($_POST['isrobots']==1){
-                if(sanitize_textarea_field($_POST['robots'])){
-                    baiduseo_seo::robots(sanitize_textarea_field($_POST['robots']));
+            baiduseo_seo::alt(isset($_POST['alt'])?(int)$_POST['alt']:0,isset($_POST['title'])?(int)$_POST['title']:0);
+            if(isset($_POST['isrobots']) && $_POST['isrobots']==1){
+                if(isset($_POST['robots']) && sanitize_textarea_field(wp_unslash($_POST['robots']))){
+                    baiduseo_seo::robots(sanitize_textarea_field(wp_unslash($_POST['robots'])));
                 }
             }
-            if((int)$_POST['sitemap_open']==1){
+            if(isset($_POST['sitemap_open']) && (int)$_POST['sitemap_open']==1){
                 baiduseo_seo::sitemap(1,1,1);
             }
             if((int)$_POST['silian_open']==1){
@@ -809,17 +832,18 @@ class baiduseo_post{
          echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_yindao_second(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $data = [
-                'thumb'=>(int)$_POST['thumb'],
-                'head_dy'=>(int)$_POST['head_dy'],
-                'xml_rpc'=>(int)$_POST['xml_rpc'],
-                'feed'=>(int)$_POST['feed'],
-                'post_thumb'=>(int)$_POST['post_thumb'],
-                'gravatar'=>(int)$_POST['gravatar'],
-                'lan'=>(int)$_POST['lan'],
-                'category'=>(int)$_POST['category'],
-                'listbtn'=>(int)$_POST['listbtn']
+                'thumb'=>isset($_POST['thumb'])?(int)$_POST['thumb']:0,
+                'head_dy'=>isset($_POST['head_dy'])?(int)$_POST['head_dy']:0,
+                'xml_rpc'=>isset($_POST['xml_rpc'])?(int)$_POST['xml_rpc']:0,
+                'feed'=>isset($_POST['feed'])?(int)$_POST['feed']:0,
+                'post_thumb'=>isset($_POST['post_thumb'])?(int)$_POST['post_thumb']:0,
+                'gravatar'=>isset($_POST['gravatar'])?(int)$_POST['gravatar']:0,
+                'lan'=>isset($_POST['lan'])?(int)$_POST['lan']:0,
+                'category'=>isset($_POST['category'])?(int)$_POST['category']:0,
+                'listbtn'=>isset($_POST['listbtn'])?(int)$_POST['listbtn']:0,
+                'wp_json'=>isset($_POST['wp_json'])?(int)$_POST['wp_json']:0
                 
             ];
            
@@ -834,19 +858,19 @@ class baiduseo_post{
          echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
     public function baiduseo_yindao_first(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             if(isset($_POST['title'])){
-                update_option('blogname',sanitize_text_field($_POST['title']));
+                update_option('blogname',sanitize_text_field(wp_unslash($_POST['title'])));
             }
             if(isset($_POST['subtitle'])){
-                update_option('blogdescription',sanitize_text_field($_POST['subtitle']));
+                update_option('blogdescription',sanitize_text_field(wp_unslash($_POST['subtitle'])));
             }
-            baiduseo_seo::seo_index(sanitize_text_field($_POST['keywords']),sanitize_textarea_field($_POST['description']));
+            baiduseo_seo::seo_index(isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'',isset($_POST['description'])?sanitize_textarea_field(wp_unslash($_POST['description'])):'');
             if(isset($_POST['cate_id'])){
-                baiduseo_seo::cate_seo(sanitize_text_field($_POST['cate_keywords']),sanitize_textarea_field($_POST['cate_description']),(int)$_POST['cate_id']);
+                baiduseo_seo::cate_seo(isset($_POST['cate_keywords'])?sanitize_text_field(wp_unslash($_POST['cate_keywords'])):'',isset($_POST['cate_description'])?sanitize_textarea_field(wp_unslash($_POST['cate_description'])):'',(int)$_POST['cate_id']);
             }
             if(isset($_POST['page'])){
-                baiduseo_seo::page_seo(sanitize_text_field($_POST['page_keywords']),sanitize_text_field($_POST['page_description']),(int)$_POST['page']);
+                baiduseo_seo::page_seo(isset($_POST['page_keywords'])?sanitize_text_field(wp_unslash($_POST['page_keywords'])):'',isset($_POST['page_description'])?sanitize_text_field(wp_unslash($_POST['page_description'])):'',(int)$_POST['page']);
             }
             echo json_encode(['code'=>1]);exit;
             
@@ -855,10 +879,10 @@ class baiduseo_post{
     }
    
     public function baiduseo_reci(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            
-            $type = (int)$_POST['type'];
-            $keyword = sanitize_text_field($_POST['keyword']);
+            $type = isset($_POST['type'])?(int)$_POST['type']:0;
+            $keyword = isset($_POST['keyword'])?sanitize_text_field(wp_unslash($_POST['keyword'])):'';
             $result = wp_remote_post('https://www.rbzzz.com/api/tag/index',['body'=>['type'=>$type,'keyword'=>$keyword,'url'=>baiduseo_common::baiduseo_url(0)]]);
            
             if(!is_wp_error($result)){
@@ -877,9 +901,9 @@ class baiduseo_post{
         echo json_encode(['msg'=>'获取失败','code'=>0]);exit;
     }
     public function baiduseo_address_delete(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $id  = (int)$_POST['id'];
+            $id  = isset($_POST['id'])?(int)$_POST['id']:0;
              $res = $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "wztkj_friends where id=  %d",(int)$id));
              
             if($res){
@@ -891,10 +915,10 @@ class baiduseo_post{
          echo json_encode(['code'=>0,'msg'=>'删除失败']);exit;
     }
     public function baiduseo_add_link(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $current_time = current_time( 'Y/m/d H:i:s');
-            $re = $wpdb->insert($wpdb->prefix."wztkj_friends",['link'=>sanitize_url($_POST['address']),'keywords'=>sanitize_text_field($_POST['keywords']),'time'=>$current_time,'status1'=>5]);
+            $re = $wpdb->insert($wpdb->prefix."wztkj_friends",['link'=>isset($_POST['address'])?sanitize_url(wp_unslash($_POST['address'])):'','keywords'=>isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'','time'=>$current_time,'status1'=>5]);
             if($re){
                 echo json_encode(['code'=>1,'msg'=>'添加成功']);exit;
             }else{
@@ -904,10 +928,10 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'添加失败']);exit;
     }
     public function baiduseo_shenhe(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $url = 'http://wp.seohnzz.com/api/wztkj/shenhe';
-            $link2 = sanitize_url($_POST['url']);
+            $link2 = isset($_POST['url'])?sanitize_url(wp_unslash($_POST['url'])):'';
             $link1 =  baiduseo_common::baiduseo_url(1);
             $result = wp_remote_post($url,['body'=>['data'=>['link1'=>$link1,'link2'=>$link2]]]);
             if(!is_wp_error($result)){
@@ -925,11 +949,11 @@ class baiduseo_post{
         echo json_encode(['msg'=>'请求失败，请稍后重试！','code'=>0]);exit;
     }
     public function baiduseo_pingbi(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $url = 'http://wp.seohnzz.com/api/wztkj/pb';
-            $link2 = sanitize_url($_POST['url']);
-            $status = (int)$_POST['status'];
+            $link2 = isset($_POST['url'])?sanitize_url(wp_unslash($_POST['url'])):'';
+            $status =isset($_POST['status'])?(int)$_POST['status']:0;
             
             if($status==0){
                 $sta = 1;
@@ -955,7 +979,7 @@ class baiduseo_post{
         echo json_encode(['msg'=>'请求失败，请稍后重试！','code'=>0]);exit;
     }
     public function baiduseo_yanzheng(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,
@@ -979,22 +1003,22 @@ class baiduseo_post{
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_linkhh(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             
-            $data['link'] = (int)$_POST['link'];
-            $data['keywords'] = sanitize_text_field($_POST['keywords']);
-            $data['hhtype'] = (int)$_POST['hhtype'];
-            $data['hhtj'] = (int)$_POST['hhtj'];
+            $data['link'] = isset($_POST['link'])?(int)$_POST['link']:'';
+            $data['keywords'] = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
+            $data['hhtype'] = isset($_POST['hhtype'])?(int)$_POST['hhtype']:0;
+            $data['hhtj'] = isset($_POST['hhtj'])?(int)$_POST['hhtj']:0;
             if(isset($_POST['level']) ){
                 $data['level'] = array_map('intval',explode(',',$_POST['level']));
             }
             if(isset($_POST['cate'])){
                 $data['cate'] = array_map('intval',explode(',',$_POST['cate']));
             }
-            $data['ystype'] = (int)$_POST['ystype'];
-            $data['kqtype'] = (int)$_POST['kqtype'];
-            $data['yswidth'] = sanitize_text_field($_POST['yswidth']);
-            $data['mobilewidth'] = sanitize_text_field($_POST['mobilewidth']);
+            $data['ystype'] = isset($_POST['ystype'])?(int)$_POST['ystype']:0;
+            $data['kqtype'] = isset($_POST['kqtype'])?(int)$_POST['kqtype']:0;
+            $data['yswidth'] = isset($_POST['yswidth'])?sanitize_text_field(wp_unslash($_POST['yswidth'])):'';
+            $data['mobilewidth'] = isset($_POST['mobilewidth'])?sanitize_text_field(wp_unslash($_POST['mobilewidth'])):'';
             
             $wztkj_linkhh = get_option('baiduseo_linkhh');
             if($wztkj_linkhh!==false){
@@ -1008,12 +1032,12 @@ class baiduseo_post{
        echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_ptts(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),$_POST['action'])){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
             $log = baiduseo_zz::pay_money();
             if(!$log){
                 echo json_encode(['msg'=>0,'data'=>'请先授权']);exit;
             }
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $urls[] = get_permalink($id);
             $baiduseo_zz_record = get_option('baiduseo_zz_record');
             baiduseo_zz::bdts($urls,0);
@@ -1026,7 +1050,7 @@ class baiduseo_post{
         }
     }
     public function baiduseo_neilian_delete_all(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            
             global $wpdb;
             $res = $wpdb->query("DELETE FROM " . $wpdb->prefix . "baiduseo_neilian ");
@@ -1038,7 +1062,7 @@ class baiduseo_post{
     }
     public function baiduseo_neilian_delete(){
       
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $dele = array_map('intval',wp_unslash(explode(',',$_POST['dele'])));
             if(!empty($dele) && is_array($dele)){
                 global $wpdb;
@@ -1054,11 +1078,11 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'删除失败']);exit;
     }
     public function baiduseo_shouquan(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $key = sanitize_text_field($_POST['key']);
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $key = isset($_POST['key'])?sanitize_text_field(wp_unslash($_POST['key'])):'';
             
             $data =  baiduseo_common::baiduseo_url(0);
-            $url1 = sanitize_text_field($_SERVER['SERVER_NAME']);
+            $url1 = isset($_SERVER['SERVER_NAME'])?sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])):'';
             $url = 'https://www.rbzzz.com/api/money/log2?url='.$data.'&url1='.$url1.'&key='.$key.'&type=1';
             $defaults = array(
                 'timeout' => 4000,
@@ -1086,7 +1110,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_neilian(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb,$baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
@@ -1096,12 +1120,12 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
             }
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             if(isset($_POST['keywords'])){
-                $data['keywords'] = sanitize_text_field($_POST['keywords']);
+                $data['keywords'] = sanitize_text_field(wp_unslash($_POST['keywords']));
             }
             if(isset($_POST['link'])){
-                $data['link'] = sanitize_text_field($_POST['link']);
+                $data['link'] = sanitize_text_field(wp_unslash($_POST['link']));
             }
             if(isset($_POST['target'])){
                 $data['target'] = (int)$_POST['target'];
@@ -1122,7 +1146,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'修改失败']);exit;
     }
     public function baiduseo_keywords_delete(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb,$baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
@@ -1131,7 +1155,7 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
             }
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $list = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where id=%d',$id),ARRAY_A);
             $res = $wpdb->query($wpdb->prepare( "DELETE FROM " . $wpdb->prefix . "baiduseo_keywords where id=  %d",$id ));
             if($res){
@@ -1151,9 +1175,9 @@ class baiduseo_post{
         echo  json_encode(['msg'=>'删除失败,请稍后重试','code'=>0]);exit;
     }
     public function baiduseo_gaixie(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),sanitize_text_field($_POST['action']))){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
             global $wpdb;
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
             $defaults = array(
                 'timeout' => 4000,
@@ -1194,19 +1218,17 @@ class baiduseo_post{
         }
     }
     public function baiduseo_kuaisu(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),sanitize_text_field($_POST['action']))){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
             
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $urls[] = get_permalink($id);
             baiduseo_zz::bddayts1($urls);
         }
     }
     public function baiduseo_yuanchuang(){
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
         global $baiduseo_wzt_log;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),sanitize_text_field($_POST['action']))){
-            $id = (int)$_POST['id'];
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
             $defaults = array(
                 'timeout' => 4000,
@@ -1292,9 +1314,9 @@ class baiduseo_post{
         echo json_encode(['msg'=>'0','data'=>'提交失败！']);exit;
     }
     public function baiduseo_kp_delete(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
             
             $kp = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_kp where id=%d',$id),ARRAY_A);
             $url = 'https://www.rbzzz.com/api/kp/keywords_delete?url='.baiduseo_common::baiduseo_url(0).'&keywords='.$kp[0]['keywords'].'&type='.$kp[0]['type'];
@@ -1324,15 +1346,13 @@ class baiduseo_post{
         echo json_encode(['code'=>'0']);exit;
     }
     public function baiduseo_tag_pladd(){
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $baiduseo_tag = get_option('baiduseo_tag');
             
-            $num = (int)$_POST['num'];
+            $num = isset($_POST['num'])?(int)$_POST['num']:0;
             
             global $wpdb;
-            $page = (int)$_POST['page']?(int)$_POST['page']:1;
+            $page = isset($_POST['page'])?(int)$_POST['page']:1;
             if($page==1){
                 global $baiduseo_wzt_log;
                 if(!$baiduseo_wzt_log){
@@ -1343,7 +1363,7 @@ class baiduseo_post{
                     echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
                 }
             }
-            $tag_num = (int)$_POST['tag_num'];
+            $tag_num = isset($_POST['tag_num'])?(int)$_POST['tag_num']:0;
             
             $count_posts = wp_count_posts();
             $total = $count_posts->publish;
@@ -1440,9 +1460,11 @@ class baiduseo_post{
         echo json_encode(['msg'=>"操作失败",'code'=>0]);exit;
     }
      public function baiduseo_add_pltag(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $type = (int)$_POST['type'];
-            $keywords = array_map('sanitize_text_field',explode(',',$_POST['keywords']));
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $type = isset($_POST['type'])?(int)$_POST['type']:0;
+            if(isset($_POST['keywords'])){
+                $keywords = array_map('sanitize_text_field', explode(',', wp_unslash($_POST['keywords'])));
+            }
             global $baiduseo_wzt_log,$wpdb;
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);
@@ -1540,11 +1562,10 @@ class baiduseo_post{
        
     }
     public function baiduseo_add_tag(){
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $keyword = sanitize_text_field($_POST['keyword']);
-            $type = (int)$_POST['type'];
+        
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $keyword = isset($_POST['keyword'])?sanitize_text_field(wp_unslash($_POST['keyword'])):'';
+            $type = isset($_POST['type'])?(int)$_POST['type']:0;
             global $baiduseo_wzt_log,$wpdb;
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);
@@ -1635,10 +1656,9 @@ class baiduseo_post{
         
     }
     public function baiduseo_tag_add(){
-        set_time_limit(0);
-        ini_set('memory_limit','-1');
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            if(sanitize_textarea_field($_POST['content'])){
+       
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            if(isset($_POST['content']) && sanitize_textarea_field(wp_unslash($_POST['content']))){
                 global $baiduseo_wzt_log;
                 if(!$baiduseo_wzt_log){
                       echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -1647,7 +1667,7 @@ class baiduseo_post{
                 if(!$log){
                      echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
                 }
-                $content = explode("\n",sanitize_textarea_field($_POST['content']));
+                $content = explode("\n",sanitize_textarea_field(wp_unslash($_POST['content'])));
                
                 if(!empty($content)){
                     global $wpdb;
@@ -1740,7 +1760,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0,'msg'=>'添加失败']);exit;
     }
     public function baiduseo_rank(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -1782,7 +1802,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0]);exit;
     }
     public function baiduseo_301(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $site_url = baiduseo_common::baiduseo_url(0).'/';
             $site_url1 = baiduseo_common::baiduseo_url(1);
             $defaults = array(
@@ -1825,7 +1845,7 @@ class baiduseo_post{
         echo json_encode(['code'=>0]);exit; 
     }
     public function baiduseo_zhizhu_clear(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                   echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -1843,9 +1863,9 @@ class baiduseo_post{
         echo json_encode(['msg'=>'删除失败','code'=>0]);exit;
     }
     public function baiduseo_zhizhu_linkdelete(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $id = (int)$_POST['id'];
+            $id = isset($_POST['id'])?(int)$_POST['id']:0;
            
             $res = $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zhizhu where id=%d",$id));
             echo json_encode(['code'=>1]);exit; 
@@ -1853,7 +1873,7 @@ class baiduseo_post{
          echo json_encode(['code'=>0]);exit; 
     }
     public function baiduseo_tag(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -1869,11 +1889,11 @@ class baiduseo_post{
     }
     public function baiduseo_kp(){
         global $wpdb;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp'") !=  $wpdb->prefix."baiduseo_kp"){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
             }
-            $data['keywords'] = sanitize_text_field($_POST['keywords']);
+            $data['keywords'] = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
             if(!$data['keywords']){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
             }
@@ -1908,13 +1928,15 @@ class baiduseo_post{
                      }
                 }
             
-            $data['type'] = (int)$_POST['type'];
+            $data['type'] = isset($_POST['type'])?(int)$_POST['type']:0;
             $resu = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_kp where type=%d and keywords=%s',(int)$data['type'],$data['keywords']),ARRAY_A);
             if(!empty($resu) && $resu[0]['status']<=2){
                 echo json_encode(['code'=>0,'msg'=>'关键词已添加,请不要重复添加']);exit;
                
             }
-            $url = 'https://www.rbzzz.com/api/kp/keywords_add?url='.sanitize_text_field($_SERVER['SERVER_NAME']).'&keywords='.$data['keywords'].'&type='.$data['type'].'&http='.trim(get_option('siteurl')).'&url1='.baiduseo_common::baiduseo_url(0);
+            if(isset($_SERVER['SERVER_NAME'])){
+                $url = 'https://www.rbzzz.com/api/kp/keywords_add?url='.sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])).'&keywords='.$data['keywords'].'&type='.$data['type'].'&http='.trim(get_option('siteurl')).'&url1='.baiduseo_common::baiduseo_url(0);
+            }
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -1946,7 +1968,7 @@ class baiduseo_post{
     }
     public function baiduseo_keywords(){
         global $wpdb;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
@@ -1955,8 +1977,10 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $keywords = sanitize_text_field($_POST['keywords']);
-            
+            $keywords = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
+            if(!isset($_POST['type'])){
+                return;
+            }
             if($keywords){
                 $list = $wpdb->query(' select * from  '.$wpdb->prefix.'baiduseo_keywords where type="'.(int)$_POST['type'].'"');
                 $defaults = array(
@@ -2012,17 +2036,18 @@ class baiduseo_post{
         echo json_encode(['msg'=>'添加失败','code'=>0]);exit;
     }
     public function baiduseo_youhua(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $data = [
-                'thumb'=>(int)$_POST['thumb'],
-                'head_dy'=>(int)$_POST['head_dy'],
-                'xml_rpc'=>(int)$_POST['xml_rpc'],
-                'feed'=>(int)$_POST['feed'],
-                'post_thumb'=>(int)$_POST['post_thumb'],
-                'gravatar'=>(int)$_POST['gravatar'],
-                'lan'=>(int)$_POST['lan'],
-                'category'=>(int)$_POST['category'],
-                'listbtn'=>(int)$_POST['listbtn']
+                'thumb'=>isset($_POST['thumb'])?(int)$_POST['thumb']:0,
+                'head_dy'=>isset($_POST['head_dy'])?(int)$_POST['head_dy']:0,
+                'xml_rpc'=>isset($_POST['xml_rpc'])?(int)$_POST['xml_rpc']:0,
+                'feed'=>isset($_POST['feed'])?(int)$_POST['feed']:0,
+                'post_thumb'=>isset($_POST['post_thumb'])?(int)$_POST['post_thumb']:0,
+                'gravatar'=>isset($_POST['gravatar'])?(int)$_POST['gravatar']:0,
+                'lan'=>isset($_POST['lan'])?(int)$_POST['lan']:0,
+                'category'=>isset($_POST['category'])?(int)$_POST['category']:0,
+                'listbtn'=>isset($_POST['listbtn'])?(int)$_POST['listbtn']:0,
+                'wp_json'=>isset($_POST['wp_json'])?(int)$_POST['wp_json']:0
             ];
             $baidu = get_option('baiduseo_youhua');
             if($baidu!==false){
@@ -2037,7 +2062,7 @@ class baiduseo_post{
     public function baiduseo_zz(){
         global $wpdb,$baiduseo_wzt_log;
         
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
@@ -2045,31 +2070,31 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $indexnow_key = sanitize_text_field($_POST['indexnow_key']);
+            $indexnow_key = isset($_POST['indexnow_key'])?sanitize_text_field(wp_unslash($_POST['indexnow_key'])):'';
             
             $seo_baidu_xzh =[                               
-                'zz_link'=>sanitize_url($_POST['zz_link']),                                   
-                'bing_key'=>sanitize_text_field($_POST['bing_key']), 
-                'shenma_key' =>sanitize_url($_POST['shenma_key']),
-                'toutiao_key'=>sanitize_text_field($_POST['toutiao_key']),
+                'zz_link'=>isset($_POST['zz_link'])?sanitize_url(wp_unslash($_POST['zz_link'])):'',                                   
+                'bing_key'=>isset($_POST['bing_key'])?sanitize_text_field(wp_unslash($_POST['bing_key'])):'', 
+                'shenma_key' =>isset($_POST['shenma_key'])?sanitize_url(wp_unslash($_POST['shenma_key'])):"",
+                'toutiao_key'=>isset($_POST['toutiao_key'])?sanitize_text_field(wp_unslash($_POST['toutiao_key'])):"",
                 'indexnow_key'=>$indexnow_key,
-                'google_api'=>sanitize_textarea_field(stripslashes($_POST['google_api'])),
-                'indexnow_pingtai'=>sanitize_text_field($_POST['indexnow_pingtai']),
-                'post_type'=>sanitize_text_field($_POST['post_type']),
-                'baiduseo_type'=>sanitize_text_field($_POST['baiduseo_type']),
-                'post_type'=>sanitize_text_field($_POST['post_type']),
-                'status'=>sanitize_text_field($_POST['status']),
-                'pingtai'=>sanitize_text_field($_POST['pingtai']),
-                'bdpt_num'=>(int)$_POST['bdpt_num'],
-                'bing_num'=>(int)$_POST['bing_num'],
-                'sm_num'=>(int)$_POST['sm_num'],
-                'log'=>sanitize_text_field($_POST['log']),
-                'bd_log'=>(int)$_POST['bd_log'],
-                'bdks_log'=>(int)$_POST['bdks_log'],
-                'bing_log'=>(int)$_POST['bing_log'],
-                'shenma_log'=>(int)$_POST['shenma_log'],
-                'indexNow_log'=>(int)$_POST['indexNow_log'],
-                'guge_log'=>(int)$_POST['guge_log'],
+                'google_api'=>isset($_POST['google_api'])?stripslashes(sanitize_textarea_field(wp_unslash($_POST['google_api']))):"",
+                'indexnow_pingtai'=>isset($_POST['indexnow_pingtai'])?sanitize_text_field(wp_unslash($_POST['indexnow_pingtai'])):"",
+                'post_type'=>isset($_POST['post_type'])?sanitize_text_field(wp_unslash($_POST['post_type'])):"",
+                // 'baiduseo_type'=>sanitize_text_field($_POST['baiduseo_type']),
+                // 'post_type'=>isset($_POST['bing_key'])?sanitize_text_field($_POST['post_type']),
+                'status'=>isset($_POST['status'])?sanitize_text_field(wp_unslash($_POST['status'])):'',
+                'pingtai'=>isset($_POST['pingtai'])?sanitize_text_field(wp_unslash($_POST['pingtai'])):'',
+                'bdpt_num'=>isset($_POST['bdpt_num'])?(int)$_POST['bdpt_num']:"",
+                'bing_num'=>isset($_POST['bing_num'])?(int)$_POST['bing_num']:"",
+                'sm_num'=>isset($_POST['sm_num'])?(int)$_POST['sm_num']:"",
+                'log'=>isset($_POST['log'])?sanitize_text_field(wp_unslash($_POST['log'])):"",
+                'bd_log'=>isset($_POST['bd_log'])?(int)$_POST['bd_log']:"",
+                'bdks_log'=>isset($_POST['bdks_log'])?(int)$_POST['bdks_log']:"",
+                'bing_log'=>isset($_POST['bing_log'])?(int)$_POST['bing_log']:"",
+                'shenma_log'=>isset($_POST['shenma_log'])?(int)$_POST['shenma_log']:"",
+                'indexNow_log'=>isset($_POST['indexNow_log'])?(int)$_POST['indexNow_log']:"",
+                'guge_log'=>isset($_POST['guge_log'])?(int)$_POST['guge_log']:"",
                 
             ];
             if($indexnow_key){
@@ -2095,8 +2120,8 @@ class baiduseo_post{
             
     }
     public function baiduseo_seo(){
-        ini_set('memory_limit','-1');
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
+       
+        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
              global $baiduseo_wzt_log;
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
@@ -2106,10 +2131,14 @@ class baiduseo_post{
             if(!$log){
                 echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
             }
-            baiduseo_seo::seo_index(sanitize_text_field($_POST['keywords']),sanitize_text_field($_POST['description']));
-            baiduseo_seo::cate_seo(sanitize_text_field($_POST['cate_keywords']),sanitize_text_field($_POST['cate_description']),(int)$_POST['cate']);
-            baiduseo_seo::page_seo(sanitize_text_field($_POST['page_keywords']),sanitize_text_field($_POST['page_description']),(int)$_POST['page']);
-            if((int)$_POST['page_404']){
+           baiduseo_seo::seo_index(isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'',isset($_POST['description'])?sanitize_textarea_field(wp_unslash($_POST['description'])):'');
+            if(isset($_POST['cate_id'])){
+                baiduseo_seo::cate_seo(isset($_POST['cate_keywords'])?sanitize_text_field(wp_unslash($_POST['cate_keywords'])):'',isset($_POST['cate_description'])?sanitize_textarea_field(wp_unslash($_POST['cate_description'])):'',(int)$_POST['cate_id']);
+            }
+            if(isset($_POST['page'])){
+                baiduseo_seo::page_seo(isset($_POST['page_keywords'])?sanitize_text_field(wp_unslash($_POST['page_keywords'])):'',isset($_POST['page_description'])?sanitize_text_field(wp_unslash($_POST['page_description'])):'',(int)$_POST['page']);
+            }
+            if(isset($_POST['page_404']) && (int)$_POST['page_404']){
                 baiduseo_seo::page_404();
             }else{
                 $seo_301_404_url = get_option('seo_301_404_url');
@@ -2120,78 +2149,75 @@ class baiduseo_post{
                 }
             }
             if(isset($_POST['robots'])){
-                baiduseo_seo::robots(sanitize_textarea_field($_POST['robots']));
+                baiduseo_seo::robots(sanitize_textarea_field(wp_unslash($_POST['robots'])));
             }
             
             $sitemap = get_option('seo_baidu_sitemap');
             if($sitemap!==false && !is_array($sitemap)){
                 // $data = $sitemap;
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
-                $data['tag_open'] = (int)$_POST['tag_open'];
+                 $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 update_option('seo_baidu_sitemap',$data);
             }elseif($sitemap!==false && is_array($sitemap)){
                 $data = $sitemap;
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
-                $data['tag_open'] = (int)$_POST['tag_open'];
+                $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 update_option('seo_baidu_sitemap',$data);
             }else{
-                $data['level1'] = (int)$_POST['level1'];
-                $data['level2'] = (int)$_POST['level2'];
-                $data['level3'] = (int)$_POST['level3'];
-                $data['level4'] = (int)$_POST['level4'];
-                $data['level5'] = (int)$_POST['level5'];
-                $data['type1'] = (int)$_POST['type1'];
-                $data['type2'] = (int)$_POST['type2'];
-                $data['type3'] = (int)$_POST['type3'];
-                $data['type4'] = (int)$_POST['type4'];
-                $data['type5'] = (int)$_POST['type5'];
-                $data['page_time'] = sanitize_text_field($_POST['page_time']);
-                $data['post_time'] = sanitize_text_field($_POST['post_time']);
-                $data['tag_time'] = sanitize_text_field($_POST['tag_time']);
-                $data['other_time'] = sanitize_text_field($_POST['other_time']);
-                $data['cate_time'] = sanitize_text_field($_POST['cate_time']);
-                $data['sitemap_open'] = (int)$_POST['sitemap_open'];
-                $data['silian_open'] = (int)$_POST['silian_open'];
-                $data['tag_open'] = (int)$_POST['tag_open'];
+                 $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
+                $data['level2'] = isset($_POST['level2'])?(int)$_POST['level2']:0;
+                $data['level3'] = isset($_POST['level3'])?(int)$_POST['level3']:0;
+                $data['level4'] = isset($_POST['level4'])?(int)$_POST['level4']:0;
+                $data['level5'] = isset($_POST['level5'])?(int)$_POST['level5']:0;
+                $data['type1'] = isset($_POST['type1'])?(int)$_POST['type1']:0;
+                $data['type2'] = isset($_POST['type2'])?(int)$_POST['type2']:0;
+                $data['type3'] = isset($_POST['type3'])?(int)$_POST['type3']:0;
+                $data['type4'] = isset($_POST['type4'])?(int)$_POST['type4']:0;
+                $data['type5'] = isset($_POST['type5'])?(int)$_POST['type5']:0;
+                $data['page_time'] = isset($_POST['page_time'])?sanitize_text_field(wp_unslash($_POST['page_time'])):"";
+                $data['post_time'] = isset($_POST['post_time'])?sanitize_text_field(wp_unslash($_POST['post_time'])):"";
+                $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
+                $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
+                $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
                 add_option('seo_baidu_sitemap',$data);  
             }
-            baiduseo_seo::alt((int)$_POST['alt'],(int)$_POST['title']);
-            if((int)$_POST['sitemap_open']==1){
+            baiduseo_seo::alt(isset($_POST['alt'])?(int)$_POST['alt']:0,isset($_POST['title'])?(int)$_POST['title']:0);
+            if(isset($_POST['sitemap_open']) && (int)$_POST['sitemap_open']==1){
             baiduseo_seo::sitemap(1,1,1);
             }
-            if((int)$_POST['silian_open']==1){
+            if(isset($_POST['silian_open']) && (int)$_POST['silian_open']==1){
                 baiduseo_seo::silian(1,1);
             }
             echo json_encode(['msg'=>'','code'=>1]);exit;
@@ -2201,8 +2227,8 @@ class baiduseo_post{
     }
 
     public function baiduseo_wycsc(){
-        if(isset($_POST['nonce']) &&  wp_verify_nonce(sanitize_text_field($_POST['nonce']),'baiduseo')){
-            $id = (int)$_POST['id'];
+        if(isset($_POST['nonce']) &&  wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
+            $id = isset($_POST['id'])?(int)$_POST['id']:'';
             delete_post_meta($id,'baiduseo');
             echo json_encode(['code'=>'1','msg'=>'删除成功']);exit;
         }

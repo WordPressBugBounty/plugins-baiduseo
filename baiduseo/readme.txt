@@ -1,15 +1,15 @@
-=== 百度站长SEO合集(支持百度/神马/Bing/头条推送) ===
+=== SEO合集(支持百度/Google/Bing/头条推送) ===
 Donate link: https://www.rbzzz.com
-Tags:baidu, Bing, 今日头条, bing站长, 谷歌站长, IndexNow, 百度, 百度站长平台, Google地图, 天级推送, 谷歌地图, tag标签内链,  友情链接, baiduseo, 关键词排名查询监控, 死链查询, 网站蜘蛛, robots, 百度推送, 百度搜索推送, category隐藏, SEO优化, sitemap, 百度收录查询, 图片alt, 文章原创率检测, 图片title,301/404, 一键推送, AI文章助手, 流量监控。
+Tags: 百度, Bing, google, 蜘蛛, sitemap
 Requires at least: 4.8
-Tested up to:  6.7.2
-Stable tag: 2.0.6
-License: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+Tested up to:  6.8
+Stable tag: 2.0.7
+License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-含百度站长、tag标签内链、今日头条、Bing站长、谷歌站长、IndexNow、百度地图sitemap、关键词排名查询监控、天级推送、网站蜘蛛、robots、图片alt标签、category隐藏、死链查询、百度自动推送、批量提交URL到站长、友情链接、文章原创率检测、友情链接、301/404等功能、AI文章助手、流量监控。
+主要是针对各大搜索引擎提供SEO的推送，包括对WP网站的底层alt属性、tag属性、sitemap、网站蜘蛛监控、AI文章等优化支持。
 == Description ==
-含百度站长、tag标签内链、今日头条、Bing站长、谷歌站长、IndexNow、百度地图sitemap、关键词排名查询监控、天级推送、网站蜘蛛、robots、图片alt标签、category隐藏、死链查询、百度自动推送、批量提交URL到站长、友情链接、文章原创率检测、友情链接、301/404等功能、AI文章助手、流量监控。
+含百度站长、tag标签内链、今日头条、Bing站长、谷歌站长、IndexNow、百度地图sitemap、关键词排名查询监控、天级推送、网站蜘蛛、robots、图片alt标签、category隐藏、死链查询、百度自动推送、批量提交URL到站长、友情链接、文章原创率检测、友情链接、301/404等功能、AI文章助手、流量监控, users用户漏洞修复。
 
 1、首页关键词
 
