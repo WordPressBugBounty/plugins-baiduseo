@@ -186,86 +186,168 @@ class baiduseo_zhizhu{
         $timezone_offet = get_option( 'gmt_offset');
         $sta1 = strtotime($sta)-$timezone_offet*3600;
         $end1 = strtotime($end)-$timezone_offet*3600;
+        if($type2==9){
+            $type3=404;
+        }elseif($type2==10){
+            $type3=200;
+        }
         if($search){
             if($sta && $end){
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
-                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                if($type2){
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  and address like %s and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条"  and address like %s  and type=%d',$sta1,$end1,'%'.$search.'%',$type3));
+                }else{
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条"  and address like %s ',$sta1,$end1,'%'.$search.'%'));
+                }
             }elseif($sta && !$end){
             
-                
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度"  and address like %s ',$sta1,'%'.$search.'%'));
+                 if($type2){
+                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="谷歌"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="360"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="搜狗"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="神马"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="必应"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="头条"  and address like %s and type=%d',$sta1,'%'.$search.'%',$type3));
+                 }else{
+                     $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度"  and address like %s ',$sta1,'%'.$search.'%'));
                 $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="谷歌"  and address like %s ',$sta1,'%'.$search.'%'));
                 $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="360"  and address like %s ',$sta1,'%'.$search.'%'));
                 $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="搜狗"  and address like %s ',$sta1,'%'.$search.'%'));
                 $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="神马"  and address like %s ',$sta1,'%'.$search.'%'));
                 $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="必应"  and address like %s ',$sta1,'%'.$search.'%'));
                 $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="头条"  and address like %s ',$sta1,'%'.$search.'%'));
+                 }
                
             }elseif(!$sta && $end){
             
-                
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="百度"  and address like %s ',$end1,'%'.$search.'%'));
+                if($type2){
+                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="百度"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="谷歌"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="360"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="搜狗"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="神马"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="必应"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="头条"  and address like %s and type=%d',$end1,'%'.$search.'%',$type3));
+                }else{
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="百度"  and address like %s ',$end1,'%'.$search.'%'));
                 $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="谷歌"  and address like %s ',$end1,'%'.$search.'%'));
                 $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="360"  and address like %s ',$end1,'%'.$search.'%'));
                 $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="搜狗"  and address like %s ',$end1,'%'.$search.'%'));
                 $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="神马"  and address like %s ',$end1,'%'.$search.'%'));
                 $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="必应"  and address like %s ',$end1,'%'.$search.'%'));
                 $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="头条"  and address like %s ',$end1,'%'.$search.'%'));
+                }
             }else{
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度"  and address like %s ','%'.$search.'%'));
-                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  and address like %s ','%'.$search.'%'));
-                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="360"  and address like %s ','%'.$search.'%'));
-                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗"  and address like %s','%'.$search.'%'));
-                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="神马"  and address like %s ','%'.$search.'%'));
-                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="必应"  and address like %s','%'.$search.'%'));
-                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="头条"  and address like %s','%'.$search.'%'));
+                if($type2){
+                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="360"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="神马"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="必应"  and address like %s and type=%d','%'.$search.'%',$type3));
+                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="头条"  and address like %s and type=%d','%'.$search.'%',$type3));
+                }else{
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度"  and address like %s ','%'.$search.'%'));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  and address like %s ','%'.$search.'%'));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="360"  and address like %s ','%'.$search.'%'));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗"  and address like %s','%'.$search.'%'));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="神马"  and address like %s ','%'.$search.'%'));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="必应"  and address like %s','%'.$search.'%'));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="头条"  and address like %s','%'.$search.'%'));
+                }
             }
             
         }else{
             if($sta && $end){
+                if($type2){
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  and type=%d',$sta1,$end1,$type3));
                 
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  ',$sta1,$end1));
-            
-                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌" ',$sta1,$end1));
-            
-                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360"',$sta1,$end1));
-                $sougou = $wpdb->query($wpdb->prepare('select count(*) from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗"',$sta1,$end1));
-                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马"',$sta1,$end1));
-                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应"',$sta1,$end1));
-                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条" ',$sta1,$end1));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌" and type=%d',$sta1,$end1,$type3));
+                
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360" and type=%d',$sta1,$end1,$type3));
+                    $sougou = $wpdb->query($wpdb->prepare('select count(*) from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗" and type=%d',$sta1,$end1,$type3));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马" and type=%d',$sta1,$end1,$type3));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应" and type=%d',$sta1,$end1,$type3));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条" and type=%d',$sta1,$end1,$type3));
+                }else{
+                     $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="百度"  ',$sta1,$end1));
+                
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="谷歌" ',$sta1,$end1));
+                
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="360"',$sta1,$end1));
+                    $sougou = $wpdb->query($wpdb->prepare('select count(*) from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="搜狗"',$sta1,$end1));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="神马"',$sta1,$end1));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="必应"',$sta1,$end1));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d and name="头条" ',$sta1,$end1));
+                }
             }elseif($sta && !$end){
+                if($type2){
                 
-                
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度"',$sta1));
-                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="谷歌" ',$sta1));
-                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="360" ',$sta1));
-                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="搜狗" ',$sta1));
-                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="神马" ',$sta1));
-                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="必应" ',$sta1));
-                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="头条"',$sta1));
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度" and type=%d',$sta1,$type3));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="谷歌" and type=%d',$sta1,$type3));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="360" ',$sta1));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="搜狗" and type=%d',$sta1,$type3));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="神马" and type=%d',$sta1,$type3));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="必应" and type=%d',$sta1,$type3));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="头条" and type=%d',$sta1,$type3));
+                }else{
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="百度"',$sta1));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="谷歌" ',$sta1));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="360" ',$sta1));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="搜狗" ',$sta1));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="神马" ',$sta1));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="必应" ',$sta1));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)>%d  and name="头条"',$sta1));
+                }
             }elseif(!$sta && $end){
                 
-                
-                $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="百度" ',$end1));
-                $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="谷歌" ',$end1));
-                $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="360"',$end1));
-                $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="搜狗" ',$end1));
-                $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="神马"',$end1));
-                $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="必应" ',$end1));
-                $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)<%d and name="头条"  ',$end1));
+                if($type2){
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="百度" and type=%d',$end1,$type3));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="谷歌" and type=%d',$end1,$type3));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="360" and type=%d',$end1,$type3));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="搜狗" and type=%d',$end1,$type3));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="神马" and type=%d',$end1,$type3));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="必应" and type=%d',$end1,$type3));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)<%d and name="头条"  and type=%d',$end1,$type3));
+                }else{
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="百度" ',$end1));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="谷歌" ',$end1));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="360"',$end1));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  unix_timestamp(time)<%d and name="搜狗" ',$end1));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="神马"',$end1));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   unix_timestamp(time)<%d and name="必应" ',$end1));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where unix_timestamp(time)<%d and name="头条"  ',$end1));
+                }
             }else{
-                $baidu = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度" ');
-                $guge = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  ');
-                $a360 = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="360"   ');
-                $sougou = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗"  ');
-                $shenma = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="神马" ');
-                $biying = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="必应"  ');
-                $toutiao = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="头条" ');
+                if($type2){
+                    $baidu = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度" and type=%d',$type3));
+                    $guge = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  and type=%d',$type3));
+                    $a360 = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="360"   and type=%d',$type3));
+                    $sougou = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗" and type=%d ',$type3));
+                    $shenma = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="神马" and type=%d',$type3));
+                    $biying = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="必应"  and type=%d',$type3));
+                    $toutiao = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="头条" and type=%d',$type3));
+                }else{
+                     $baidu = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="百度" ');
+                    $guge = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="谷歌"  ');
+                    $a360 = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="360"   ');
+                    $sougou = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where   name="搜狗"  ');
+                    $shenma = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="神马" ');
+                    $biying = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where    name="必应"  ');
+                    $toutiao = $wpdb->query('select id from '.$wpdb->prefix . 'baiduseo_zhizhu  where  name="头条" ');
+                }
             }
            
         }
@@ -362,34 +444,70 @@ class baiduseo_zhizhu{
           $other = [];
             $other1 = [];
         if(isset($baiduseo_zhizhu['type'])){
-          
-            if(strpos($baiduseo_zhizhu['type'],'1')!==false){
-                $other[] = $baidu;
-                $other1[] = '百度';
-            }
-            if(strpos($baiduseo_zhizhu['type'],'2')!==false){
-                $other[] = $guge;
-                $other1[] = '谷歌';
-            }
-             if(strpos($baiduseo_zhizhu['type'],'3')!==false){
-                $other[] = $a360;
-                $other1[] = '360';
-            }
-             if(strpos($baiduseo_zhizhu['type'],'4')!==false){
-                $other[] = $sougou;
-                $other1[] = '搜狗';
-            }
-             if(strpos($baiduseo_zhizhu['type'],'5')!==false){
-                $other[] = $shenma;
-                $other1[] = '神马';
-            }
-             if(strpos($baiduseo_zhizhu['type'],'6')!==false){
-                $other[] = $biying;
-                $other1[] = 'Bing';
-            }
-             if(strpos($baiduseo_zhizhu['type'],'7')!==false){
-                $other[] = $toutiao;
-                $other1[] = '头条';
+            if($type==1){
+                if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+                    $other[] = $baidu;
+                    $other1[] = '百度';
+                }
+                if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+                    $other[] = $guge;
+                    $other1[] = 'Google';
+                }
+                 if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+                    $other[] = $a360;
+                    $other1[] = '360';
+                }
+                 if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+                    $other[] = $sougou;
+                    $other1[] = '搜狗';
+                }
+                 if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+                    $other[] = $shenma;
+                    $other1[] = '神马';
+                }
+                 if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+                    $other[] = $biying;
+                    $other1[] = 'Bing';
+                }
+                 if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+                    $other[] = $toutiao;
+                    $other1[] = '头条';
+                }
+            }elseif($type=='百度'){
+                if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+                    $other[] = $baidu;
+                    $other1[] = '百度';
+                }
+            }elseif($type=='谷歌'){
+                 if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+                    $other[] = $guge;
+                    $other1[] = 'Google';
+                }
+            }elseif($type=='360'){
+                if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+                    $other[] = $a360;
+                    $other1[] = '360';
+                }
+            }elseif($type=='搜狗'){
+                if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+                    $other[] = $sougou;
+                    $other1[] = '搜狗';
+                }
+            }elseif($type=='神马'){
+                if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+                    $other[] = $shenma;
+                    $other1[] = '神马';
+                }
+            }elseif($type=='必应'){
+                  if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+                    $other[] = $biying;
+                    $other1[] = 'Bing';
+                }
+            }elseif($type=='头条'){
+                if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+                    $other[] = $toutiao;
+                    $other1[] = '头条';
+                }
             }
              
         }
@@ -447,7 +565,7 @@ class baiduseo_zhizhu{
             }
             if(strpos($baiduseo_zhizhu['type'],'2')!==false){
                 $other[] = $suoyin_guge;
-                $other1[] = '谷歌';
+                $other1[] = 'Google';
             }
              if(strpos($baiduseo_zhizhu['type'],'3')!==false){
                 $other[] = $suoyin_360;
@@ -596,17 +714,17 @@ class baiduseo_zhizhu{
             }
             if(strpos($baiduseo_zhizhu['type'],'2')!==false){
                 $other[] = $suoyin_guge2;
-                $other1[] = '谷歌';
+                $other1[] = 'Google';
             }
              if(strpos($baiduseo_zhizhu['type'],'3')!==false){
                 $other[] = $suoyin_3602;
                 $other1[] = '360';
-                $suoyin['360'] = $suoyin_sougou1;
+                // $suoyin['360'] = $suoyin_sougou1;
             }
              if(strpos($baiduseo_zhizhu['type'],'4')!==false){
                 $other[] = $suoyin_sougou2;
                 $other1[] = '搜狗';
-                $suoyin['sougou'] = $suoyin_3601;
+                // $suoyin['sougou'] = $suoyin_3601;
             }
              if(strpos($baiduseo_zhizhu['type'],'5')!==false){
                 $other[] = $suoyin_shenma2;
@@ -615,7 +733,7 @@ class baiduseo_zhizhu{
              if(strpos($baiduseo_zhizhu['type'],'6')!==false){
                 $other[] = $suoyin_biying2;
                 $other1[] = 'Bing';
-                $suoyin['bing'] = $suoyin_biying1;
+                // $suoyin['bing'] = $suoyin_biying1;
             }
              if(strpos($baiduseo_zhizhu['type'],'7')!==false){
                 $other[] = $suoyin_toutiao2;

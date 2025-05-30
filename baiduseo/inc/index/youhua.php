@@ -29,11 +29,47 @@ class baiduseo_youhua{
           if(isset($baiduseo_youhua['wp_json']) && $baiduseo_youhua['wp_json']){
             $this->baiduseo_wp_json();
         }
+        if(isset($baiduseo_youhua['art_cron']) && $baiduseo_youhua['art_cron']){
+            $this->baiduseo_art_cron();
+        }
+    }
+    public function baiduseo_bootstrap() {
+            
+    	if(!wp_next_scheduled( 'baiduseo_art_cron' )){
+            wp_schedule_event( time(), 'five_minutes', 'baiduseo_art_cron' );
+        }
+        
+    }
+    public  function baiduseo_add_cron_interval( $schedules ) {
+        $schedules['five_minutes'] = array(
+          'interval' => 300,
+          'display'  => esc_html__( 'Every Five Minutes','baiduseo' ),
+        );
+        return $schedules;
+    }
+    public function baiduseo_cronexec() {
+    	global $wpdb;
+    	$scheduled_ids = $wpdb->get_col(
+    		$wpdb->prepare(
+    			"SELECT ID FROM {$wpdb->posts} WHERE post_date <= %s AND post_status = 'future' LIMIT %d",
+    			current_time( 'mysql', 0 ),
+    			20
+    		)
+    	);
+    	
+    	if ( ! count( $scheduled_ids ) ) {
+    		return;
+    	}
+    
+    	array_map( 'wp_publish_post', $scheduled_ids );
+    }
+    public function baiduseo_art_cron(){
+        add_action( 'init', [$this,'baiduseo_bootstrap'] );
+        add_filter( 'cron_schedules', [$this,'baiduseo_add_cron_interval'] );
+        add_action( 'baiduseo_art_cron',[$this,'baiduseo_cronexec'] );
     }
     public function  baiduseo_wp_json(){
         add_filter('rest_pre_dispatch', [$this,'baiduseo_restrict_rest_api_to_same_origin'], 10, 3);
-        
-        
         if(isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'wp-sitemap-users') !== false){
                 echo '<script>window.location.href="/"</script>';
                 exit;

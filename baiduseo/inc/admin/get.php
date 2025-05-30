@@ -416,7 +416,7 @@
                 }else{
                     $url_301['re_url2'] =''; 
                 }
-                 if($url_301['re_url2'] && $url_301['re_url1'] && trim($url_301['re_url2'],'/')==trim($url_301['re_url1'],'/') && trim($url_301['re_url1'],'/')==trim($site_url1,'/')){
+                 if( trim($url_301['re_url2'],'/')==trim($site_url1,'/') || trim($url_301['re_url1'],'/')==trim($site_url1,'/')){
                     $url_301['status'] = 1;
                 }else{
                     $url_301['status'] = 0;
@@ -436,7 +436,7 @@
                 );
                 $baiduseo_level = get_option('baiduseo_level');
                
-                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600){
+                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION>(int)str_replace('.','',$level1[2]))){
                     $url = 'https://www.rbzzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                     $result = wp_remote_get($url,$defaults);
                     if(!is_wp_error($result)){
@@ -444,18 +444,19 @@
                         $level = json_decode($level,true);
                         
                         $level1 = explode(',',$level['level']);
-                        $level2 = $level1;
+                        
                         if(isset($level1[0]) && ($level1[0]==1 || $level1[0]==2)){
-                            $level2[2] = time();
-                            $level2[3] = $level['version'];
-                            update_option('baiduseo_level',$level2);
+                            $level1[2] = $level['version'];
+                            $level1[3] = BAIDUSEO_VERSION;
+                            $level1[4] = time();
+                            update_option('baiduseo_level',$level1);
                             $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
                         }
                     }
                 }else{
                     $level1 = $baiduseo_level;
                     $level = [];
-                    $level['version'] = $baiduseo_level[3];
+                    $level['version'] = $baiduseo_level[2];
                     if(isset($level1[0]) && ($level1[0]==1 || $level1[0]==2)){
                         $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
                     }
@@ -1992,9 +1993,10 @@
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
             $p1 = isset($_POST['pages'])?(int)$_POST['pages']:1;
+            $type = isset($_POST['type'])?(int)$_POST['type']:5;
             $start1 = ($p1-1)*20;
-            $count = $wpdb->query("SELECT * FROM ".$wpdb->prefix ."baiduseo_zz  where type=5 ",ARRAY_A);
-            $post1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."baiduseo_zz  where type=5 order by id desc limit %d,20",$start1),ARRAY_A);
+            $count = $wpdb->query($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."baiduseo_zz  where type=%d ",$type),ARRAY_A);
+            $post1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."baiduseo_zz  where type=%d order by id desc limit %d,20",$type,$start1),ARRAY_A);
              $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
              if($baiduseo_indexnow_record===false){
                 $baiduseo_indexnow_record = [

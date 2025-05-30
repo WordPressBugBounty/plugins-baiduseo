@@ -21,7 +21,7 @@ class baiduseo_zz{
                     message varchar(255) default NULL,
                     UNIQUE KEY id (id)
                 ) $charset_collate;";
-                /*ts:1成功2，失败,type:1百度普通，2百度快速，3bing,4神马,5indexnow,6谷歌*/
+                /*ts:1成功2，失败,type:1百度普通，2百度快速，3bing,4神马,5indexnow（7.bing,8.Seznam.cz,9.Yandex,10.Naver,11.Yep）,6谷歌*/
                 dbDelta($sql15);
             }
             //友链互换
@@ -50,7 +50,332 @@ class baiduseo_zz{
              
         }
     }
-  
+     public static function indexnow($urls,$id=0,$tag_id=0,$type=5){
+         global $wpdb;
+         $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
+         $baiduseo_zz = get_option('baiduseo_zz');
+          $currnetTime= current_time( 'Y/m/d H:i:s');
+         $data = array(
+            'host' =>baiduseo_common::baiduseo_url(2) ,
+            'key' => $baiduseo_zz['indexnow_key'],
+            'keyLocation' => get_home_url() . '/' . $baiduseo_zz['indexnow_key'] . '.txt',
+            'urlList' => $urls
+        );
+       
+       switch ($type) {
+            case 5:
+                $re = wp_remote_post('https://api.indexnow.org/indexnow', array(
+                    'body' => json_encode($data),
+                    'sslverify' => false,
+                    'timeout' => 40000,
+                    'headers' => array(
+                        'Host' => 'api.indexnow.org',
+                        'Content-Type' => 'application/json; charset=utf-8'
+                    )
+                ));
+                
+                if(!is_wp_error($re)){
+                    if(isset($baiduseo_zz['indexNow_log_show']) && $baiduseo_zz['indexNow_log_show']){
+                        if(isset($re['response']['code']) && $re['response']['code']>202){
+                            
+                                if($re['response']['code']=='400'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>5,'message'=>'无效的格式']);
+                                }elseif($re['response']['code']=='403'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>5,'message'=>'根目录没有密钥文件']);
+                                }elseif($re['response']['code']=='422'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>5,'message'=>'URL与密钥不匹配']);
+                                }elseif($re['response']['code']=='429'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>5,'message'=>'请求过多']);
+                                }
+                            
+                        }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                            foreach($urls as $k=>$v){
+                            $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>5,'message'=>'']);
+                            }
+                           
+                        }
+                    }
+                     if($baiduseo_indexnow_record!==false){
+                        if($id){
+                            $baiduseo_indexnow_record['id'] = $id;
+                        }
+                        if($tag_id){
+                            $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                        }
+                        $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                        update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                    }else{
+                        $baiduseo_indexnow_record = [];
+                         if($id){
+                            $baiduseo_indexnow_record['id'] = $id;
+                        }
+                        if($tag_id){
+                            $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                        }
+                        $baiduseo_indexnow_record['num'] = count($urls);
+                        add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                    }
+                }
+                       
+                    
+                // 当表达式的值等于值1时执行的代码
+                break;
+            case 6:
+                  $re = wp_remote_post('https://www.bing.com/indexnow', array(
+                        'body' => json_encode($data),
+                        'sslverify' => false,
+                        'timeout' => 4000,
+                        'headers' => array(
+                            'Host' => 'www.bing.com',
+                            'Content-Type' => 'application/json; charset=utf-8'
+                        )
+                    ));
+                  
+                    if(!is_wp_error($re)){
+                        if(isset($baiduseo_zz['indexNow_bing_log']) && $baiduseo_zz['indexNow_bing_log']){
+                            if(isset($re['response']['code']) && $re['response']['code']>202){
+                                if($re['response']['code']=='400'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>7,'message'=>'无效的格式']);
+                                }elseif($re['response']['code']=='403'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>7,'message'=>'根目录没有密钥文件']);
+                                }elseif($re['response']['code']=='422'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>7,'message'=>'URL与密钥不匹配']);
+                                }elseif($re['response']['code']=='429'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>7,'message'=>'请求过多']);
+                                }
+                            }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                                foreach($urls as $k=>$v){
+                                $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>7,'message'=>'']);
+                                }
+                            }
+                        }
+                        if($baiduseo_indexnow_record!==false){
+                            if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                            update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }else{
+                            $baiduseo_indexnow_record = [];
+                             if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = count($urls);
+                            add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }
+                    }
+                // 当表达式的值等于值2时执行的代码
+                break;
+            case 7:
+                $re = wp_remote_get('https://search.seznam.cz/indexnow?url='.$urls[0].'&key='.$baiduseo_zz['indexnow_key']);
+                      
+                
+                if(!is_wp_error($re)){
+                    if(isset($baiduseo_zz['seznam_log_show']) && $baiduseo_zz['seznam_log_show']){
+                        if(isset($re['response']['code']) && $re['response']['code']>202){
+                            
+                            if($re['response']['code']=='400'){
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'无效的格式']);
+                            }elseif($re['response']['code']=='403'){
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'根目录没有密钥文件']);
+                            }elseif($re['response']['code']=='422'){
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'URL与密钥不匹配']);
+                            }elseif($re['response']['code']=='429'){
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'请求过多']);
+                            }
+                        }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                             foreach($urls as $k=>$v){
+                            $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>8,'message'=>'']);
+                            }
+                        }
+                    }
+                    if($baiduseo_indexnow_record!==false){
+                            if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                            update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }else{
+                            $baiduseo_indexnow_record = [];
+                             if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = count($urls);
+                            add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }
+                }
+                // 当表达式的值等于值3时执行的代码
+                break;
+             case 8:
+                  $re = wp_remote_post('https://yandex.com/indexnow', array(
+                        'body' => json_encode($data),
+                        'sslverify' => false,
+                        'timeout' => 4000,
+                        'headers' => array(
+                            'Host' => 'yandex.com',
+                            'Content-Type' => 'application/json; charset=utf-8'
+                        )
+                    ));
+                    if(!is_wp_error($re)){
+                        if(isset($baiduseo_zz['yandex_log_show']) && $baiduseo_zz['yandex_log_show']){
+                            if(isset($re['response']['code']) && $re['response']['code']>202){
+                                if($re['response']['code']=='400'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'无效的格式']);
+                                }elseif($re['response']['code']=='403'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'根目录没有密钥文件']);
+                                }elseif($re['response']['code']=='422'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'URL与密钥不匹配']);
+                                }elseif($re['response']['code']=='429'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'请求过多']);
+                                }
+                            }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                                 foreach($urls as $k=>$v){
+                                    $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>9,'message'=>'']);
+                                    }
+                            }
+                        }
+                        if($baiduseo_indexnow_record!==false){
+                            if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                            update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }else{
+                            $baiduseo_indexnow_record = [];
+                             if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = count($urls);
+                            add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }
+                    }
+                // 当表达式的值等于值3时执行的代码
+                break;
+             case 9:
+                    $re = wp_remote_post('https://searchadvisor.naver.com/indexnow', array(
+                        'body' => json_encode($data),
+                        'sslverify' => false,
+                        'timeout' => 40000,
+                        'headers' => array(
+                            'Host' => 'searchadvisor.naver.com',
+                            'Content-Type' => 'application/json; charset=utf-8'
+                        )
+                    ));
+                    if(!is_wp_error($re)){
+                        if(isset($baiduseo_zz['naver_log_show']) && $baiduseo_zz['naver_log_show']){
+                            if(isset($re['response']['code']) && $re['response']['code']>202){
+                                if($re['response']['code']=='400'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'无效的格式']);
+                                }elseif($re['response']['code']=='403'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'根目录没有密钥文件']);
+                                }elseif($re['response']['code']=='422'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'URL与密钥不匹配']);
+                                }elseif($re['response']['code']=='429'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'请求过多']);
+                                }
+                            }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                                 foreach($urls as $k=>$v){
+                            $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>10,'message'=>'']);
+                            }
+                            }
+                        }
+                        if($baiduseo_indexnow_record!==false){
+                            if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                            update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }else{
+                            $baiduseo_indexnow_record = [];
+                             if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = count($urls);
+                            add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }
+                    }
+                // 当表达式的值等于值3时执行的代码
+                break;
+            case 10:
+                $re = wp_remote_post('https://indexnow.yep.com/indexnow', array(
+                        'body' => json_encode($data),
+                        'sslverify' => false,
+                        'timeout' => 40000,
+                        'headers' => array(
+                            'Host' => 'indexnow.yep.com',
+                            'Content-Type' => 'application/json; charset=utf-8'
+                        )
+                    ));
+                    if(!is_wp_error($re)){
+                        if(isset($baiduseo_zz['yep_log_show']) && $baiduseo_zz['yep_log_show']){
+                            if(isset($re['response']['code']) && $re['response']['code']>202){
+                                if($re['response']['code']=='400'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>11,'message'=>'无效的格式']);
+                                }elseif($re['response']['code']=='403'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>11,'message'=>'根目录没有密钥文件']);
+                                }elseif($re['response']['code']=='422'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>11,'message'=>'URL与密钥不匹配']);
+                                }elseif($re['response']['code']=='429'){
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>11,'message'=>'请求过多']);
+                                }
+                            }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
+                                 foreach($urls as $k=>$v){
+                            $res = $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$v,'ts'=>1,'type'=>11,'message'=>'']);
+                            }
+                            }
+                        }
+                        if($baiduseo_indexnow_record!==false){
+                            if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = $baiduseo_indexnow_record['num']+count($urls);
+                            update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }else{
+                            $baiduseo_indexnow_record = [];
+                             if($id){
+                                $baiduseo_indexnow_record['id'] = $id;
+                            }
+                            if($tag_id){
+                                $baiduseo_indexnow_record['tag_id'] = $tag_id;
+                            }
+                            $baiduseo_indexnow_record['num'] = count($urls);
+                            add_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+                        }
+                    }
+                // 当表达式的值等于值3时执行的代码
+                break;
+            default:
+                // 当表达式的值与上面所有case都不匹配时执行的代码
+        }
+                         
+     }
     public static function bdts($urls,$id=0,$tag_id=0){
         global $wpdb;
         
@@ -69,42 +394,50 @@ class baiduseo_zz{
                 
                 if(isset($res['error'])){
                     if($res['message']=='over quota'){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                        if(isset($baidu['bd_log']) && $baidu['bd_log']){
                             foreach($urls as $key=>$val){
-                                // $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'超过每日配额了']);
+                                
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'超过每日配额了']);
+                                $baiduseo_bd_chao = get_option('baiduseo_bd_chao');
+                                 $today = date_i18n('Y-m-d', current_time('timestamp'));
+                                if($baiduseo_bd_chao===false){
+                                    add_option('baiduseo_bd_chao', $today);
+                                }else{
+                                    update_option('baiduseo_bd_chao', $today);
+                                }
                                 break;
                             }
                         }
                     }elseif($res['message']=='site error'){
-                         if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                       if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'站点未在站长平台验证']);
                             break;
                         }
                         }
                     }elseif($res['message']=='only 2000 urls are allowed once'){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                        if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'每次最多只能提交2000条链接']);
                             break;
                         }
                         }
                     }elseif($res['message']=='token is not valid'){
-                         if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                        if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'token错误']);
                             break;
                         }
                         }
                     }elseif($res['message']=='token is not valid'){
-                         if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                         if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'接口地址填写错误']);
                             break;
                         }
                         }
                     }elseif($res['message']=='internal error, please try later'){
-                         if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                       if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'服务器偶然异常']);
                             break;
@@ -113,7 +446,7 @@ class baiduseo_zz{
                     }
                 }elseif(isset($res['success'])){
                     if(isset($res['not_same_site'])){
-                         if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                        if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -121,7 +454,7 @@ class baiduseo_zz{
                         }
                     }
                     if(isset($res['not_valid'])){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                        if(isset($baidu['bd_log']) && $baidu['bd_log']){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>1,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -130,7 +463,7 @@ class baiduseo_zz{
                     }
                     
                     if(isset($res['success'])){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'1')!==false){
+                       if(isset($baidu['bd_log']) && $baidu['bd_log']){
                             foreach($urls as $key=>$val){
                                 $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>1,'type'=>1,'message'=>'']);
                             }
@@ -331,7 +664,7 @@ class baiduseo_zz{
         }
         return baiduseo_seo::pay_money();
     }
-    public static  function google($data){
+    public static  function google($urls,$id=0,$tag_id=0){
         global $wpdb;
         $currnetTime= current_time( 'Y-m-d H:i:s');
         $baidu = get_option('baiduseo_zz');
@@ -339,11 +672,8 @@ class baiduseo_zz{
         $token = baiduseo_zz::google_token();
         
         if(!$token){
-            if(isset($baidu['log']) && strpos($baidu['log'],'6')!==false){
-             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$data['url'],'ts'=>0,'type'=>6,'message'=>'token获取失败，请检查谷歌的配置']);
-            }
+           
             return false;
-            
         }
         $body = [
             'timeout'=>1000,
@@ -352,7 +682,7 @@ class baiduseo_zz{
                 'content-type' => 'application/json',
                 'authorization' => 'Bearer '.$token,
             ],
-            'body'=>json_encode($data)
+            'body'=>json_encode(['url'=>$urls,'type'=>'URL_UPDATED'])
         ];
         $result = wp_remote_post($url,$body);
         
@@ -377,7 +707,7 @@ class baiduseo_zz{
                     $data1['num'] =1;
                     add_option('baiduseo_google_record',$data1);
                 }
-                if(isset($baidu['log']) && strpos($baidu['log'],'6')!==false){
+                if(isset($baidu['guge_log_show']) && $baidu['guge_log_show']){
                 $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$data['url'],'ts'=>1,'type'=>6,'message'=>'']);
                 }
             }else{
@@ -532,7 +862,7 @@ class baiduseo_zz{
             }
              $currnetTime= current_time( 'Y/m/d H:i:s');
              
-            if(isset($baidu['log']) && strpos($baidu['log'],'3')!==false){ 
+            if(isset($baidu['bing_log_show']) && $baidu['bing_log_show']){ 
                 foreach($urls as $key=>$val){
                     $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>1,'type'=>3,'message'=>'']);
                 }

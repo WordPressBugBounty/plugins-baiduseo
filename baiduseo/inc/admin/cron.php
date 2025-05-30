@@ -3,7 +3,7 @@ class baiduseo_cron{
     public function init(){
         add_action( 'baiduseo_cronhook', [$this,'baiduseo_cronexec'] );
         // if(isset($_GET['plan'])){
-        // $this->baiduseo_cronexec();
+        //     $this->baiduseo_cronexec();
         // }
         if(!wp_next_scheduled( 'baiduseo_cronhook' )){
             wp_schedule_event( strtotime(current_time('Y-m-d H:i:00',1)), 'hourly', 'baiduseo_cronhook' );
@@ -27,19 +27,33 @@ class baiduseo_cron{
         
         $baiduseo_auto = get_option('baiduseo_zz');
         
-	    if( isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
-	        $this->baiduseo_zz();
+	    if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1,')!==false){
+	        $today = date_i18n('Y-m-d', current_time('timestamp'));
+	        $baiduseo_bd_chao = get_option('baiduseo_bd_chao');
+
+	        if($baiduseo_bd_chao!=$today){
+	            $this->baiduseo_zz();
+	        }
 	    }
-	     if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'2')!==false){
+	     if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'2')!==false){
 	         $this->baiduseo_bing();
 	    }
+	  
+	     if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'4')!==false){
+	         $this->baiduseo_google();
+	    }
+	   
+	     if(isset($baiduseo_auto['pingtai']) && (strpos($baiduseo_auto['pingtai'],'5')!==false || strpos($baiduseo_auto['pingtai'],'6')!==false || strpos($baiduseo_auto['pingtai'],'7')!==false || strpos($baiduseo_auto['pingtai'],'8')!==false || strpos($baiduseo_auto['pingtai'],'9')!==false || strpos($baiduseo_auto['pingtai'],'10')!==false )){
+	         $this->baiduseo_indexnow();
+	    }
+	    
 	    //下架
 	   // if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'3')!==false){
 	   //      $this->baiduseo_shenma();
 	   // }
-	    if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
-	         $this->baiduseo_day();
-	    }
+	   // if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
+	   //      $this->baiduseo_day();
+	   // }
 	   
 	    $sitemap = get_option('seo_baidu_sitemap');
 	    if(isset($sitemap['sitemap_open']) && $sitemap['sitemap_open']){
@@ -53,6 +67,197 @@ class baiduseo_cron{
         $this->baiduseo_tongji();
         $this->baiduseo_clear_log();
         $this->baiduseo_liuliang();
+    }
+    public function  baiduseo_indexnow(){
+        
+        global $wpdb,$baiduseo_wzt_log;
+        if($baiduseo_wzt_log){
+         $log = baiduseo_zz::pay_money();
+        if(!$log){
+            return;
+        }
+        global $wp_rewrite;
+	    if(!$wp_rewrite){
+	       $wp_rewrite = new wp_rewrite();
+	    }
+	    
+	    $baiduseo_auto = get_option('baiduseo_zz');
+	    $pingtai = explode(',',$baiduseo_auto['pingtai']);
+	    if(isset($baiduseo_auto['guowai_num']) && $baiduseo_auto['guowai_num']){
+	        $bdpt_num = $baiduseo_auto['guowai_num'];
+	    }else{
+	        return;
+	    }
+	    
+        $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
+        
+        if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
+            
+            
+            if(isset($baiduseo_indexnow_record['id']) && $baiduseo_indexnow_record['id']){
+                $id =$baiduseo_indexnow_record['id'];
+            }else{
+                $id = 0;
+            }
+          
+            $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_status="publish" AND FIND_IN_SET(`post_type`,%s) and ID>%d order by ID asc limit %d',$baiduseo_auto['post_type'],$id,$bdpt_num),ARRAY_A);
+            
+           
+        	$urls = [];
+        	if(!empty($article)){
+        	    $ids = end($article)['ID'];
+                foreach($article as $key=>$val){
+                    $urls[] = get_permalink($val["ID"]);
+                    
+                }
+                foreach($pingtai as $s=>$ss){
+                    if($ss>4){
+                    baiduseo_zz::indexnow($urls,0,$ids,$ss);
+                    }
+                }
+              
+            }else{
+                $baiduseo_indexnow_record['id'] =0;
+                update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+            }
+        }
+        $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
+        if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
+           
+            if(isset($baiduseo_indexnow_record['tag_id']) && $baiduseo_indexnow_record['tag_id']){
+                $tag_id =$baiduseo_indexnow_record['tag_id'];
+            }else{
+                $tag_id = 0;
+            }
+          
+            $tag = $wpdb->get_results($wpdb->prepare('select a.term_id,b.taxonomy from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id  where FIND_IN_SET(`taxonomy`,%s)  and a.term_id>%d limit  %d',$baiduseo_auto['post_type'],$tag_id,$bdpt_num),ARRAY_A);
+            
+            if(!empty($tag)){
+                
+                $ids = end($tag)['term_id'];
+                $urls = [];
+                foreach($tag as $k=>$v){
+                    
+                    if($v['taxonomy']=='category'){
+                        $urls[] = get_category_link($v['term_id']);
+                        
+                    }elseif($v['taxonomy']=='post_tag'){
+                         
+                         $urls[] =get_tag_link($v['term_id']);
+                        
+                    }else{
+                        $term = get_term_by('ID',$v['term_id'],$v['term_id']);
+                        if($term){
+                            $urls[] = $term;
+                            
+                        }
+                         
+                    }
+                     foreach($pingtai as $s=>$ss){
+                                if($ss>4){
+                                baiduseo_zz::indexnow($urls,0,$ids,$ss);
+                                }
+                            }
+                    
+                }
+                
+            }else{
+                $baiduseo_indexnow_record = get_option('baiduseo_indexnow_record');
+                $baiduseo_indexnow_record['tag_id'] = 0;
+                $ids = 0;
+                update_option('baiduseo_indexnow_record',$baiduseo_indexnow_record);
+            }
+            
+        }
+        }
+    }
+    public function baiduseo_google(){
+         global $wpdb,$baiduseo_wzt_log;
+        if($baiduseo_wzt_log){
+         $log = baiduseo_zz::pay_money();
+        if(!$log){
+            return;
+        }
+        global $wp_rewrite;
+	    if(!$wp_rewrite){
+	       $wp_rewrite = new wp_rewrite();
+	    }
+	    
+	    $baiduseo_auto = get_option('baiduseo_zz');
+	    if(isset($baiduseo_auto['guowai_num']) && $baiduseo_auto['guowai_num']){
+	        $bdpt_num = $baiduseo_auto['guowai_num'];
+	    }else{
+	        return;
+	    }
+	    
+        $baiduseo_google_record = get_option('baiduseo_google_record');
+        
+        if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
+            
+            
+            if(isset($baiduseo_google_record['id']) && $baiduseo_google_record['id']){
+                $id =$baiduseo_google_record['id'];
+            }else{
+                $id = 0;
+            }
+          
+            $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_status="publish" AND FIND_IN_SET(`post_type`,%s) and ID>%d order by ID asc limit %d',$baiduseo_auto['post_type'],$id,$bdpt_num),ARRAY_A);
+            
+            
+        	$urls = [];
+        	if(!empty($article)){
+        	    $ids = end($article)['ID'];
+                foreach($article as $key=>$val){
+                    baiduseo_zz::google(get_permalink($val["ID"]),$ids);
+                }
+              
+            }else{
+                $baiduseo_google_record['id'] =0;
+                update_option('baiduseo_google_record',$baiduseo_google_record);
+            }
+        }
+        $baiduseo_google_record = get_option('baiduseo_google_record');
+        if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
+           
+            if(isset($baiduseo_google_record['tag_id']) && $baiduseo_google_record['tag_id']){
+                $tag_id =$baiduseo_google_record['tag_id'];
+            }else{
+                $tag_id = 0;
+            }
+          
+            $tag = $wpdb->get_results($wpdb->prepare('select a.term_id,b.taxonomy from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id  where FIND_IN_SET(`taxonomy`,%s)  and a.term_id>%d limit  %d',$baiduseo_auto['post_type'],$tag_id,$bdpt_num),ARRAY_A);
+            
+            if(!empty($tag)){
+                
+                $ids = end($tag)['term_id'];
+                foreach($tag as $k=>$v){
+                    
+                    if($v['taxonomy']=='category'){
+                        
+                        
+                        baiduseo_zz::google(get_category_link($v['term_id']),0,$ids);
+                    }elseif($v['taxonomy']=='post_tag'){
+                        
+                        
+                        baiduseo_zz::google(get_tag_link($v['term_id']),0,$ids);
+                    }else{
+                        $term = get_term_by('ID',$v['term_id'],$v['term_id']);
+                        if($term){
+                            baiduseo_zz::google($term,0,$ids);
+                        }
+                    }
+                    
+                }
+                
+            }else{
+                $baiduseo_google_record = get_option('baiduseo_google_record');
+                $baiduseo_google_record['tag_id'] = 0;
+                $ids = 0;
+                update_option('baiduseo_google_record',$baiduseo_google_record);
+            }
+            
+        }
+        }
     }
     public function baiduseo_liuliang(){
         global $wpdb,$baiduseo_wzt_log;
@@ -842,6 +1047,7 @@ class baiduseo_cron{
         }else{
             $id = 1;
         }
+        
         if($num>0){
              if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
             	$article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_status="publish" AND FIND_IN_SET(`post_type`,%s) and ID>%d order by ID asc limit %d',$baiduseo_auto['post_type'],$id,$num),ARRAY_A);
@@ -1067,10 +1273,11 @@ class baiduseo_cron{
     public function baiduseo_zz(){
         global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
-         $log = baiduseo_zz::pay_money();
-        if(!$log){
-            return;
-        }
+            $log = baiduseo_zz::pay_money();
+           
+            if(!$log){
+                return;
+            }
         global $wp_rewrite;
 	    if(!$wp_rewrite){
 	       $wp_rewrite = new wp_rewrite();
@@ -1083,6 +1290,7 @@ class baiduseo_cron{
 	        return;
 	    }
 	    
+	    
         $baiduseo_zz_record = get_option('baiduseo_zz_record');
         
         if(isset($baiduseo_auto['post_type']) && $baiduseo_auto['post_type']){
@@ -1093,6 +1301,7 @@ class baiduseo_cron{
             }else{
                 $id = 0;
             }
+            
             if(isset($baiduseo_zz_record['remind']) && $baiduseo_zz_record['remind']>0 && $baiduseo_zz_record['remind']<$bdpt_num){
         	    $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_status="publish" AND FIND_IN_SET(`post_type`,%s) and ID>%d order by ID asc limit %d',$baiduseo_auto['post_type'],$id,$baiduseo_zz_record['remind']),ARRAY_A);
             }else{
@@ -1194,6 +1403,9 @@ class baiduseo_cron{
             }elseif($baiduseo_auto['bd_log']==3){
                  $end = strtotime('-7 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=1",$end));
+            }elseif($baiduseo_auto['bd_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=1",$end));
             }
     	}
     	if(isset($baiduseo_auto['bdks_log'])){
@@ -1204,7 +1416,10 @@ class baiduseo_cron{
                  $end = strtotime('-3 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=2",$end));
             }elseif($baiduseo_auto['bdks_log']==3){
-                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=2",$end));
+            }elseif($baiduseo_auto['bdks_log']==4){
+                $end = strtotime('-30 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=2",$end));
             }
     	}
@@ -1218,6 +1433,9 @@ class baiduseo_cron{
             }elseif($baiduseo_auto['bing_log']==3){
                  $end = strtotime('-7 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=3",$end));
+            }elseif($baiduseo_auto['bing_log']==4){
+                $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=3",$end));
             }
     	}
         if(isset($baiduseo_auto['shenma_log'])){
@@ -1229,6 +1447,9 @@ class baiduseo_cron{
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=4",$end));
             }elseif($baiduseo_auto['shenma_log']==3){
                  $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=4",$end));
+            }elseif($baiduseo_auto['shenma_log']==4){
+                $end = strtotime('-30 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=4",$end));
             }
     	}
@@ -1242,6 +1463,84 @@ class baiduseo_cron{
             }elseif($baiduseo_auto['indexNow_log']==3){
                  $end = strtotime('-7 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=5",$end));
+            }elseif($baiduseo_auto['indexNow_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=5",$end));
+            }
+    	}
+    		if(isset($baiduseo_auto['indexNow_bing_log'])){
+            if($baiduseo_auto['indexNow_bing_log']==1){
+                $end = strtotime('-1 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=7",$end));
+            }elseif($baiduseo_auto['indexNow_bing_log']==2){
+                 $end = strtotime('-3 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=7",$end));
+            }elseif($baiduseo_auto['indexNow_bing_log']==3){
+                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=7",$end));
+            }elseif($baiduseo_auto['indexNow_bing_log']==4){
+                $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=7",$end));
+            }
+    	}
+    		if(isset($baiduseo_auto['seznam_log'])){
+            if($baiduseo_auto['seznam_log']==1){
+                $end = strtotime('-1 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=8",$end));
+            }elseif($baiduseo_auto['seznam_log']==2){
+                 $end = strtotime('-3 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=8",$end));
+            }elseif($baiduseo_auto['seznam_log']==3){
+                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=8",$end));
+            }elseif($baiduseo_auto['seznam_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=8",$end));
+            }
+    	}
+    		if(isset($baiduseo_auto['yandex_log'])){
+            if($baiduseo_auto['yandex_log']==1){
+                $end = strtotime('-1 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=9",$end));
+            }elseif($baiduseo_auto['yandex_log']==2){
+                 $end = strtotime('-3 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=9",$end));
+            }elseif($baiduseo_auto['yandex_log']==3){
+                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=9",$end));
+            }elseif($baiduseo_auto['yandex_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=9",$end));
+            }
+    	}
+    		if(isset($baiduseo_auto['naver_log'])){
+            if($baiduseo_auto['naver_log']==1){
+                $end = strtotime('-1 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=10",$end));
+            }elseif($baiduseo_auto['naver_log']==2){
+                 $end = strtotime('-3 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=10",$end));
+            }elseif($baiduseo_auto['naver_log']==3){
+                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=10",$end));
+            }elseif($baiduseo_auto['naver_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=10",$end));
+            }
+    	}
+    		if(isset($baiduseo_auto['yep_log'])){
+            if($baiduseo_auto['yep_log']==1){
+                $end = strtotime('-1 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=11",$end));
+            }elseif($baiduseo_auto['yep_log']==2){
+                 $end = strtotime('-3 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=11",$end));
+            }elseif($baiduseo_auto['yep_log']==3){
+                 $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=11",$end));
+            }elseif($baiduseo_auto['yep_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=11",$end));
             }
     	}
     	if(isset($baiduseo_auto['guge_log'])){
@@ -1253,6 +1552,9 @@ class baiduseo_cron{
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=6",$end));
             }elseif($baiduseo_auto['guge_log']==3){
                  $end = strtotime('-7 days')-$timezone_offet*3600;
+                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=6",$end));
+            }elseif($baiduseo_auto['guge_log']==4){
+                 $end = strtotime('-30 days')-$timezone_offet*3600;
                 $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_zz  where unix_timestamp(time)<%d and type=6",$end));
             }
     	}

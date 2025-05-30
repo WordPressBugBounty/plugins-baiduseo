@@ -3,7 +3,7 @@ Donate link: https://www.rbzzz.com
 Tags: 百度, Bing, google, 蜘蛛, sitemap
 Requires at least: 4.8
 Tested up to:  6.8
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -171,6 +171,18 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 16.文章原创率检测
 17.文章伪原创
 == Changelog ==
+= 2.0.8 =（2025/05/30）
+*流量监控UI优化
+*流量监控日志优化
+*站长功能简化，更方便操作
+*wp优化新增文章定时发布失效的处理
+*引导模式UI优化
+*文案优化
+*版本号延迟问题优化
+*蜘蛛查询优化
+*修复分类dk设置不上问题
+= 2.0.7 =（2025/05/22）
+*安全问题修复
 = 2.0.6 =（2025/02/12）
 *新增快速收录
 *流量监控和蜘蛛清空功能优化

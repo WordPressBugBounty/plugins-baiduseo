@@ -59,8 +59,13 @@ class baiduseo_crons{
           
             if($num){
                 
-                $res = $wpdb->insert($wpdb->prefix."baiduseo_zhizhu_suoyin",['name'=>'百度','num'=>$num,'time'=>$currnetTime]);
+                $wpdb->insert($wpdb->prefix."baiduseo_zhizhu_suoyin",['name'=>'百度','num'=>$num,'time'=>$currnetTime]);
                 
+            }else{
+                $post = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix ."baiduseo_zhizhu_suoyin where name='百度' and num>0 order by id desc ",ARRAY_A);
+                if(isset($post[0]) && is_array($post[0]) && isset($post[0]['num'])  &&  $post[0]['num']){
+                $wpdb->insert($wpdb->prefix."baiduseo_zhizhu_suoyin",['name'=>'百度','num'=>$post[0]['num'],'time'=>$currnetTime]);
+                }
             }
            
         }
