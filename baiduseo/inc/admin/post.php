@@ -117,6 +117,7 @@ class baiduseo_post{
             
             if(!is_wp_error($result)){
                 $content = wp_remote_retrieve_body($result);
+           
                
                 //验证
                 $content1 = json_decode($content,true);
