@@ -74,34 +74,36 @@
              }
         }
         public function baiduseo_get_gonggao(){
+            
              if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-             global $wpdb;
-          
-            $defaults = array(
-                'timeout' => 5,
-                'connecttimeout'=>4000,
-                'redirection' => 3,
-                'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                'sslverify' => FALSE,
-            );
-            $page =isset($_POST['page'])?(int)$_POST['page']:0;
-            $url = 'https://www.rbzzz.com/api/rank/gonggao?type=1&page='.$page;
-            $result = wp_remote_get($url,$defaults);
-            if(!is_wp_error($result)){
-                $result = wp_remote_retrieve_body($result);
-                $result = json_decode($result,true);
-                foreach($result['data'] as $k=>$v){
-                    $re = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_gonggao where gid=%d ',$v['id']),ARRAY_A);
-                    if($re){
-                        $result['data'][$k]['is_read'] =1;
-                    }else{
-                        $result['data'][$k]['is_read'] =0;
+                global $wpdb;
+              
+                $defaults = array(
+                    'timeout' => 5,
+                    'connecttimeout'=>4000,
+                    'redirection' => 3,
+                    'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+                    'sslverify' => FALSE,
+                );
+                $page =isset($_POST['page'])?(int)$_POST['page']:0;
+                $url = 'https://art.seohnzz.com/api/rank/gonggao?type=1&page='.$page;
+                $result = wp_remote_get($url,$defaults);
+                if(!is_wp_error($result)){
+                    $result = wp_remote_retrieve_body($result);
+                    $result = json_decode($result,true);
+                    foreach($result['data'] as $k=>$v){
+                        $re = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_gonggao where gid=%d ',$v['id']),ARRAY_A);
+                        if($re){
+                            $result['data'][$k]['is_read'] =1;
+                        }else{
+                            $result['data'][$k]['is_read'] =0;
+                        }
                     }
+                    
+                    echo wp_json_encode(['code'=>1,'data'=>$result['data'],'total'=>(int)$result['total']]);exit; 
+                }else{
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
-                echo wp_json_encode(['code'=>1,'data'=>$result['data'],'total'=>(int)$result['total']]);exit; 
-            }else{
-                echo wp_json_encode(['code'=>0]);exit;
-            }
              }
         }
         public function baiduseo_get_pingfen(){
@@ -436,8 +438,8 @@
                 );
                 $baiduseo_level = get_option('baiduseo_level');
                
-                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION>(int)str_replace('.','',$level1[2]))){
-                    $url = 'https://www.rbzzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
+                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION)>(int)str_replace('.','',$level1[2])){
+                    $url = 'https://art.seohnzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                     $result = wp_remote_get($url,$defaults);
                     if(!is_wp_error($result)){
                         $level = wp_remote_retrieve_body($result);
@@ -1528,7 +1530,7 @@
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $baiduseo_quanzhong = get_option('baiduseo_quanzhong');
                 if(!isset($baiduseo_quanzhong['time']) || $baiduseo_quanzhong['time']<time()-24*3600){
-                    $url = 'http://wp.seohnzz.com/api/rank/quanzhong?url='.baiduseo_common::baiduseo_url(0);
+                    $url = 'https://art.seohnzz.com/api/rank/quanzhong?url='.baiduseo_common::baiduseo_url(0);
                     $defaults = array(
                         'timeout' => 4000,
                         'redirection' => 4000,

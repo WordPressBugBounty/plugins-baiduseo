@@ -519,7 +519,7 @@ class baiduseo_zhizhu{
             return 0;
         }
         $data =  isset($_SERVER['SERVER_NAME']) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])):baiduseo_common::baiduseo_url(0);
-        $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+        $url = "https://art.seohnzz.com/api/index/pay_money?url={$data}&type=1";
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,

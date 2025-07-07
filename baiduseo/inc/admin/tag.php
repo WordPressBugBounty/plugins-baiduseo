@@ -164,7 +164,7 @@ class baiduseo_tag{
             return 0;
         }
         $data =  baiduseo_common::baiduseo_url(0);
-    	$url = "https://www.rbzzz.com/api/money/pay_money?url={$data}&type=1";
+    	$url = "https://art.seohnzz.com/api/index/pay_money?url={$data}&type=1";
     	$defaults = array(
             'timeout' =>4000,
             'connecttimeout'=>4000,

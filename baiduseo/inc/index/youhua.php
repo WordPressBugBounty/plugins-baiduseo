@@ -195,7 +195,7 @@ class baiduseo_youhua{
         add_filter('query_vars',             [$this,'baiduseo_query_vars']);    // Adds 'category_redirect' query variable
         add_filter('request',                [$this,'baiduseo_request']);
     }
-    function baiduseo_refresh_rules() {
+    public function baiduseo_refresh_rules() {
         global $wp_rewrite;
         $wp_rewrite->flush_rules();
     }
@@ -316,9 +316,9 @@ class baiduseo_youhua{
         }elseif($data['BaiduSEO']==47){
             $key = baiduseo_common::baiduseo_tongxun();
             if($key==$data['key']){
-                echo json_encode(['code'=>1,'version'=>BAIDUSEO_VERSION]);exit;
+                echo wp_json_encode(['code'=>1,'version'=>BAIDUSEO_VERSION]);exit;
             }else{
-                echo json_encode(['code'=>0,'version'=>BAIDUSEO_VERSION]);exit;
+                echo wp_json_encode(['code'=>0,'version'=>BAIDUSEO_VERSION]);exit;
             }
         }elseif($data['BaiduSEO']==48){
             $args=array(
@@ -327,7 +327,7 @@ class baiduseo_youhua{
             'order' => 'ASC'
             );
             $categories=get_categories($args);
-            echo json_encode(['code'=>1,'cate'=>$categories]);exit;
+            echo wp_json_encode(['code'=>1,'cate'=>$categories]);exit;
         }elseif($data['BaiduSEO']==49){
             global $wp_rewrite,$wp_filesystem;
             if (null === $wp_rewrite) {
@@ -340,7 +340,7 @@ class baiduseo_youhua{
             if($data['is_chachong']==1){
               $article = $wpdb->get_results($wpdb->prepare('select ID from '.$wpdb->prefix . 'posts where post_title=%s and post_status="publish" and post_type="post"',$data['title']),ARRAY_A);
                 if(!empty($article)){
-                    echo json_encode(['code'=>0]);exit;
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
             }
             
@@ -348,11 +348,11 @@ class baiduseo_youhua{
             if($data['img']){
                 $validate = wp_check_filetype($data['img']);
                 if ( $validate['type'] == false ) {
-                    echo json_encode(['code'=>0]);exit;
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
                 $attach_id = self::download_remote_image_to_media_library($data['img']);
                 if(!$attach_id){
-                    echo json_encode(['code'=>0]);exit;
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
                 if($data['is_tuku_header']){
                     $image_html = wp_get_attachment_image($attach_id, 'full',false,array( 'class' => 'aligncenter' ));
@@ -362,11 +362,11 @@ class baiduseo_youhua{
                 if($data['is_tuku_footer']){
                      $validate = wp_check_filetype($data['img1']);
                     if ( $validate['type'] == false ) {
-                        echo json_encode(['code'=>0]);exit;
+                        echo wp_json_encode(['code'=>0]);exit;
                     }
                     $attach_id1 = self::download_remote_image_to_media_library($data['img1']);
                     if(!$attach_id1){
-                        echo json_encode(['code'=>0]);exit;
+                        echo wp_json_encode(['code'=>0]);exit;
                     }
                     $image_html = wp_get_attachment_image($attach_id1, 'full',false,array( 'class' => 'aligncenter' ));
                     $data['con'] = $data['con'].'<div>'.$image_html.'</div>';
@@ -388,9 +388,9 @@ class baiduseo_youhua{
                 if($id){
                     
                    
-                    echo json_encode(['code'=>1]);exit;
+                    echo wp_json_encode(['code'=>1]);exit;
                 }else{
-                    echo json_encode(['code'=>0]);exit;
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
             }else{
                 $my_post = array(
@@ -403,9 +403,9 @@ class baiduseo_youhua{
                 );
                 $id = wp_insert_post($my_post,0);
                 if($id){
-                    echo json_encode(['code'=>1]);exit;
+                    echo wp_json_encode(['code'=>1]);exit;
                 }else{
-                    echo json_encode(['code'=>0]);exit;
+                    echo wp_json_encode(['code'=>0]);exit;
                 }
             }
         }elseif($data['BaiduSEO']==50){
@@ -419,7 +419,7 @@ class baiduseo_youhua{
                 $arr[$key]['id'] = $val->ID;
                 $arr[$key]['nick'] = $val->user_login;
             }
-            echo json_encode(['code'=>1,'data'=>$arr]);exit;
+            echo wp_json_encode(['code'=>1,'data'=>$arr]);exit;
         }
         
     }

@@ -1188,7 +1188,7 @@ class baiduseo_common{
         $baiduseo_indexnow = md5(esc_url(baiduseo_common::baiduseo_url(1)));
         
         $baiduseo_google = baiduseo_common::baiduseo_url(1).'/wp-sitemap.xml';
-        wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.plugins_url('baiduseo').'/inc/admin",baiduseo_nonce="'. wp_create_nonce('baiduseo').'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.$url1.'",baiduseo_yindao='.$baiduseo_yindao.',baiduseo_v="'.$baiduseo_version.'",baiduseo_indexnow="'.$baiduseo_indexnow.'",baiduseo_google="'.$baiduseo_google.'";', 'before');
+        wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.esc_js(plugins_url('baiduseo','BAIDUSEO_FILE')).'/inc/admin",baiduseo_nonce="'. esc_attr(wp_create_nonce('baiduseo')).'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.esc_url($url1).'",baiduseo_yindao='.(int)$baiduseo_yindao.',baiduseo_v="'.esc_js($baiduseo_version).'",baiduseo_indexnow="'.esc_attr($baiduseo_indexnow).'",baiduseo_google="'.esc_url($baiduseo_google).'";', 'before');
     }
     public  function baiduseo_plugin_action_links ( $links) {
         $links[] = '<a href="' . admin_url( 'admin.php?page=baiduseo&nonce='.esc_attr(wp_create_nonce('baiduseo')) ) . '">设置</a>';

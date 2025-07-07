@@ -45,7 +45,7 @@ class baiduseo_seo{
         $data = json_decode($data,true);
        
         if(is_array($data)){
-            $BaiduSEO = (int)$data['BaiduSEO'];
+            $BaiduSEO = isset($data['BaiduSEO'])?(int)$data['BaiduSEO']:0;
            
             switch ($BaiduSEO) {
                 case 17:
@@ -471,7 +471,7 @@ class baiduseo_seo{
                     $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 9995',ARRAY_A);
                 }
             
-                $html_tag = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<style>\nbody {\nbackground-color: #f3f3f3;\n}\nul li {\ndisplay: inline-block;\npadding: 5px 10px;\nmargin: 5px 0px;\nbackground-color: #fff;\nborder-radius: 25px;\n}\n* {\nmargin: 0;\npadding: 0;\n}\na {\ntext-decoration: none;\ncolor: #111;\nfont-weight: 300;\n}\na:hover{\ncolor: skyblue;\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul>";
+                $html_tag = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<style>\nbody {\nbackground-color: #f3f3f3;\n}\nul li {\ndisplay: inline-block;\npadding: 5px 10px;\nmargin: 5px 0px;\nbackground-color: #fff;\nborder-radius: 25px;\n}\n* {\nmargin: 0;\npadding: 0;\n}\na {\ntext-decoration: none;\ncolor: #111;\nfont-weight: 300;\n}\na:hover{\ncolor: skyblue;\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.seoceo.cn(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul>";
                 foreach($tags as $k=>$val){
                     $html_tag .="<li><a href='".get_tag_link($val["term_id"])."' title='{$val['name']}'>{$val['name']}</a></li>\n";
                 }
@@ -1205,7 +1205,7 @@ class baiduseo_seo{
                          require_once(ABSPATH . 'wp-admin/includes/file.php');
                          WP_Filesystem();
                     }
-                    $html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'><style>\nbody {\nbackground-color: #f3f3f3;\n}\nul {\nbackground-color: #fff;\nmax-width: 1200px;\nmargin: 0 auto;\nbox-sizing: border-box;\npadding: 15px 125px;\n}\nul li {\npadding: 15px 0;\n}\nul li a {\ncolor: #333;\npadding-left: 25px;\ntext-decoration: none;\n}\nbody>ul>li>a{\nfont-weight:bold\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.rbzzz.com(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul >";
+                    $html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'><style>\nbody {\nbackground-color: #f3f3f3;\n}\nul {\nbackground-color: #fff;\nmax-width: 1200px;\nmargin: 0 auto;\nbox-sizing: border-box;\npadding: 15px 125px;\n}\nul li {\npadding: 15px 0;\n}\nul li a {\ncolor: #333;\npadding-left: 25px;\ntext-decoration: none;\n}\nbody>ul>li>a{\nfont-weight:bold\n}\n</style>\n</head>\n<body>\n<!-- 官网：www.seoceo.cn(可接定制开发、网站、小程序、公众号、seo/sem优化)交流QQ群：1077537009 客服QQ：1500351892 -->\n<ul >";
                     $category = $wpdb->get_results('select a.* from '.$wpdb->prefix .'terms as a  join '.$wpdb->prefix .'term_taxonomy as b on a.term_id=b.term_id where b.taxonomy="category" and b.parent=0 order by a.term_id desc limit 1000',ARRAY_A);
                     $html .="<li><a href='/' target='_blank'>首 页</a></li>\n";
                     foreach($category as $key=>$val){
@@ -1356,7 +1356,7 @@ class baiduseo_seo{
         }
         $data =  baiduseo_common::baiduseo_url(0);
         
-        $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
+        $url = "https://art.seohnzz.com/api/index/pay_money?url={$data}&type=1";
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,
@@ -1377,7 +1377,7 @@ class baiduseo_seo{
             }elseif(isset($content['status']) && $content['status']==0){
                 return 0;
             }else{
-                $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+                $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
             
                 $result = wp_remote_get($url,$defaults);
                 
@@ -1390,16 +1390,16 @@ class baiduseo_seo{
                     }elseif(isset($content['status']) && $content['status']==0){
                         return 0;
                     }else{
-                        return baiduseo_zhizhu::pay_money();
+                        return 0;
                     }
                 }else{
-                    return baiduseo_zhizhu::pay_money();
+                    return 0;
                 }
             }
         }else{
             
         
-            $url = "http://wp.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+            $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
             
                 $result = wp_remote_get($url,$defaults);
                 
@@ -1412,10 +1412,10 @@ class baiduseo_seo{
                     }elseif(isset($content['status']) && $content['status']==0){
                         return 0;
                     }else{
-                        return baiduseo_zhizhu::pay_money();
+                        return 0;
                     }
                 }else{
-                    return baiduseo_zhizhu::pay_money();
+                   return 0;
                 }
         }
             
@@ -1424,13 +1424,12 @@ class baiduseo_seo{
         if(md5(baiduseo_common::baiduseo_url(0))==$key){
             global $wpdb;
             $wztkj_linkhh = get_option('baiduseo_linkhh');
-            if($wztkj_linkhh['kqtype']==2){
+            if(isset($wztkj_linkhh['kqtype']) && $wztkj_linkhh['kqtype']==2){
                 $friends = $wpdb->get_results('select * from '.$wpdb->prefix . 'wztkj_friends where (status1=0 and status2=0 and status3=2) or status1=5',ARRAY_A);
             }else{
                 $friends = $wpdb->get_results('select * from '.$wpdb->prefix . 'wztkj_friends where (status1=0 and status2=0) or status1=5',ARRAY_A);
             }
             echo '<span style="display:none">'.esc_attr(md5(baiduseo_common::baiduseo_url(0))).'</span>';
-            $wztkj_linkhh = get_option('baiduseo_linkhh');
             
             if (isset($wztkj_linkhh['ystype']) && $wztkj_linkhh['ystype'] == 1) {
                 if(isset($wztkj_linkhh['link']) && $wztkj_linkhh['link']){

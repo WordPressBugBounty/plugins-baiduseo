@@ -16,38 +16,9 @@ class baiduseo_crons{
             return;
         }
         $currnetTime= current_time( 'Y/m/d H:i:s');
-        // $data =  baiduseo_common::baiduseo_url(0);
-        // $url = "http://wp.seohnzz.com/api/tongbu/keywords?url={$data}";
-        // $defaults = array(
-        //     'timeout' => 4000,
-        //     'connecttimeout'=>4000,
-        //     'redirection' => 3,
-        //     'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-        //     'sslverify' => FALSE,
-        // );
-        // $result = wp_remote_get($url,$defaults);
-        
-        // if(!is_wp_error($result)){
-        //     $content = wp_remote_retrieve_body($result);
-        //     $content = json_decode($content,true);
-        //     if(isset($content['data'])){
-        //         $content = $content['data'];
-        //         foreach($content as $key=>$val){
-        //             $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where keywords=%s and type=%d',sanitize_text_field($val['keywords']),(int)$val['type']),ARRAY_A);
-        //             if(!empty($res)){
-        //                  $wpdb->update($wpdb->prefix . 'baiduseo_keywords',['time'=>sanitize_text_field($val['updatetime']),'num'=>(int)$val['rank'],'prev'=>(int)$val['high']],['id'=>$res[0]['id']]);
-        //             }else{
-        //                  $wpdb->insert($wpdb->prefix."baiduseo_keywords",['time'=>sanitize_text_field($val['updatetime']),'num'=>(int)$val['rank'],'prev'=>(int)$val['high'],'type'=>(int)$val['type'],'keywords'=>sanitize_text_field($val['keywords'])]);
-        //             }
-        //         }
-        //     }
-            
-        // }
-       
-        // $this->baiduseo_tongbu1();
         $this->baiduseo_tongbu2();
         $this->baiduseo_tongbu3();
-        $this->baiduseo_tongbu4();
+        // $this->baiduseo_tongbu4();
         $this->baiduseo_tongbu5();
         $timezone_offet = get_option( 'gmt_offset');
         $sta =strtotime(gmdate('Y-m-d 00:00:00'))-$timezone_offet*3600;
@@ -90,40 +61,10 @@ class baiduseo_crons{
             }
         }
     }
-    public function baiduseo_tongbu1(){
-        global $wpdb;
-        $data =  baiduseo_common::baiduseo_url(0);
-        $url = "http://wp.seohnzz.com/api/tongbu/kp?url={$data}";
-        $defaults = array(
-            'timeout' => 4000,
-            'connecttimeout'=>4000,
-            'redirection' => 3,
-            'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-            'sslverify' => FALSE,
-        );
-        $result = wp_remote_get($url,$defaults);
-        if(!is_wp_error($result)){
-            $content = wp_remote_retrieve_body($result);
-            $content = json_decode($content,true);
-            if(isset($content['data'])){
-                $content = $content['data'];
-                
-                foreach($content as $key=>$val){
-                    $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp where keywords=%s and type=%d',sanitize_text_field($val['keywords']),(int)$val['type']),ARRAY_A);
-                    if(!empty($res)){
-                         $wpdb->update($wpdb->prefix . 'baiduseo_kp',['time'=>sanitize_text_field($val['time']),'check_time'=>sanitize_text_field($val['check_time']),'delete_time'=>sanitize_text_field($val['delete_time']),'chu'=>(int)$val['chu'],'news'=>(int)$val['news'],'status'=>(int)$val['status'],'high'=>(int)$val['high'],'high_time'=>sanitize_text_field($val['high_time'])],['id'=>$val['id']]);
-                    }else{
-                         $wpdb->insert($wpdb->prefix."baiduseo_kp",['time'=>sanitize_text_field($val['time']),'check_time'=>sanitize_text_field($val['check_time']),'delete_time'=>sanitize_text_field($val['delete_time']),'chu'=>(int)$val['chu'],'news'=>(int)$val['news'],'status'=>(int)$val['status'],'high'=>(int)$val['high'],'high_time'=>sanitize_text_field($val['high_time']),'type'=>(int)$val['type'],'keywords'=>sanitize_text_field($val['keywords'])]);
-                    }
-                }
-            }
-            
-        }
-    }
      public function baiduseo_tongbu2(){
         global $wpdb;
         $data =  baiduseo_common::baiduseo_url(0);
-        $url = "http://wp.seohnzz.com/api/tongbu/kp_log?url={$data}";
+        $url = "https://art.seohnzz.com/api/tongbu/kp_log?url={$data}";
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,
@@ -153,7 +94,7 @@ class baiduseo_crons{
     public function baiduseo_tongbu3(){
          global $wpdb;
         $data =  baiduseo_common::baiduseo_url(0);
-        $url = "http://wp.seohnzz.com/api/tongbu/long?url={$data}";
+        $url = "https://art.seohnzz.com/api/tongbu/long?url={$data}";
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,

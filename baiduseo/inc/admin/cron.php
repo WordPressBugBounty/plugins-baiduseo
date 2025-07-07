@@ -62,8 +62,6 @@ class baiduseo_cron{
 	    if(isset($sitemap['silian_open']) && $sitemap['silian_open']){
             $this->baiduseo_silian();
         }
-      
-        // $this->baiduseo_rank();
         $this->baiduseo_tongji();
         $this->baiduseo_clear_log();
         $this->baiduseo_liuliang();
@@ -342,7 +340,7 @@ class baiduseo_cron{
             $sheng = $wpdb->get_results('select ip from '.$wpdb->prefix . 'baiduseo_liuliang where sheng is null and ip !="" and ip !="unknown" group by ip limit 100',ARRAY_A);
             if(!empty($sheng)){
                     $ur=  baiduseo_common::baiduseo_url(0);
-            	    $url = 'https://www.rbzzz.com/api/tag/getaddress?url='.$ur;
+            	    $url = 'https://art.seohnzz.com/api/tag/getaddress?url='.$ur;
                     $defaults = array(
                         'timeout' => 4000,
                         'redirection' => 4000,
@@ -406,7 +404,7 @@ class baiduseo_cron{
             }
         }
         //提交到远端
-       $url = 'http://wp.seohnzz.com/api/wztkj/friend_post';
+       $url = 'https://art.seohnzz.com/api/wztkj/friend_post';
        $wztkj_linkhh['linkurl'] = baiduseo_common::baiduseo_url(1);
 	   $result = wp_remote_post($url,['body'=>['data'=>$wztkj_linkhh]]);
 	   if(!is_wp_error($result)){
@@ -638,32 +636,6 @@ class baiduseo_cron{
         }
         }
     }
-    public function baiduseo_rank(){
-    //     global $baiduseo_wzt_log;
-    //     if($baiduseo_wzt_log){
-    //     $log = baiduseo_zz::pay_money();
-    //     if(!$log){
-    //         return;
-    //     }
-    //     $baiduseo_rank = get_option('baiduseo_rank');
-	   // $ur=  baiduseo_common::baiduseo_url(0);
-	   // $url = 'http://wp.seohnzz.com/api/rank/rank1?url='.$ur.'&http='.get_option('siteurl');
-    //     $defaults = array(
-    //         'timeout' => 4000,
-    //         'redirection' => 4000,
-    //         'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-    //         'sslverify' => FALSE,
-    //     );
-	   // $result = wp_remote_get($url,$defaults);
-	   // $result = wp_remote_retrieve_body($result);
-    //     if($baiduseo_rank!==false){
-    //         update_option('baiduseo_rank',json_decode($result,true));
-    //     }else{
-    //         add_option('baiduseo_rank',json_decode($result,true));
-    //     }
-    //     }
-		
-    }
     public function baiduseo_kp(){
         global $wpdb;
         $tuisong = 0;
@@ -676,7 +648,7 @@ class baiduseo_cron{
         if($baiduseo_kp_tongbu_error===false){
             update_option('baiduseo_kp_tongbu_error',1);
             $wpdb->query( "DELETE FROM " . $wpdb->prefix . "baiduseo_kp_log  where num<0" );
-            $url = 'https://www.rbzzz.com/api/kp/tongbu3';
+            $url = 'https://art.seohnzz.com/api/kp/tongbu3';
             $url1 = get_option('siteurl');
             $url1 = str_replace('https://','',$url1);
             $url1 = str_replace('http://','',$url1);
@@ -700,7 +672,7 @@ class baiduseo_cron{
             
             update_option('baiduseo_kp_tongbu',['time'=>time()+24*3600]);
             
-            $url = 'https://www.rbzzz.com/api/kp/tongbu3';
+            $url = 'https://art.seohnzz.com/api/kp/tongbu3';
             $url1 = get_option('siteurl');
             $url1 = str_replace('https://','',$url1);
             $url1 = str_replace('http://','',$url1);
@@ -708,17 +680,17 @@ class baiduseo_cron{
             $result = wp_remote_post($url,['body'=>['url'=>$url1,'tuisong'=>$tuisong,'title'=>$title]]);
             $content = wp_remote_retrieve_body($result);
             $content = json_decode($content,true);
-            foreach($content['kp'] as $key=>$val){
-                unset($val['http']);
-                unset($val['id']);
-                unset($val['url']);
-                $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp where keywords=%s and type=%d',$val['keywords'],$val['type']),ARRAY_A);
-                if($res){
-                    $wpdb->update($wpdb->prefix . 'baiduseo_kp',$val,['id'=>$res[0]['id']]);
-                }else{
-                    $wpdb->insert($wpdb->prefix . 'baiduseo_kp',$val);
-                }
-            }
+            // foreach($content['kp'] as $key=>$val){
+            //     unset($val['http']);
+            //     unset($val['id']);
+            //     unset($val['url']);
+            //     $res = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_kp where keywords=%s and type=%d',$val['keywords'],$val['type']),ARRAY_A);
+            //     if($res){
+            //         $wpdb->update($wpdb->prefix . 'baiduseo_kp',$val,['id'=>$res[0]['id']]);
+            //     }else{
+            //         $wpdb->insert($wpdb->prefix . 'baiduseo_kp',$val);
+            //     }
+            // }
             
             foreach($content['log'] as $key=>$val){
                 unset($val['id']);
@@ -740,7 +712,7 @@ class baiduseo_cron{
     public function baiduseo_wyc(){
         global $wpdb,$baiduseo_wzt_log;
         $seo_init = get_option('baiduseo_wyc');
-        $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
+        $url = 'https://art.seohnzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
         
 	    $defaults = array(
             'timeout' => 4000,
@@ -1371,7 +1343,7 @@ class baiduseo_cron{
         if(!$BaiduSEO_tongji || (isset($BaiduSEO_tongji) && $BaiduSEO_tongji['time']<time()) ){
             $wp_version =  get_bloginfo('version');
             $data =  baiduseo_common::baiduseo_url(0);
-        	$url = "http://wp.seohnzz.com/api/baiduseo/index?url={$data}&type=1&url1=".md5($data.'seohnzz.com')."&theme_version=".BAIDUSEO_VERSION."&php_version=".PHP_VERSION."&wp_version={$wp_version}";
+        	$url = "https://art.seohnzz.com/api/baiduseo/index?url={$data}&type=1&url1=".md5($data.'seohnzz.com')."&theme_version=".BAIDUSEO_VERSION."&php_version=".PHP_VERSION."&wp_version={$wp_version}";
         	$defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,

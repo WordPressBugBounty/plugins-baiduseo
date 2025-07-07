@@ -1,9 +1,9 @@
 === SEO合集(支持百度/Google/Bing/头条推送) ===
-Donate link: https://www.rbzzz.com
+Donate link: https://www.seoceo.cn
 Tags: 百度, Bing, google, 蜘蛛, sitemap
 Requires at least: 4.8
 Tested up to:  6.8
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -75,9 +75,9 @@ Sitemap推送功能也是百度站长URL提交功能之一，自动读取文章�
 
 22、快速排名。
 **温馨提示**：
-上述部分功能，都为初始版本如果出现BUG问题请及时联系我们网址：<a href="https://www.rbzzz.com" rel="friend" title="沃之涛官网">www.rbzzz.com</a>
-需要注意本插件需要依赖于第三方授权才可以正常使用授权地址：<a href="https://www.rbzzz.com/qxcp.html" rel="friend" title="授权">wp.seohnzz.com</a>
-在使用我们插件的同时请阅读我们的第三方用户服务协议条款：<a href="https://www.rbzzz.com/index/index/server" rel="friend" title="服务协议条款"><b>服务协议条款</b></a>
+上述部分功能，都为初始版本如果出现BUG问题请及时联系我们网址：<a href="https://www.seoceo.cn" rel="friend" title="沃之涛官网">www.seoceo.cn</a>
+需要注意本插件需要依赖于第三方授权才可以正常使用授权地址：<a href="https://www.seoceo.cn/qxcp.html" rel="friend" title="授权">wp.seohnzz.com</a>
+在使用我们插件的同时请阅读我们的第三方用户服务协议条款：<a href="https://www.seoceo.cn/index/index/server" rel="friend" title="服务协议条款"><b>服务协议条款</b></a>
 
 
 == Installation ==
@@ -104,7 +104,7 @@ FTP上传安装
 5. 至此，该插件安装完毕。
 
 
-关于本插件，你可以通过阅读<a href="https://luntan.rbzzz.com/thread/6" rel="friend" title="插件教程说明">SEO合集插件教程</a>学习了解插件安装、设置等详细内容。
+关于本插件，你可以通过阅读<a href="https://www.seoceo.cn/plugins/baiduseo.html" rel="friend" title="插件教程说明">SEO合集插件教程</a>学习了解插件安装、设置等详细内容。
 
 == Frequently Asked Questions ==
 
@@ -171,6 +171,12 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 16.文章原创率检测
 17.文章伪原创
 == Changelog ==
+= 2.0.9 =（2025/07/07）
+*优化打开速度
+*修复原创检测设置失败问题
+*修复301检测问题
+*优化授权
+*优化aidk接口
 = 2.0.8 =（2025/05/30）
 *流量监控UI优化
 *流量监控日志优化

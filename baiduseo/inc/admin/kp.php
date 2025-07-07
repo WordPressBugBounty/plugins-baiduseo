@@ -11,23 +11,23 @@ class baiduseo_kp{
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-            if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp'") !=  $wpdb->prefix."baiduseo_kp"){
-                $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_kp   (
-                    id bigint NOT NULL AUTO_INCREMENT,
-                    keywords varchar(255) NOT NULL ,
-                    type bigint NOT NULL DEFAULT 1,
-                    time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    check_time timestamp   NULL ,
-                    delete_time timestamp  NULL,
-                    chu bigint NOT NULL DEFAULT 0,
-                    news  bigint NOT NULL DEFAULT 0,
-                    status bigint NOT NULL DEFAULT 1,
-                    high tinyint DEFAULT 0,
-                    high_time timestamp NULL,
-                    UNIQUE KEY id (id)
-                ) $charset_collate;";
-                dbDelta($sql15);
-            }
+            // if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp'") !=  $wpdb->prefix."baiduseo_kp"){
+            //     $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_kp   (
+            //         id bigint NOT NULL AUTO_INCREMENT,
+            //         keywords varchar(255) NOT NULL ,
+            //         type bigint NOT NULL DEFAULT 1,
+            //         time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            //         check_time timestamp   NULL ,
+            //         delete_time timestamp  NULL,
+            //         chu bigint NOT NULL DEFAULT 0,
+            //         news  bigint NOT NULL DEFAULT 0,
+            //         status bigint NOT NULL DEFAULT 1,
+            //         high tinyint DEFAULT 0,
+            //         high_time timestamp NULL,
+            //         UNIQUE KEY id (id)
+            //     ) $charset_collate;";
+            //     dbDelta($sql15);
+            // }
             
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp_log'") !=  $wpdb->prefix."baiduseo_kp_log"){
                  $sql16 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_kp_log(
@@ -45,7 +45,7 @@ class baiduseo_kp{
         }
     }
     public static function  get_jifen(){
-        $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
+        $url = 'https://art.seohnzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,

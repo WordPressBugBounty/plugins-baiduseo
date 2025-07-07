@@ -7,11 +7,7 @@ class baiduseo_post{
         add_action('wp_ajax_baiduseo_zz', [$this,'baiduseo_zz']);
         add_action('wp_ajax_baiduseo_youhua', [$this,'baiduseo_youhua']);
         add_action('wp_ajax_baiduseo_rank', [$this,'baiduseo_rank']);
-        add_action('wp_ajax_baiduseo_keywords', [$this,'baiduseo_keywords']);
-        add_action('wp_ajax_baiduseo_keywords_delete', [$this,'baiduseo_keywords_delete']);
         add_action('wp_ajax_baiduseo_shouquan', [$this,'baiduseo_shouquan']);
-        add_action('wp_ajax_baiduseo_kp', [$this,'baiduseo_kp']);
-        add_action('wp_ajax_baiduseo_kp_delete', [$this,'baiduseo_kp_delete']);
         add_action('wp_ajax_baiduseo_zhizhu_clear', [$this,'baiduseo_zhizhu_clear']);
         add_action('wp_ajax_baiduseo_tag', [$this,'baiduseo_tag']);
         add_action('wp_ajax_baiduseo_tag_add', [$this,'baiduseo_tag_add']);
@@ -113,7 +109,7 @@ class baiduseo_post{
             $url1 = baiduseo_common::baiduseo_url(0);
             
            
-            $result = wp_remote_get('https://www.rbzzz.com/index/index/zhongzhuan1?codea='.$codea.'&msg='.$msg.'&url='.$url1,$defaults);
+            $result = wp_remote_get('https://art.seohnzz.com/api/index/zhongzhuan1?codea='.$codea.'&msg='.$msg.'&url='.$url1,$defaults);
             
             if(!is_wp_error($result)){
                 $content = wp_remote_retrieve_body($result);
@@ -169,13 +165,13 @@ class baiduseo_post{
             $wyc_min = isset($_POST['wyc_min'])?(int)$_POST['wyc_min']:0;
             $baiduseo_wyc = get_option('baiduseo_wyc');
             if($baiduseo_wyc!==false){
-                $res = update_option('baiduseo_wyc',['wyc'=>$wyc,'gx'=>$gx,'wyc_min'=>$wyc_min]);
+               update_option('baiduseo_wyc',['wyc'=>$wyc,'gx'=>$gx,'wyc_min'=>$wyc_min]);
             }else{
-                $res = add_option('baiduseo_wyc',['wyc'=>$wyc,'gx'=>$gx,'wyc_min'=>$wyc_min]);
+                add_option('baiduseo_wyc',['wyc'=>$wyc,'gx'=>$gx,'wyc_min'=>$wyc_min]);
             }
-            if($res){
-                echo json_encode(['msg'=>'保存成功','code'=>1]);exit;
-            }
+            
+            echo json_encode(['msg'=>'保存成功','code'=>1]);exit;
+            
         }
         echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
@@ -272,7 +268,7 @@ class baiduseo_post{
                 'sslverify' => FALSE,
             );
             $data =  baiduseo_common::baiduseo_url(1);
-            $url = 'http://wp.seohnzz.com/api/rank/daochu?keywords='.$keywords.'&total='.$total.'&long='.$long.'&collect='.$collect.'&bidword='.$bidword.'&url='.$data;
+            $url = 'https://art.seohnzz.com/api/rank/daochu?keywords='.$keywords.'&total='.$total.'&long='.$long.'&collect='.$collect.'&bidword='.$bidword.'&url='.$data;
             
             $result = wp_remote_get($url,$defaults);
             
@@ -300,7 +296,7 @@ class baiduseo_post{
                 'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
                 'sslverify' => FALSE,
             );
-            $url = 'http://wp.seohnzz.com/api/rank/word_vip?keywords='.$name;
+            $url = 'https://art.seohnzz.com/api/rank/word_vip?keywords='.$name;
             $result = wp_remote_get($url,$defaults);
             if(!is_wp_error($result)){
                 $level = wp_remote_retrieve_body($result);
@@ -321,7 +317,7 @@ class baiduseo_post{
                     'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
                     'sslverify' => FALSE,
                 );
-                $url = 'https://www.rbzzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
+                $url = 'https://art.seohnzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $level = wp_remote_retrieve_body($result);
@@ -342,7 +338,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/keywords?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/keywords?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -365,7 +361,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/description?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/description?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -419,7 +415,9 @@ class baiduseo_post{
                     $url_301['re_url2'] =''; 
                 }
                 
-                 if($url_301['re_url2'] && $url_301['re_url1'] && trim($url_301['re_url2'],'/')==trim($url_301['re_url1'],'/') && trim($url_301['re_url1'],'/')==trim($site_url1,'/')){
+         
+                
+                if( trim($url_301['re_url2'],'/')==trim($site_url1,'/') || trim($url_301['re_url1'],'/')==trim($site_url1,'/')){
                     $url_301['status'] = 1;
                 }else{
                     $url_301['status'] = 0;
@@ -502,7 +500,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  str_replace('www.','',baiduseo_common::baiduseo_url(0));
-                $url = "https://www.rbzzz.com/api/speed/beian?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/beian?url={$data}";
                
                 $result = wp_remote_get($url,$defaults);
                 $beian = get_option('baiduseo_beian');
@@ -532,7 +530,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/wx_check?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/wx_check?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -555,7 +553,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/h1?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/h1?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -577,7 +575,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/iframe?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/iframe?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -620,7 +618,7 @@ class baiduseo_post{
                     'sslverify' => FALSE,
                 );
                 $data =  baiduseo_common::baiduseo_url(1);
-                $url = "https://www.rbzzz.com/api/speed/gn_yc?url={$data}";
+                $url = "https://art.seohnzz.com/api/speed/gn_yc?url={$data}";
                 $result = wp_remote_get($url,$defaults);
                 if(!is_wp_error($result)){
                     $content = wp_remote_retrieve_body($result);
@@ -902,7 +900,7 @@ class baiduseo_post{
            
             $type = isset($_POST['type'])?(int)$_POST['type']:0;
             $keyword = isset($_POST['keyword'])?sanitize_text_field(wp_unslash($_POST['keyword'])):'';
-            $result = wp_remote_post('https://www.rbzzz.com/api/tag/index',['body'=>['type'=>$type,'keyword'=>$keyword,'url'=>baiduseo_common::baiduseo_url(0)]]);
+            $result = wp_remote_post('https://art.seohnzz.com/api/tag/index',['body'=>['type'=>$type,'keyword'=>$keyword,'url'=>baiduseo_common::baiduseo_url(0)]]);
            
             if(!is_wp_error($result)){
                 $result = wp_remote_retrieve_body($result);
@@ -949,7 +947,7 @@ class baiduseo_post{
     public function baiduseo_shenhe(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $url = 'http://wp.seohnzz.com/api/wztkj/shenhe';
+            $url = 'https://art.seohnzz.com/api/wztkj/shenhe';
             $link2 = isset($_POST['url'])?sanitize_url(wp_unslash($_POST['url'])):'';
             $link1 =  baiduseo_common::baiduseo_url(1);
             $result = wp_remote_post($url,['body'=>['data'=>['link1'=>$link1,'link2'=>$link2]]]);
@@ -970,7 +968,7 @@ class baiduseo_post{
     public function baiduseo_pingbi(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             global $wpdb;
-            $url = 'http://wp.seohnzz.com/api/wztkj/pb';
+            $url = 'https://art.seohnzz.com/api/wztkj/pb';
             $link2 = isset($_POST['url'])?sanitize_url(wp_unslash($_POST['url'])):'';
             $status =isset($_POST['status'])?(int)$_POST['status']:0;
             
@@ -1140,7 +1138,7 @@ class baiduseo_post{
             
             $data =  baiduseo_common::baiduseo_url(0);
             $url1 = isset($_SERVER['SERVER_NAME'])?sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])):'';
-            $url = 'https://www.rbzzz.com/api/money/log2?url='.$data.'&url1='.$url1.'&key='.$key.'&type=1';
+            $url = 'https://art.seohnzz.com/api/money/log2?url='.$data.'&url1='.$url1.'&key='.$key.'&type=1';
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -1202,40 +1200,12 @@ class baiduseo_post{
         }
         echo json_encode(['code'=>0,'msg'=>'修改失败']);exit;
     }
-    public function baiduseo_keywords_delete(){
-        if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            global $wpdb,$baiduseo_wzt_log;
-            if(!$baiduseo_wzt_log){
-                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
-            }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
-            }
-            $id = isset($_POST['id'])?(int)$_POST['id']:0;
-            $list = $wpdb->get_results($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where id=%d',$id),ARRAY_A);
-            $res = $wpdb->query($wpdb->prepare( "DELETE FROM " . $wpdb->prefix . "baiduseo_keywords where id=  %d",$id ));
-            if($res){
-                $defaults = array(
-                    'timeout' => 4000,
-                    'redirection' => 4000,
-                    'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                    'sslverify' => FALSE,
-                );
-                $url = 'http://wp.seohnzz.com/api/keywords/delete?url='.get_option('siteurl').'&keywords='.$list[0]['keywords'].'&type='.$list[0]['type'];
-                wp_remote_get($url,$defaults);
-                echo  json_encode(['msg'=>'删除成功','code'=>1]);exit;
-            }
-                
-            
-        }
-        echo  json_encode(['msg'=>'删除失败,请稍后重试','code'=>0]);exit;
-    }
+
     public function baiduseo_gaixie(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
             global $wpdb;
             $id = isset($_POST['id'])?(int)$_POST['id']:0;
-            $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
+            $url = 'https://art.seohnzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -1286,7 +1256,7 @@ class baiduseo_post{
         global $baiduseo_wzt_log;
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
             $id = isset($_POST['id'])?(int)$_POST['id']:0;
-            $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
+            $url = 'https://art.seohnzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
             $defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,
@@ -1369,38 +1339,6 @@ class baiduseo_post{
             }
         }
         echo json_encode(['msg'=>'0','data'=>'提交失败！']);exit;
-    }
-    public function baiduseo_kp_delete(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            global $wpdb;
-            $id = isset($_POST['id'])?(int)$_POST['id']:0;
-            
-            $kp = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_kp where id=%d',$id),ARRAY_A);
-            $url = 'https://www.rbzzz.com/api/kp/keywords_delete?url='.baiduseo_common::baiduseo_url(0).'&keywords='.$kp[0]['keywords'].'&type='.$kp[0]['type'];
-            $defaults = array(
-                'timeout' => 4000,
-                'connecttimeout'=>4000,
-                'redirection' => 3,
-                'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                'sslverify' => FALSE,
-            );
-             $result = wp_remote_get($url,$defaults);
-           
-            if(!is_wp_error($result)){
-                $content = wp_remote_retrieve_body($result);
-                if($content){
-                    if($kp[0]['status']==2 || $kp[0]['status']==1){
-                        $wpdb->update($wpdb->prefix . 'baiduseo_kp',['status'=>3],['id'=>$id]);
-                    }elseif($kp[0]['status']==5){
-                        $wpdb->update($wpdb->prefix . 'baiduseo_kp',['status'=>7],['id'=>$id]);
-                    }
-                    echo json_encode(['code'=>'1']);exit;
-                }
-            }
-                
-            
-        }
-        echo json_encode(['code'=>'0']);exit;
     }
     public function baiduseo_tag_pladd(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
@@ -1829,7 +1767,7 @@ class baiduseo_post{
             
             $baiduseo_rank = get_option('baiduseo_rank');
             $ur=  baiduseo_common::baiduseo_url(0);
-            $url = 'https://www.rbzzz.com/api/rank/get_rank?url='.$ur.'&http='.get_option('siteurl');
+            $url = 'https://art.seohnzz.com/api/rank/get_rank?url='.$ur.'&http='.get_option('siteurl');
             $defaults = array(
                 'timeout' => 4000,
                 'redirection' => 4000,
@@ -1945,154 +1883,7 @@ class baiduseo_post{
         }
         echo json_encode(['msg'=>'保存失败','code'=>0]);exit;
     }
-    public function baiduseo_kp(){
-        global $wpdb;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp'") !=  $wpdb->prefix."baiduseo_kp"){
-                echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
-            }
-            $data['keywords'] = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
-            if(!$data['keywords']){
-                echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
-            }
-            $length = mb_strlen($data['keywords']);
 
-           
-                $url = 'https://www.rbzzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
-                $defaults = array(
-                    'timeout' => 4000,
-                    'connecttimeout'=>4000,
-                    'redirection' => 3,
-                    'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                    'sslverify' => FALSE,
-                );
-                $result = wp_remote_get($url,$defaults);
-                if(!is_wp_error($result)){
-                    $jifen = wp_remote_retrieve_body($result);
-                    $jifen =$jifen?$jifen:0;
-                }else{
-                    $jifen = 0;
-                }
-                
-                if($jifen>=150){
-                    
-                }else{
-                     if($length<5){
-                         echo json_encode(['code'=>0,'msg'=>'剩余积分不足150,不允许添加4个字及4个字以下的关键词！']);exit;
-                       
-                     }
-                     if($jifen<10){
-                         echo json_encode(['code'=>0,'msg'=>'剩余积分低于10积分,无法正常消费！']);exit;
-                     }
-                }
-            
-            $data['type'] = isset($_POST['type'])?(int)$_POST['type']:0;
-            $resu = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'baiduseo_kp where type=%d and keywords=%s',(int)$data['type'],$data['keywords']),ARRAY_A);
-            if(!empty($resu) && $resu[0]['status']<=2){
-                echo json_encode(['code'=>0,'msg'=>'关键词已添加,请不要重复添加']);exit;
-               
-            }
-            if(isset($_SERVER['SERVER_NAME'])){
-                $url = 'https://www.rbzzz.com/api/kp/keywords_add?url='.sanitize_text_field(wp_unslash($_SERVER['SERVER_NAME'])).'&keywords='.$data['keywords'].'&type='.$data['type'].'&http='.trim(get_option('siteurl')).'&url1='.baiduseo_common::baiduseo_url(0);
-            }
-            $defaults = array(
-                'timeout' => 4000,
-                'connecttimeout'=>4000,
-                'redirection' => 3,
-                'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                'sslverify' => FALSE,
-            );
-            $result = wp_remote_get($url,$defaults);
-            if(!is_wp_error($result)){
-                $content = wp_remote_retrieve_body($result);
-                if($content){
-                    if(!empty($resu) && $resu[0]['status']>2){
-                        $wpdb->update($wpdb->prefix . 'baiduseo_kp',['status'=>1],['id'=>$resu[0]['id']]);
-                    }else{
-                        $res = $wpdb->insert($wpdb->prefix."baiduseo_kp",['keywords'=>$data['keywords'],'type'=>(int)$data['type'],'time'=>current_time( 'Y-m-d H:i:s'),'status'=>1]);
-                    }
-                    echo json_encode(['code'=>1,'msg'=>'关键词验证通过，已进入人工审核期！人工审核会在24小时内完成审核并进行优化']);exit;
-                    
-                }else{
-                    echo json_encode(['code'=>0,'msg'=>'您提交的关键词经检验不适合快速优化原因:1.该关键词在网站不存在2.已收录的内容未匹配到该关键词3.网站质量过低，无法快速优化指定关键词。请您更换其他关键词进行尝试！']);exit;
-                    
-                }
-            }else{
-                echo json_encode(['code'=>0,'msg'=>'添加失败！']);exit;
-                
-            }
-        }
-        echo json_encode(['code'=>0,'msg'=>'添加失败！']);exit;
-    }
-    public function baiduseo_keywords(){
-        global $wpdb;
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-           global $baiduseo_wzt_log;
-            if(!$baiduseo_wzt_log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
-            }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
-            }
-            $keywords = isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'';
-            if(!isset($_POST['type'])){
-                return;
-            }
-            if($keywords){
-                $list = $wpdb->query(' select * from  '.$wpdb->prefix.'baiduseo_keywords where type="'.(int)$_POST['type'].'"');
-                $defaults = array(
-                    'timeout' => 4000,
-                    'redirection' => 4000,
-                    'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-                    'sslverify' => FALSE,
-                );
-                if($list>9){
-                    $url = 'http://wp.seohnzz.com/api/keywords/num';
-                    $result = wp_remote_get($url,$defaults);
-                    $content = wp_remote_retrieve_body($result);
-                    if($list>$content-1){
-                        echo json_encode(['msg'=>'超出关键词限制个数','code'=>0]);exit;
-                        
-                    }
-                }
-                $re = $wpdb->query($wpdb->prepare(' select * from  '.$wpdb->prefix.'baiduseo_keywords where keywords=%s and type=%d',$keywords,(int)$_POST['type']));
-                if($re>=1){
-                    echo json_encode(['msg'=>'该关键词已添加','code'=>0]);exit;
-                    
-                }
-                $currnetTime= current_time( 'Y/m/d H:i:s');
-                $res = $wpdb->insert($wpdb->prefix."baiduseo_keywords",['post_time'=>$currnetTime,'keywords'=>$keywords,'type'=>(int)$_POST['type']]);
-                if(!$res){
-                    echo json_encode(['msg'=>'添加失败','code'=>0]);exit;
-                    
-                }
-                $ids = $wpdb->get_results(' select * from  '.$wpdb->prefix.'baiduseo_keywords order by ID desc');
-                $id = $ids[0]->id;
-                $url = 'http://wp.seohnzz.com/api/keywords/log?url='.get_option('siteurl').'&keywords='.$keywords.'&type='.(int)$_POST['type'];
-                $result = wp_remote_get($url,$defaults);
-                if(is_wp_error($result)){
-                    
-                    $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_keywords where id=  %d",$id));
-                    echo json_encode(['msg'=>'添加失败','code'=>0]);exit;
-                }
-                $content = wp_remote_retrieve_body($result);
-        
-                if($content){
-                    echo json_encode(['msg'=>'添加成功','code'=>1]);exit;
-                }else{
-                     
-                    $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "baiduseo_keywords where id=  %d",$id));
-                    echo json_encode(['msg'=>'添加失败','code'=>0]);exit;
-                }
-            }else{
-                echo json_encode(['msg'=>'请填写关键词','code'=>0]);exit;
-                
-            }
-            
-        }
-        echo json_encode(['msg'=>'添加失败','code'=>0]);exit;
-    }
     public function baiduseo_youhua(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
             $data = [
