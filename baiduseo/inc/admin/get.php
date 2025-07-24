@@ -551,18 +551,18 @@
                     $sql .=' and unix_timestamp(time)>%d and  unix_timestamp(time)<%d';
                     $con = [$sta1,$end1];
                 }
-                if(isset($_POST['rukou'])){
+                if(isset($_POST['rukou']) && sanitize_text_field(wp_unslash($_POST['rukou']))){
                     $rukou = sanitize_text_field(wp_unslash($_POST['rukou']));
                     $sql .= ' and url=%s';
                     $con[] = $rukou;
                 }
-                 if(isset($_POST['ip'])){
+                 if(isset($_POST['ip']) && sanitize_text_field(wp_unslash($_POST['ip']))){
                      $ip = sanitize_text_field(wp_unslash($_POST['ip']));
                 
                     $sql .= ' and ip=%s';
                     $con[] = $ip;
                 }
-                 if(isset($_POST['session'])){
+                 if(isset($_POST['session']) && sanitize_text_field(wp_unslash($_POST['session']))){
                      $session = sanitize_text_field(wp_unslash($_POST['session']));
                     $sql .= ' and session=%s';
                     $con[] = $session;
@@ -592,7 +592,7 @@
                 }else{
                     $count = $wpdb->query($wpdb->prepare($sql1,array_values($con1)),ARRAY_A);
                 }
-                // var_dump($wpdb->prepare($sql,array_values($con)));exit;
+                
                 $list = $wpdb->get_results($wpdb->prepare($sql,array_values($con)),ARRAY_A);
                 
                 if(!empty($list)){
@@ -1576,7 +1576,7 @@
         }
         public function baiduseo_get_bdpe(){
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-                $urls[] = get_option('siteurl');
+                $urls[] = get_option('home');
                 baiduseo_zz::bdts($urls,0,0);
                 
                 $baiduseo_zz_record = get_option('baiduseo_zz_record');

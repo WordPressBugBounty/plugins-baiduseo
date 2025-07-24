@@ -30,7 +30,8 @@ class baiduseo_seo{
             }else{
                $wpdb->query(' ALTER TABLE '.$wpdb->prefix.'baiduseo_ai_lishi ADD COLUMN `jifen` varchar(255) DEFAULT "-0.35"');
             }
-         }
+        }
+        
     }
     public static function seo_index($key,$des){
         $seo_init = get_option('seo_init');
@@ -39,6 +40,30 @@ class baiduseo_seo{
         }else{
             add_option('seo_init',['keywords'=>$key,'description'=>$des]);
         }  
+    }
+    public static function baiduseo_sanitizing_key($key,$arr){
+        foreach ($arr as $item) {
+            if (strpos($key, $item) !== false) {
+                return $key;
+            }
+        }
+        return 0;
+    }
+    public static function baiduseo_sanitizing_date($key){
+        if (strlen($key) !== 104) {
+            return false;
+        }
+    
+        // 提取各部分
+        $a = substr($key, 32, 2);
+        $b = substr($key, 66, 2);
+        $c = substr($key, 100, 4);
+        $today = date_i18n('Ymd', current_time('timestamp'));
+        $num = $c.$b.$a;
+        if((int)$num>(int)$today){
+            return $key;
+        }
+        return 0;
     }
     public static function sanitizing_json($data){
         $arr = [];
@@ -410,7 +435,7 @@ class baiduseo_seo{
         }
     }
     public static function robots($roobots){
-        $url =trim(get_option('siteurl'),'/').'/robots.txt';   
+        $url =trim(get_option('home'),'/').'/robots.txt';   
         $currnetTime= current_time( 'Y/m/d H:i:s');
         $robot = [                                          
             'robot'=>$roobots,                                                  
@@ -464,7 +489,7 @@ class baiduseo_seo{
         //  $data['sitemap_url'] = [];
         //  $data['sitemap_htmlurl'] = [];
             if(isset($sitemap['tag_open']) && $sitemap['tag_open']==1){
-                $data['sitemap_tag'] = get_option('siteurl'). '/tag.html';
+                $data['sitemap_tag'] = get_option('home'). '/tag.html';
                 if($tag_sl){
                     $tags = $wpdb->get_results('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag"  limit 500',ARRAY_A);
                 }else{
@@ -483,26 +508,26 @@ class baiduseo_seo{
             $page1 = $baiduseo_sitemap_num-1;
             $add_address = 0;
             foreach($data['sitemap_url'] as $key=>$val){
-                if($val==get_option('siteurl'). '/sitemap'.$page1.'.xml'){
+                if($val==get_option('home'). '/sitemap'.$page1.'.xml'){
                     $add_address =1;
                 }
             }
             if($add_address==0){
-                $data['sitemap_url'][] = get_option('siteurl'). '/sitemap'.$page1.'.xml';
+                $data['sitemap_url'][] = get_option('home'). '/sitemap'.$page1.'.xml';
                 
             }
-            $data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
+            $data['sitemap_htmlurl'][] = get_option('home').'/sitemap.html';
         }else{
             $add_address1 =0;
             foreach($data['sitemap_url'] as $key=>$val){
-                if($val==get_option('siteurl'). '/sitemap.xml'){
+                if($val==get_option('home'). '/sitemap.xml'){
                     $add_address1 =1;
                 }
             }
             if($add_address1==0){
-                $data['sitemap_url'][] = get_option('siteurl'). '/sitemap.xml';
+                $data['sitemap_url'][] = get_option('home'). '/sitemap.xml';
             }
-            $data['sitemap_htmlurl'][] = get_option('siteurl').'/sitemap.html';
+            $data['sitemap_htmlurl'][] = get_option('home').'/sitemap.html';
         }
         $data['sitemap_url'] = array_unique($data['sitemap_url']);
         $data['sitemap_htmlurl'] = array_unique($data['sitemap_htmlurl']);
@@ -1098,7 +1123,7 @@ class baiduseo_seo{
                  
                    if($baiduseo_sitemap_num==1){
                         $xml .= "<url>\n";
-                        $xml .= "<loc>".get_option('siteurl')."</loc>\n";
+                        $xml .= "<loc>".get_option('home')."</loc>\n";
                         $xml .= "<lastmod>{$currnetTime1}</lastmod>\n";
                         $xml .= "<changefreq>daily</changefreq>\n";
                         $xml .= "<priority>1.0</priority>\n";
@@ -1120,7 +1145,7 @@ class baiduseo_seo{
                     $page1 = $baiduseo_sitemap_num-1;
                     
                     foreach($data['sitemap_url'] as $key=>$val){
-                        $s = str_replace(get_option('siteurl'). '/sitemap','',$val);
+                        $s = str_replace(get_option('home'). '/sitemap','',$val);
                         $s = str_replace('.xml','',$s);
                         
                         if($s>=$page1 && $page1>0){
@@ -1128,7 +1153,7 @@ class baiduseo_seo{
                         }
                     }
                     foreach($sitemap['sitemap_htmlurl'] as $key=>$val){
-                        $s = str_replace(get_option('siteurl'). '/sitemap','',$val);
+                        $s = str_replace(get_option('home'). '/sitemap','',$val);
                         $s = str_replace('.html','',$s);   
                         if($s>=$page1  && $page1>0){
                             unset($data['sitemap_htmlurl'][$key]);
@@ -1294,7 +1319,7 @@ class baiduseo_seo{
                 $xml .= "<urlset>\n";
                 $txt = '';
                 foreach($zhizhu as $key=>$val){
-                    $url = get_option('siteurl');
+                    $url = get_option('home');
                     $url1 = trim($url,'/');
                     if(strpos($val['address'], $url1) !== false) {
                         $xml .= "<url>\n";
@@ -1310,25 +1335,25 @@ class baiduseo_seo{
                 $xml .= "</urlset>\n";
                 if($two==2){
                     if($i==0){
-                        $data['silian_url'][] = get_option('siteurl'). '/silian.xml';
-                        $data['silian_htmlurl'][] = get_option('siteurl'). '/silian.txt';
+                        $data['silian_url'][] = get_option('home'). '/silian.xml';
+                        $data['silian_htmlurl'][] = get_option('home'). '/silian.txt';
                         $wp_filesystem->put_contents ('../silian.xml',$xml);
                         $wp_filesystem->put_contents ('../silian.txt',$txt);
                     }else{
-                        $data['silian_url'][] = get_option('siteurl'). '/silian'.$i.'.xml';
-                        $data['silian_htmlurl'][] = get_option('siteurl'). '/silian'.$i.'.txt';
+                        $data['silian_url'][] = get_option('home'). '/silian'.$i.'.xml';
+                        $data['silian_htmlurl'][] = get_option('home'). '/silian'.$i.'.txt';
                         $wp_filesystem->put_contents ('../silian'.$i.'.xml',$xml);
                         $wp_filesystem->put_contents ('../silian'.$i.'.txt',$txt);
                     }
                 }elseif($two==1){
                     if($i==0){
-                        $data['silian_url'][] = get_option('siteurl'). '/silian.xml';
-                         $data['silian_htmlurl'][] = get_option('siteurl'). '/silian.txt';
+                        $data['silian_url'][] = get_option('home'). '/silian.xml';
+                         $data['silian_htmlurl'][] = get_option('home'). '/silian.txt';
                         $wp_filesystem->put_contents (ABSPATH.'/silian.xml',$xml);
                         $wp_filesystem->put_contents (ABSPATH.'/silian.txt',$txt);
                     }else{
-                        $data['silian_url'][] = get_option('siteurl'). '/silian'.$i.'.xml';
-                        $data['silian_htmlurl'][] = get_option('siteurl'). '/silian'.$i.'.txt';
+                        $data['silian_url'][] = get_option('home'). '/silian'.$i.'.xml';
+                        $data['silian_htmlurl'][] = get_option('home'). '/silian'.$i.'.txt';
                         $wp_filesystem->put_contents (ABSPATH.'/silian'.$i.'.xml',$xml);
                         $wp_filesystem->put_contents (ABSPATH.'/silian'.$i.'.txt',$txt);
                     }
@@ -1356,7 +1381,7 @@ class baiduseo_seo{
         }
         $data =  baiduseo_common::baiduseo_url(0);
         
-        $url = "https://art.seohnzz.com/api/index/pay_money?url={$data}&type=1";
+        $url = "https://art.seohnzz.com/api/index/pay_money?url={$data}&type=1&log={$baiduseo_wzt_log}";
         $defaults = array(
             'timeout' => 4000,
             'connecttimeout'=>4000,
@@ -1373,6 +1398,30 @@ class baiduseo_seo{
             $content = json_decode($content,true);
             
             if(isset($content['status']) && $content['status']==1){
+                if(isset($content['token1']) && $content['token1']){
+                    $baiduseo_wzt_token1 = get_option('baiduseo_wzt_token1');
+                    if($baiduseo_wzt_token1===false){
+                        add_option('baiduseo_wzt_token1',$content['token1']);
+                    }else{
+                        update_option('baiduseo_wzt_token1',$content['token1']);
+                    }
+                }
+                if(isset($content['token2']) && $content['token2']){
+                    $baiduseo_wzt_token2 = get_option('baiduseo_wzt_token2');
+                    if($baiduseo_wzt_token2===false){
+                        add_option('baiduseo_wzt_token2',$content['token2']);
+                    }else{
+                        update_option('baiduseo_wzt_token2',$content['token2']);
+                    }
+                }
+                if(isset($content['token3']) && $content['token3']){
+                    $baiduseo_wzt_token3 = get_option('baiduseo_wzt_token3');
+                    if($baiduseo_wzt_token3===false){
+                        add_option('baiduseo_wzt_token3',$content['token3']);
+                    }else{
+                        update_option('baiduseo_wzt_token3',$content['token3']);
+                    }
+                }
                 return 1;
             }elseif(isset($content['status']) && $content['status']==0){
                 return 0;

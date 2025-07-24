@@ -2,7 +2,7 @@
 /*
 Plugin Name: SEO合集(支持百度/Google/Bing/头条推送)
 Description: 含百度站长、360站长、Bing站长、今日头条站长、神马站长、IndexNow、tag标签内链、友情链接、百度地图sitemap、Google地图、 谷歌地图、关键词排名查询监控、360站长JS自动推送、 文章原创率检测、文章伪原创、 网站蜘蛛、robots、图片alt标签、天级推送、category隐藏、死链查询、百度自动推送、批量提交URL到站长、百度收录查询、批量推送未收录、301/404等功能、AI文章助手、流量监控。
-Version: 2.0.9
+Version: 2.1.0
 Author: 沃之涛科技
 Author URI: https://www.seoceo.cn
 License: GPLv3
@@ -11,7 +11,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 if(!defined('ABSPATH'))exit;
 global $baiduseo_wzt_log;
 $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
-define('BAIDUSEO_VERSION','2.0.9');
+define('BAIDUSEO_VERSION','2.1.0');
 define('BAIDUSEO_FILE',__FILE__);
 define('BAIDUSEO_NAME',plugin_basename(__FILE__));
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/common/index.php';
@@ -20,7 +20,6 @@ require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/cron_tongbu.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/post.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/get.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/kp.php';
-require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/rank.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/seo.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/tag.php';
 require plugin_dir_path( BAIDUSEO_FILE ) . 'inc/admin/zhizhu.php';
@@ -38,8 +37,6 @@ $baiduseo_zhizhu = new baiduseo_zhizhu();
 $baiduseo_zhizhu->init();
 $baiduseo_kp = new baiduseo_kp();
 $baiduseo_kp->init();
-$baiduseo_rank = new baiduseo_rank();
-$baiduseo_rank->init();
 $baiduseo_seo = new baiduseo_seo();
 $baiduseo_seo->init();
 $baiduseo_tag = new baiduseo_tag();

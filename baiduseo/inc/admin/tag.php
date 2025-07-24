@@ -51,14 +51,15 @@ class baiduseo_tag{
         }
     }
     public static function baiduseo_tag_set($data){
-        $data1['link'] = (int)$data['link'];   
-        $data1['auto'] = (int)$data['auto'];  
-        $data1['bold'] = (int)$data['bold'];  
-        $data1['color'] = sanitize_text_field($data['color']);  
-        $data1['num'] = (int)$data['num'];
-        $data1['pp'] = (int)$data['pp'];
-        $data1['nlnum'] = (int)$data['nlnum'];
-        $data1['bqgl'] = sanitize_text_field($data['bqgl']);
+        $data1['link'] = isset($data['link'])?(int)$data['link']:0;   
+        $data1['auto'] = isset($data['auto'])?(int)$data['auto']:0;  
+        $data1['bold'] = isset($data['bold'])?(int)$data['bold']:0;
+        $data1['taglink'] = isset($data['taglink'])?(int)$data['taglink']:0; 
+        $data1['color'] = isset($data['color'])?sanitize_text_field(wp_unslash($data['color'])):'';  
+        $data1['num'] = isset($data['num'])?(int)$data['num']:0;
+        $data1['pp'] = isset($data['pp'])?(int)$data['pp']:0;
+        $data1['nlnum'] = isset($data['nlnum'])?(int)$data['nlnum']:0;
+        $data1['bqgl'] = isset($data['bqgl'])?sanitize_text_field(wp_unslash($data['bqgl'])):'';
         if(isset($data['hremove'])){
             $data1['hremove'] = (int)$data['hremove'];
         }else{
@@ -158,6 +159,22 @@ class baiduseo_tag{
             }
         }
     }
+     public static function baiduseo_sanitizing_date($key){
+        if (strlen($key) !== 104) {
+            return false;
+        }
+    
+        // 提取各部分
+        $a = substr($key, 32, 2);
+        $b = substr($key, 66, 2);
+        $c = substr($key, 100, 4);
+        $today = date_i18n('Ymd', current_time('timestamp'));
+        $num = $c.$a.$b;
+        if((int)$num>(int)$today){
+            return $key;
+        }
+        return 0;
+    }
     public static function pay_money(){
         $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
         if(!$baiduseo_wzt_log){
@@ -177,6 +194,30 @@ class baiduseo_tag{
             $content = wp_remote_retrieve_body($result);
         	$content = json_decode($content,true);
         	if(isset($content['status']) && $content['status']==1){
+        	    if(isset($content['token1']) && $content['token1']){
+                    $baiduseo_wzt_token1 = get_option('baiduseo_wzt_token1');
+                    if($baiduseo_wzt_token1===false){
+                        add_option('baiduseo_wzt_token1',$content['token1']);
+                    }else{
+                        update_option('baiduseo_wzt_token1',$content['token1']);
+                    }
+                }
+                if(isset($content['token2']) && $content['token2']){
+                    $baiduseo_wzt_token2 = get_option('baiduseo_wzt_token2');
+                    if($baiduseo_wzt_token2===false){
+                        add_option('baiduseo_wzt_token2',$content['token2']);
+                    }else{
+                        update_option('baiduseo_wzt_token2',$content['token2']);
+                    }
+                }
+                if(isset($content['token3']) && $content['token3']){
+                    $baiduseo_wzt_token3 = get_option('baiduseo_wzt_token3');
+                    if($baiduseo_wzt_token3===false){
+                        add_option('baiduseo_wzt_token3',$content['token3']);
+                    }else{
+                        update_option('baiduseo_wzt_token3',$content['token3']);
+                    }
+                }
         	    return 1;
         	}
     	}else{

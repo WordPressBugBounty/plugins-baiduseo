@@ -29,13 +29,7 @@ class baiduseo_zhizhu{
                 dbDelta($sql1);
             }
             
-            $res = $wpdb->query('Describe '.$wpdb->prefix.'baiduseo_zhizhu num');
-            
-            if($res){
-                 
-            }else{
-               $wpdb->query(' ALTER TABLE '.$wpdb->prefix.'baiduseo_zhizhu ADD COLUMN `num` bigint DEFAULT 1');
-            }
+          
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_zhizhu_suoyin'") !=  $wpdb->prefix."baiduseo_zhizhu_suoyin"){
                  $sql8 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_zhizhu_suoyin   (
                     id bigint NOT NULL AUTO_INCREMENT,
@@ -532,6 +526,30 @@ class baiduseo_zhizhu{
             $content = wp_remote_retrieve_body($result);
             $content = json_decode($content,true);
             if(isset($content['status']) && $content['status']==1){
+                if(isset($content['token1']) && $content['token1']){
+                    $baiduseo_wzt_token1 = get_option('baiduseo_wzt_token1');
+                    if($baiduseo_wzt_token1===false){
+                        add_option('baiduseo_wzt_token1',$content['token1']);
+                    }else{
+                        update_option('baiduseo_wzt_token1',$content['token1']);
+                    }
+                }
+                if(isset($content['token2']) && $content['token2']){
+                    $baiduseo_wzt_token2 = get_option('baiduseo_wzt_token2');
+                    if($baiduseo_wzt_token2===false){
+                        add_option('baiduseo_wzt_token2',$content['token2']);
+                    }else{
+                        update_option('baiduseo_wzt_token2',$content['token2']);
+                    }
+                }
+                if(isset($content['token3']) && $content['token3']){
+                    $baiduseo_wzt_token3 = get_option('baiduseo_wzt_token3');
+                    if($baiduseo_wzt_token3===false){
+                        add_option('baiduseo_wzt_token3',$content['token3']);
+                    }else{
+                        update_option('baiduseo_wzt_token3',$content['token3']);
+                    }
+                }
                 return 1;
             }
         }else{

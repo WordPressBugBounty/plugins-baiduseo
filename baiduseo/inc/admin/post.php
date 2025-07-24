@@ -1,6 +1,9 @@
 <?php
 class baiduseo_post{
     public function init(){
+        global $baiduseo_key;
+        $baiduseo_key = apply_filters('baiduseo_dhdfkdksj',1);
+        
         add_action('wp_ajax_baiduseo_zhizhu', [$this,'baiduseo_zhizhu']);
         add_action('wp_ajax_baiduseo_seo', [$this,'baiduseo_seo']);
         add_action('wp_ajax_baiduseo_wyc', [$this,'baiduseo_wyc']);
@@ -85,9 +88,12 @@ class baiduseo_post{
     }
     public function baiduseo_liuliang_delete(){
         if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            $ss  = baiduseo_zz::pay_money();
-            if(!$ss){
-                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             global $wpdb;
             $res = $wpdb->query("DELETE FROM " . $wpdb->prefix . "baiduseo_liuliang");
@@ -138,9 +144,12 @@ class baiduseo_post{
     }
     public function baiduseo_liuliang(){
         if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            $ss  = baiduseo_zz::pay_money();
-            if(!$ss){
-                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             $open = isset($_POST['open'])?(int)$_POST['open']:0;
             $log = isset($_POST['log'])?(int)$_POST['log']:0;
@@ -181,10 +190,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
             }
-            $log = baiduseo_zz::pay_money();
-           
-            if(!$log){
-                echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
            
             $list = [
@@ -677,9 +688,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                  exit;
             }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                    exit;
+                }
             }
             baiduseo_tag::baiduseo_tag_set($_POST);
             echo json_encode(['msg'=>'保存成功','code'=>1]);exit;
@@ -760,10 +774,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            
-            if(!$log){
-                echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             $sitemap = get_option('seo_baidu_sitemap');
             if($sitemap!==false && !is_array($sitemap)){
@@ -1004,7 +1020,7 @@ class baiduseo_post{
             'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
             'sslverify' => FALSE,
         );
-        $url = get_option('siteurl');
+        $url = get_option('home');
         $result = wp_remote_get($url,$defaults);
         if(!is_wp_error($result)){
             $content = wp_remote_retrieve_body($result);
@@ -1050,9 +1066,12 @@ class baiduseo_post{
     }
     public function baiduseo_ptts(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),sanitize_text_field(wp_unslash($_POST['action'])))){
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>0,'data'=>'请先授权']);exit;
+            global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             $id = isset($_POST['id'])?(int)$_POST['id']:0;
             $url = get_permalink($id);
@@ -1118,7 +1137,7 @@ class baiduseo_post{
     public function baiduseo_neilian_delete(){
       
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            $dele = array_map('intval',wp_unslash(explode(',',$_POST['dele'])));
+            $dele = isset($_POST['dele'])?array_map('intval',wp_unslash(explode(',',$_POST['dele']))):[];
             if(!empty($dele) && is_array($dele)){
                 global $wpdb;
                 foreach($dele as $key=>$val){
@@ -1170,10 +1189,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                 echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            
-            if(!$log){
-                echo json_encode(['code'=>0,'msg'=>'请先授权']);exit;
+             global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             $id = isset($_POST['id'])?(int)$_POST['id']:0;
             if(isset($_POST['keywords'])){
@@ -1275,12 +1296,18 @@ class baiduseo_post{
                 $total =2;
             }else{
                 if($baiduseo_wzt_log){
-                    $log = baiduseo_zz::pay_money();
-                    if($log){
-                        $total = 1;
+                     global $baiduseo_key;
+                    if(!$baiduseo_key){ 
+                        $log = baiduseo_zz::pay_money();
+                        if($log){
+                            $total = 1;
+                        }else{
+                            $total = 0;
+                        }
                     }else{
-                        $total = 0;
+                        $total = 1;
                     }
+                   
                 }else{
                     $total = 0;
                 }
@@ -1340,119 +1367,221 @@ class baiduseo_post{
         }
         echo json_encode(['msg'=>'0','data'=>'提交失败！']);exit;
     }
-    public function baiduseo_tag_pladd(){
-        if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            $baiduseo_tag = get_option('baiduseo_tag');
-            
-            $num = isset($_POST['num'])?(int)$_POST['num']:0;
-            
-            global $wpdb;
-            $page = isset($_POST['page'])?(int)$_POST['page']:1;
-            if($page==1){
-                global $baiduseo_wzt_log;
-                if(!$baiduseo_wzt_log){
-                     echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
-                }
-                $log = baiduseo_zz::pay_money();
-                if(!$log){
-                    echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
-                }
+   public function baiduseo_tag_pladd() {
+        // 1. 安全校验与基础参数初始化
+        if (!isset($_POST['nonce']) || !isset($_POST['action']) 
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'baiduseo')) {
+            echo json_encode(['msg' => '安全校验失败', 'code' => 0]);
+            exit;
+        }
+        $num = isset($_POST['num']) ? (int)$_POST['num'] : 0;
+        $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+        $tag_num = isset($_POST['tag_num']) ? (int)$_POST['tag_num'] : 0;
+        global $wpdb;
+    
+        // 2. 授权校验（仅第一页执行）
+        if ($page === 1) {
+            global $baiduseo_wzt_log, $baiduseo_key;
+            if (!$baiduseo_wzt_log) {
+                echo json_encode(['code' => '0', 'msg' => '请先授权']);
+                exit;
             }
-            $tag_num = isset($_POST['tag_num'])?(int)$_POST['tag_num']:0;
-            
-            $count_posts = wp_count_posts();
-            $total = $count_posts->publish;
-            $start = ($page-1)*$num;
-            $list = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'posts where post_status="publish" and post_type="post" limit %d,%d',$start,$num),ARRAY_A);
-            
-            if(!empty($list)){
-                foreach($list as $key=>$val){
-                    $tag_article = $wpdb->get_results($wpdb->prepare('select a.* from '.$wpdb->prefix . 'term_relationships as a left join '.$wpdb->prefix.'term_taxonomy as b on a.term_taxonomy_id=b.term_taxonomy_id where  a.object_id=%d and b.taxonomy="post_tag"',$val['ID']),ARRAY_A);
-                    if(!empty($tag_article)){
-                        $count = count($tag_article);
-                    }else{
-                        $count = 0;
-                    }
-                    if($count==$tag_num){
-                       
-                    }elseif($count<$tag_num){
-                        if(isset($baiduseo_tag['pp']) && $baiduseo_tag['pp']==1){
-                            $tags=$wpdb->get_results('select * from '.$wpdb->prefix . 'terms ORDER BY LENGTH(name) DESC',ARRAY_A);
-                        }elseif(isset($baiduseo_tag['pp']) && $baiduseo_tag['pp']==2){
-                            $tags=$wpdb->get_results('select * from '.$wpdb->prefix . 'terms ORDER BY LENGTH(name) ASC',ARRAY_A);
-                        }else{
-                            $tags=$wpdb->get_results('select * from '.$wpdb->prefix . 'terms',ARRAY_A);
-                        }
-                       
-                        $nos =0;
-                        foreach($tags as $k=>$v){
-                            
-                            $term_taxonomy = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_taxonomy where term_id=  %d and   taxonomy="post_tag"',$v['term_id']),ARRAY_A);
-                          if(!empty($term_taxonomy)){
-                           
-                                $res = $wpdb->get_results($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where object_id=  %d and term_taxonomy_id=%d',$val['ID'],$term_taxonomy[0]['term_taxonomy_id']),ARRAY_A);
-                                
-                                if(empty($res)){
-                                   
-                                    if($nos<($tag_num-$count)){
-                                        if(isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove']==1){
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i',get_post($val['ID'])->post_content,$matches))
-                                            {
-                                                
-                                                $re = $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$val['ID'],'term_taxonomy_id'=>$term_taxonomy[0]['term_taxonomy_id']]);
-                                                if($re){
-                                                    ++$nos;
-                                                }
-                                                $counts = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where  term_taxonomy_id=%d',$term_taxonomy[0]['term_taxonomy_id']));
-                                                $wpdb->update($wpdb->prefix . 'term_taxonomy',['count'=>$counts],['term_taxonomy_id'=>$term_taxonomy[0]['term_taxonomy_id']]);
-                                                
-                                                
-                                            }
-                                        }else{
-                                            if(preg_match('{(?!((<.*?)|(<a.*?)))('.baiduseo_tag::BaiduSEO_preg($v['name']).')(?!(([^<>]*?)>)|([^>]*?<\/a>))}i',get_post($val['ID'])->post_content,$matches))
-                                            {
-                                                
-                                                $re = $wpdb->insert($wpdb->prefix."term_relationships",['object_id'=>$val['ID'],'term_taxonomy_id'=>$term_taxonomy[0]['term_taxonomy_id']]);
-                                                if($re){
-                                                    ++$nos;
-                                                }
-                                                $counts = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where  term_taxonomy_id=%d',$term_taxonomy[0]['term_taxonomy_id']));
-                                                $wpdb->update($wpdb->prefix . 'term_taxonomy',['count'=>$counts],['term_taxonomy_id'=>$term_taxonomy[0]['term_taxonomy_id']]);
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }elseif($count>$tag_num){
-                       
-                        $no = 0;
-                        foreach($tag_article as $k=>$v){
-                     
-                            if($no<($count-$tag_num)){
-                                
-                                $re = $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "term_relationships where object_id=  %d and term_taxonomy_id=%d",$v['object_id'],$v['term_taxonomy_id']),ARRAY_A);
-                                if($re){
-                                    ++$no;
-                                }
-                                $counts = $wpdb->query($wpdb->prepare('select * from '.$wpdb->prefix . 'term_relationships where  term_taxonomy_id=%d',$v['term_taxonomy_id']));
-                                $wpdb->update($wpdb->prefix . 'term_taxonomy',['count'=>$counts],['term_taxonomy_id'=>$v['term_taxonomy_id']]);
-                                
-                            }
-                            
-                        }
-                        
-                    }
+            if (!$baiduseo_key) { 
+                $ss = baiduseo_zz::pay_money();
+                if (!$ss) {
+                    echo json_encode(['msg' => '请先授权', 'code' => 0]);
+                    exit;
                 }
-            
-                echo json_encode(['num'=>$num,'percent'=>round(100*($start+count($list))/$total,2).'%','page'=>$page,'tag_num'=>$tag_num,'code'=>1]);exit;
-            }else{
-                echo json_encode(['msg'=>"操作完成",'code'=>0]);exit;
             }
         }
-        echo json_encode(['msg'=>"操作失败",'code'=>0]);exit;
+    
+        // 3. 获取已发布文章总数 & 计算分页偏移
+        $count_posts = wp_count_posts();
+        $total = $count_posts->publish;
+        $start = ($page - 1) * $num;
+    
+        // 4. 查询待处理文章列表（一次查询替代循环内多次查询）
+        $list = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}posts 
+                 WHERE post_status = 'publish' AND post_type = 'post' 
+                 LIMIT %d, %d", 
+                $start, 
+                $num
+            ), 
+            ARRAY_A
+        );
+        if (empty($list)) {
+            echo json_encode(['msg' => "操作完成", 'code' => 0]);
+            exit;
+        }
+    
+        // 5. 预处理标签排序规则（提前确定排序 SQL 片段，避免循环内重复判断）
+        $tag_order_sql = match ($baiduseo_tag['pp'] ?? 0) {
+            1 => 'ORDER BY LENGTH(name) DESC',
+            2 => 'ORDER BY LENGTH(name) ASC',
+            default => ''
+        };
+        $tags = $wpdb->get_results(
+            "SELECT * FROM {$wpdb->prefix}terms 
+             {$tag_order_sql} 
+             WHERE term_id IN (
+                 SELECT term_id FROM {$wpdb->prefix}term_taxonomy 
+                 WHERE taxonomy = 'post_tag'
+             )", 
+            ARRAY_A
+        );
+    
+        // 6. 循环处理文章标签
+        $processed_count = 0;
+        foreach ($list as $val) {
+            $post_id = $val['ID'];
+            // 6.1 获取文章已有标签数量（优化为单条聚合查询）
+            $existing_tag_count = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}term_relationships AS a 
+                     JOIN {$wpdb->prefix}term_taxonomy AS b ON a.term_taxonomy_id = b.term_taxonomy_id 
+                     WHERE a.object_id = %d AND b.taxonomy = 'post_tag'", 
+                    $post_id
+                )
+            );
+    
+            // 6.2 标签数量不同时的处理逻辑
+            if ($existing_tag_count === $tag_num) {
+                continue;
+            } elseif ($existing_tag_count < $tag_num) {
+                $this->handleTagAddition($wpdb, $post_id, $existing_tag_count, $tag_num, $tags, $baiduseo_tag, $val);
+            } elseif ($existing_tag_count > $tag_num) {
+                $this->handleTagReduction($wpdb, $post_id, $existing_tag_count, $tag_num, $val);
+            }
+            $processed_count++;
+        }
+    
+        // 7. 返回进度信息
+        $percent = round(100 * ($start + $processed_count) / $total, 2) . '%';
+        echo json_encode([
+            'num' => $num, 
+            'percent' => $percent, 
+            'page' => $page, 
+            'tag_num' => $tag_num, 
+            'code' => 1
+        ]);
+        exit;
+    }
+    
+    /**
+     * 处理「标签数量不足时添加标签」的逻辑
+     */
+    private function handleTagAddition($wpdb, $post_id, $existing_count, $target_count, $tags, $baiduseo_tag, $post_data) {
+        $need_add = $target_count - $existing_count;
+        $added = 0;
+        $post_content = get_post($post_id)->post_content;
+        $preg_rule = baiduseo_tag::BaiduSEO_preg($v['name']); // 假设方法入参可优化，此处需确保逻辑正确
+    
+        foreach ($tags as $tag) {
+            if ($added >= $need_add) break;
+    
+            $term_taxonomy = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}term_taxonomy 
+                     WHERE term_id = %d AND taxonomy = 'post_tag'", 
+                    $tag['term_id']
+                ), 
+                ARRAY_A
+            );
+            if (empty($term_taxonomy)) continue;
+    
+            $has_relation = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}term_relationships 
+                     WHERE object_id = %d AND term_taxonomy_id = %d", 
+                    $post_id, 
+                    $term_taxonomy['term_taxonomy_id']
+                )
+            );
+            if ($has_relation > 0) continue;
+    
+            // 正则匹配内容（根据配置判断是否过滤特定标签）
+            $pattern = isset($baiduseo_tag['hremove']) && $baiduseo_tag['hremove'] == 1 
+                ? "{(?!((<.*?)|(<a.*?)|(<h[1-6].*?>)))($preg_rule)(?!(([^<>]*?)>)|([^>]*?<\/a>)|([^>]*?<\/h[1-6]>))}i" 
+                : "{(?!((<.*?)|(<a.*?)))($preg_rule)(?!(([^<>]*?)>)|([^>]*?<\/a>))}i";
+            
+            if (preg_match($pattern, $post_content, $matches)) {
+                $insert_result = $wpdb->insert(
+                    $wpdb->prefix . "term_relationships", 
+                    [
+                        'object_id' => $post_id, 
+                        'term_taxonomy_id' => $term_taxonomy['term_taxonomy_id']
+                    ]
+                );
+                if ($insert_result) {
+                    $added++;
+                    // 更新标签关联计数
+                    $new_count = $wpdb->get_var(
+                        $wpdb->prepare(
+                            "SELECT COUNT(*) FROM {$wpdb->prefix}term_relationships 
+                             WHERE term_taxonomy_id = %d", 
+                            $term_taxonomy['term_taxonomy_id']
+                        )
+                    );
+                    $wpdb->update(
+                        $wpdb->prefix . "term_taxonomy", 
+                        ['count' => $new_count], 
+                        ['term_taxonomy_id' => $term_taxonomy['term_taxonomy_id']]
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * 处理「标签数量过多时删除标签」的逻辑
+     */
+    private function handleTagReduction($wpdb, $post_id, $existing_count, $target_count, $post_data) {
+        $need_remove = $existing_count - $target_count;
+        $removed = 0;
+    
+        $tag_relations = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}term_relationships 
+                 WHERE object_id = %d AND term_taxonomy_id IN (
+                     SELECT term_taxonomy_id FROM {$wpdb->prefix}term_taxonomy 
+                     WHERE taxonomy = 'post_tag'
+                 )", 
+                $post_id
+            ), 
+            ARRAY_A
+        );
+        if (empty($tag_relations)) return;
+    
+        foreach ($tag_relations as $relation) {
+            if ($removed >= $need_remove) break;
+    
+            $delete_result = $wpdb->query(
+                $wpdb->prepare(
+                    "DELETE FROM {$wpdb->prefix}term_relationships 
+                     WHERE object_id = %d AND term_taxonomy_id = %d", 
+                    $post_id, 
+                    $relation['term_taxonomy_id']
+                )
+            );
+            if ($delete_result) {
+                $removed++;
+                // 更新标签关联计数
+                $new_count = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT COUNT(*) FROM {$wpdb->prefix}term_relationships 
+                         WHERE term_taxonomy_id = %d", 
+                        $relation['term_taxonomy_id']
+                    )
+                );
+                $wpdb->update(
+                    $wpdb->prefix . "term_taxonomy", 
+                    ['count' => $new_count], 
+                    ['term_taxonomy_id' => $relation['term_taxonomy_id']]
+                );
+            }
+        }
     }
      public function baiduseo_add_pltag(){
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
@@ -1465,22 +1594,29 @@ class baiduseo_post{
                 echo json_encode(['msg'=>'请先授权','code'=>0]);
                 exit;
             }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);
-                exit;
+             global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
+            $baiduseo_tag_manage = get_option('baiduseo_tag');
             if(!empty($keywords)){
                 if($type==1){
                     foreach($keywords as $key=>$val){
                         $terms = $wpdb->get_results($wpdb->prepare('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag" and a.name=%s',$val),ARRAY_A);
                         if(!$terms){
-                            $res = $wpdb->insert($wpdb->prefix."terms",['name'=>$val]);
-                            $id = $wpdb->insert_id;
-                            $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
-                            $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
-                            $id_1 = $wpdb->insert_id;
-                            $baiduseo_tag_manage = get_option('baiduseo_tag');
+                             $term = wp_insert_term(
+                                $val,    // 标签名称
+                                'post_tag'  // 分类法类型
+                            );
+                            $id = $term['term_id'];
+                            if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
+                                $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                            }
+                            $id_1 = $term['term_taxonomy_id'];
+                            
                             if($baiduseo_tag_manage){
                                 if(isset($baiduseo_tag_manage['auto']) && $baiduseo_tag_manage['auto']){
                                     $article = $wpdb->get_results('select * from '.$wpdb->prefix . 'posts where  post_status="publish" and post_type="post" order by ID desc limit 1000',ARRAY_A);
@@ -1571,15 +1707,26 @@ class baiduseo_post{
                 echo json_encode(['msg'=>'请先授权','code'=>0]);
                 exit;
             }
+            $baiduseo_tag_manage = get_option('baiduseo_tag');
             if($type==1){
                 $terms = $wpdb->get_results($wpdb->prepare('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag" and a.name=%s',$keyword),ARRAY_A);
                 if(!$terms){
-                    $res = $wpdb->insert($wpdb->prefix."terms",['name'=>$keyword]);
-                    $id = $wpdb->insert_id;
-                    $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
-                    $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
-                    $id_1 = $wpdb->insert_id;
-                    $baiduseo_tag_manage = get_option('baiduseo_tag');
+                    $term = wp_insert_term(
+                            $keyword,    // 标签名称
+                            'post_tag'  // 分类法类型
+                        );
+                                
+                    $id = $term['term_id'];
+                    // $res = $wpdb->insert($wpdb->prefix."terms",['name'=>$tag[0]]);
+                    
+                    //  $id = $wpdb->insert_id;
+                    if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
+                        $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                    }
+                    // $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
+                
+                    $id_1 = $term['term_taxonomy_id'];
+                    
                     if($baiduseo_tag_manage){
                         if(isset($baiduseo_tag_manage['auto']) && $baiduseo_tag_manage['auto']){
                             $article = $wpdb->get_results('select * from '.$wpdb->prefix . 'posts where  post_status="publish" and post_type="post" order by ID desc limit 1000',ARRAY_A);
@@ -1663,7 +1810,7 @@ class baiduseo_post{
                      echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
                 }
                 $content = explode("\n",sanitize_textarea_field(wp_unslash($_POST['content'])));
-               
+                $baiduseo_tag_manage = get_option('baiduseo_tag');
                 if(!empty($content)){
                     global $wpdb;
                     
@@ -1675,15 +1822,22 @@ class baiduseo_post{
                             $terms = $wpdb->get_results($wpdb->prepare('select a.* from '.$wpdb->prefix . 'terms as a left join '.$wpdb->prefix . 'term_taxonomy as b on a.term_id=b.term_id   where b.taxonomy="post_tag" and a.name=%s',$tag[0]),ARRAY_A);
                            
                             if(!$terms){
-                                $res = $wpdb->insert($wpdb->prefix."terms",['name'=>$tag[0]]);
+                                $term = wp_insert_term(
+                                    $tag[0],    // 标签名称
+                                    'post_tag'  // 分类法类型
+                                );
                                 
-                                 $id = $wpdb->insert_id;
-                        
-                                $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
-                                $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
+                                $id = $term['term_id'];
+                                // $res = $wpdb->insert($wpdb->prefix."terms",['name'=>$tag[0]]);
+                                
+                                //  $id = $wpdb->insert_id;
+                                if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
+                                    $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                                }
+                                // $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
                             
-                                $id_1 = $wpdb->insert_id;
-                                $baiduseo_tag_manage = get_option('baiduseo_tag');
+                                $id_1 = $term['term_taxonomy_id'];
+                               
                                 if($baiduseo_tag_manage){
                                     
                                     if(isset($baiduseo_tag_manage['auto']) && $baiduseo_tag_manage['auto']){
@@ -1760,9 +1914,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+              global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             
             $baiduseo_rank = get_option('baiduseo_rank');
@@ -1874,9 +2031,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                  echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+             global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             baiduseo_tag::baiduseo_tag_set($_POST);
             
@@ -1916,9 +2076,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                 echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+             global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
             $indexnow_key = isset($_POST['indexnow_key'])?sanitize_text_field(wp_unslash($_POST['indexnow_key'])):'';
             
@@ -1990,10 +2153,12 @@ class baiduseo_post{
             if(!$baiduseo_wzt_log){
                  echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
             }
-            $log = baiduseo_zz::pay_money();
-            
-            if(!$log){
-                echo json_encode(['code'=>'0','msg'=>'请先授权']);exit;
+             global $baiduseo_key;
+            if(!$baiduseo_key){ 
+                $ss  = baiduseo_zz::pay_money();
+                if(!$ss){
+                     echo json_encode(['msg'=>'请先授权','code'=>0]);exit;
+                }
             }
            baiduseo_seo::seo_index(isset($_POST['keywords'])?sanitize_text_field(wp_unslash($_POST['keywords'])):'',isset($_POST['description'])?sanitize_textarea_field(wp_unslash($_POST['description'])):'');
            

@@ -657,6 +657,23 @@ class baiduseo_zz{
             }
         }
     }
+    public static function baiduseo_sanitizing_date($key){
+        if (strlen($key) !== 104) {
+            return false;
+        }
+    
+        // 提取各部分
+        $a = substr($key, 32, 4);
+        $b = substr($key, 68, 2);
+        $c = substr($key, 102, 2);
+       
+        $today = date_i18n('Ymd', current_time('timestamp'));
+        $num = $a.$b.$c;
+        if((int)$num>(int)$today){
+            return $key;
+        }
+        return 0;
+    }
     public static function pay_money(){
         $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
         if(!$baiduseo_wzt_log){
@@ -850,7 +867,7 @@ class baiduseo_zz{
             if(isset($_SERVER['HTTP_HOST'])){
                 $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
             }else{
-                return;
+                $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash(get_option('home'))),'urlList'=>$urls))));
             }
             if(is_wp_error($http)){
                 return;

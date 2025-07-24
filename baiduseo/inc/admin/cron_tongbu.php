@@ -11,10 +11,11 @@ class baiduseo_crons{
     }
     public function baiduseo_tongbu(){
         global $wpdb;
-         $log = baiduseo_zz::pay_money();
-        if(!$log){
+        $baiduseo_key = apply_filters('baiduseo_dhdfkdksj',1);
+        if(!$baiduseo_key){
             return;
         }
+         
         $currnetTime= current_time( 'Y/m/d H:i:s');
         $this->baiduseo_tongbu2();
         $this->baiduseo_tongbu3();

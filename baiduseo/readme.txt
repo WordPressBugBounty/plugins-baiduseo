@@ -3,7 +3,7 @@ Donate link: https://www.seoceo.cn
 Tags: 百度, Bing, google, 蜘蛛, sitemap
 Requires at least: 4.8
 Tested up to:  6.8
-Stable tag: 2.0.9
+Stable tag: 2.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -171,6 +171,23 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 16.文章原创率检测
 17.文章伪原创
 == Changelog ==
+= 2.1.0 =（2025/07/24）
+*新增tag生成的链接方式选择
+*tag手机版样式调整
+*评分海报图优化
+*流量监控显示时间优化
+*流量监控页面图表空白修复
+*微信群客服二维码优化
+*QQ客服下架
+*公告加载速度优化
+*部分提示优化
+*标签、关键词批量添加优化
+*批量打标签加载502优化
+*流量监控时间选择框优化
+*站长信息获取配额优化
+*公告提醒优化
+*版本号显示优化
+*全面优化加载速度
 = 2.0.9 =（2025/07/07）
 *优化打开速度
 *修复原创检测设置失败问题

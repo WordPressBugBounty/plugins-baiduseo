@@ -10,7 +10,7 @@ class baiduseo_cron{
         }
     }
     public function baiduseo_cronexec(){
-        
+        $baiduseo_key = apply_filters('baiduseo_dhdfkdksj',1);
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         $baiduseo_zhizhu = get_option('baiduseo_zhizhu');
         if(isset($baiduseo_zhizhu['open']) && $baiduseo_zhizhu['open']==1){
@@ -19,10 +19,11 @@ class baiduseo_cron{
 	    $this->baiduseo_kp();
         $baiduseo_wyc = get_option('baiduseo_wyc');
         if(isset($baiduseo_wyc['wyc']) && $baiduseo_wyc['wyc']){
-            $this->baiduseo_wyc();
+            $this->baiduseo_wyc($baiduseo_key);
         }
         
         $this->wztkj_linkhh();
+      
         
         
         $baiduseo_auto = get_option('baiduseo_zz');
@@ -32,29 +33,21 @@ class baiduseo_cron{
 	        $baiduseo_bd_chao = get_option('baiduseo_bd_chao');
 
 	        if($baiduseo_bd_chao!=$today){
-	            $this->baiduseo_zz();
+	            $this->baiduseo_zz($baiduseo_key);
 	        }
 	    }
 	     if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'2')!==false){
-	         $this->baiduseo_bing();
+	         $this->baiduseo_bing($baiduseo_key);
 	    }
 	  
 	     if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'4')!==false){
-	         $this->baiduseo_google();
+	         $this->baiduseo_google($baiduseo_key);
 	    }
 	   
 	     if(isset($baiduseo_auto['pingtai']) && (strpos($baiduseo_auto['pingtai'],'5')!==false || strpos($baiduseo_auto['pingtai'],'6')!==false || strpos($baiduseo_auto['pingtai'],'7')!==false || strpos($baiduseo_auto['pingtai'],'8')!==false || strpos($baiduseo_auto['pingtai'],'9')!==false || strpos($baiduseo_auto['pingtai'],'10')!==false )){
-	         $this->baiduseo_indexnow();
+	         $this->baiduseo_indexnow($baiduseo_key);
 	    }
 	    
-	    //下架
-	   // if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'3')!==false){
-	   //      $this->baiduseo_shenma();
-	   // }
-	   // if(isset($baiduseo_auto['status']) && strpos($baiduseo_auto['status'],'1')!==false && isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1')!==false){
-	   //      $this->baiduseo_day();
-	   // }
-	   
 	    $sitemap = get_option('seo_baidu_sitemap');
 	    if(isset($sitemap['sitemap_open']) && $sitemap['sitemap_open']){
             $this->baiduseo_sitemap();
@@ -64,15 +57,17 @@ class baiduseo_cron{
         }
         $this->baiduseo_tongji();
         $this->baiduseo_clear_log();
-        $this->baiduseo_liuliang();
+        $this->baiduseo_liuliang($baiduseo_key);
     }
-    public function  baiduseo_indexnow(){
+    public function  baiduseo_indexnow($baiduseo_key){
         
         global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
-         $log = baiduseo_zz::pay_money();
-        if(!$log){
-            return;
+        if(!$baiduseo_key){
+             $log = baiduseo_zz::pay_money();
+            if(!$log){
+                return;
+            }
         }
         global $wp_rewrite;
 	    if(!$wp_rewrite){
@@ -169,13 +164,15 @@ class baiduseo_cron{
         }
         }
     }
-    public function baiduseo_google(){
+    public function baiduseo_google($baiduseo_key){
          global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
-         $log = baiduseo_zz::pay_money();
-        if(!$log){
-            return;
-        }
+            if(!$baiduseo_key){
+                 $log = baiduseo_zz::pay_money();
+                if(!$log){
+                    return;
+                }
+            }
         global $wp_rewrite;
 	    if(!$wp_rewrite){
 	       $wp_rewrite = new wp_rewrite();
@@ -257,12 +254,14 @@ class baiduseo_cron{
         }
         }
     }
-    public function baiduseo_liuliang(){
+    public function baiduseo_liuliang($baiduseo_key){
         global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
-            $log = baiduseo_zz::pay_money();
-            if(!$log){
-                return;
+            if(!$baiduseo_key){
+                $log = baiduseo_zz::pay_money();
+                if(!$log){
+                    return;
+                }
             }
             //删除超过限制的数据
             $timezone_offet = get_option( 'gmt_offset');
@@ -338,6 +337,14 @@ class baiduseo_cron{
             }
             
             $sheng = $wpdb->get_results('select ip from '.$wpdb->prefix . 'baiduseo_liuliang where sheng is null and ip !="" and ip !="unknown" group by ip limit 100',ARRAY_A);
+            foreach ($sheng as $k=>$row) {
+                if (filter_var($row['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    
+                }else{
+                    unset($sheng[$k]);
+                    $wpdb->update($wpdb->prefix . 'baiduseo_liuliang',['sheng'=>'异常ip地址'],['ip'=>$row['ip']]);
+                }
+            }
             if(!empty($sheng)){
                     $ur=  baiduseo_common::baiduseo_url(0);
             	    $url = 'https://art.seohnzz.com/api/tag/getaddress?url='.$ur;
@@ -380,7 +387,7 @@ class baiduseo_cron{
                 'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
                 'sslverify' => FALSE,
             );
-            $url = get_option('siteurl');
+            $url = get_option('home');
             $result = wp_remote_get($url,$defaults);
             if(!is_wp_error($result)){
                 $content = wp_remote_retrieve_body($result);
@@ -403,59 +410,62 @@ class baiduseo_cron{
                 }
             }
         }
-        //提交到远端
-       $url = 'https://art.seohnzz.com/api/wztkj/friend_post';
-       $wztkj_linkhh['linkurl'] = baiduseo_common::baiduseo_url(1);
-	   $result = wp_remote_post($url,['body'=>['data'=>$wztkj_linkhh]]);
-	   if(!is_wp_error($result)){
-	        $result = wp_remote_retrieve_body($result);
-	        $result = json_decode($result,true);
-	        if(!empty($result)){
-	            $baiduseo_hh_count = get_option('baiduseo_hh_count');
-	            if(!is_array($baiduseo_hh_count)){
-	                $baiduseo_hh_count = [];
-	            }
-	            foreach($result as $key=>$val){
-	                //需要处理
-                    $res = $wpdb->get_results(
-                        $wpdb->prepare(
-                            "SELECT * FROM {$wpdb->prefix}wztkj_friends WHERE link = %s",
-                            $val['link2']
-                        ),
-                        ARRAY_A
-                    );
-                    $currnetTime = current_time( 'Y-m-d H:i:s');
-                    $status3 = $val['status3'];
-                    $baiduseo_hh_count['count'] = $val['count'];
-                    $baiduseo_hh_count['hhcount'] = $val['hhcount'];
-                    if($wztkj_linkhh['kqtype']==2 && $wztkj_linkhh['link']==1){
-                        if($val['status3']==1 && $val['is_check2']==1 && $val['status4']==1){
-                            $status3=2;
+        $wztkj_linkhh = get_option('baiduseo_linkhh');
+         if(isset($wztkj_linkhh['link'])){
+            //提交到远端
+               $url = 'https://art.seohnzz.com/api/wztkj/friend_post';
+               $wztkj_linkhh['linkurl'] = baiduseo_common::baiduseo_url(1);
+        	   $result = wp_remote_post($url,['body'=>['data'=>$wztkj_linkhh]]);
+        	   if(!is_wp_error($result)){
+        	        $result = wp_remote_retrieve_body($result);
+        	        $result = json_decode($result,true);
+        	        if(!empty($result)){
+        	            $baiduseo_hh_count = get_option('baiduseo_hh_count');
+        	            if(!is_array($baiduseo_hh_count)){
+        	                $baiduseo_hh_count = [];
+        	            }
+        	            foreach($result as $key=>$val){
+        	                //需要处理
+                            $res = $wpdb->get_results(
+                                $wpdb->prepare(
+                                    "SELECT * FROM {$wpdb->prefix}wztkj_friends WHERE link = %s",
+                                    $val['link2']
+                                ),
+                                ARRAY_A
+                            );
+                            $currnetTime = current_time( 'Y-m-d H:i:s');
+                            $status3 = $val['status3'];
+                            $baiduseo_hh_count['count'] = $val['count'];
+                            $baiduseo_hh_count['hhcount'] = $val['hhcount'];
+                            if($wztkj_linkhh['kqtype']==2 && $wztkj_linkhh['link']==1){
+                                if($val['status3']==1 && $val['is_check2']==1 && $val['status4']==1){
+                                    $status3=2;
+                                }
+                                if($val['status3']==1 && $val['is_check2']==0){
+                                    $status3=2;
+                                }
+                            }else{
+                                if( $val['is_check2']==1 && $val['status4']==1){
+                                    $status3=2;
+                                }
+                                 if( $val['is_check2']==0){
+                                    $status3=2;
+                                }
+                            }
+                            
+                            if(!empty($res)){
+                                
+                                $wpdb->update($wpdb->prefix . 'wztkj_friends',['keywords'=>$val['keywords'],'status1'=>$val['status1'],'status2'=>$val['status2'],'status3'=>$status3],['id'=>$res[0]['id']]);
+                            }else{  
+                                $wpdb->insert($wpdb->prefix."wztkj_friends",['link'=>$val['link2'],'keywords'=>$val['keywords'],'time'=>$currnetTime,'status1'=>$val['status1'],'status2'=>$val['status2'],'status3'=>$status3]);
+                            }
                         }
-                        if($val['status3']==1 && $val['is_check2']==0){
-                            $status3=2;
-                        }
-                    }else{
-                        if( $val['is_check2']==1 && $val['status4']==1){
-                            $status3=2;
-                        }
-                         if( $val['is_check2']==0){
-                            $status3=2;
-                        }
-                    }
-                    
-                    if(!empty($res)){
+                        update_option('baiduseo_hh_count',$baiduseo_hh_count);
                         
-                        $wpdb->update($wpdb->prefix . 'wztkj_friends',['keywords'=>$val['keywords'],'status1'=>$val['status1'],'status2'=>$val['status2'],'status3'=>$status3],['id'=>$res[0]['id']]);
-                    }else{  
-                        $wpdb->insert($wpdb->prefix."wztkj_friends",['link'=>$val['link2'],'keywords'=>$val['keywords'],'time'=>$currnetTime,'status1'=>$val['status1'],'status2'=>$val['status2'],'status3'=>$status3]);
-                    }
-                }
-                update_option('baiduseo_hh_count',$baiduseo_hh_count);
-                
-	        }
-	        
-	   }
+        	        }
+        	        
+        	   }
+        }
     }
     public function baiduseo_shenma(){
         global $wpdb,$baiduseo_wzt_log;
@@ -709,7 +719,7 @@ class baiduseo_cron{
             }
         }
     }
-    public function baiduseo_wyc(){
+    public function baiduseo_wyc($baiduseo_key){
         global $wpdb,$baiduseo_wzt_log;
         $seo_init = get_option('baiduseo_wyc');
         $url = 'https://art.seohnzz.com/api/kp/jifen?url='.baiduseo_common::baiduseo_url(0);
@@ -734,11 +744,15 @@ class baiduseo_cron{
     	    $total = 2;
     	}else{
             if($baiduseo_wzt_log){
-                $log = baiduseo_zz::pay_money();
-                if($log){
-                    $total = 1;
+                if(!$baiduseo_key){
+                    $log = baiduseo_zz::pay_money();
+                    if($log){
+                        $total = 1;
+                    }else{
+                        $total = 0;
+                    }
                 }else{
-                    $total = 0;
+                    $total = 1;
                 }
             }else{
                 $total = 0;
@@ -984,15 +998,18 @@ class baiduseo_cron{
             }
     	}
     }
-    public function baiduseo_bing(){
+    public function baiduseo_bing($baiduseo_key){
         global $wpdb,$baiduseo_wzt_log;
         
         if($baiduseo_wzt_log){
-        $log = baiduseo_zz::pay_money();
+            if(!$baiduseo_key){
+                $log = baiduseo_zz::pay_money();
+                
+                if(!$log){
+                    return;
+                }
+            }
         global $wp_rewrite;
-        if(!$log){
-            return;
-        }
 	    if(!$wp_rewrite){
 	       $wp_rewrite = new wp_rewrite();
 	    }
@@ -1032,9 +1049,9 @@ class baiduseo_cron{
                     $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
                     $api = 'https://www.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey='.$baidu['bing_key'];
                     if(isset($_SERVER['HTTP_HOST'])){
-                    $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
+                        $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
                     }else{
-                        return;
+                        $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash(get_option('home'))),'urlList'=>$urls))));
                     }
                     if(is_wp_error($http)){
                         return;
@@ -1116,7 +1133,7 @@ class baiduseo_cron{
                 if(isset($_SERVER['HTTP_HOST'])){
                 $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash($http_type.$_SERVER['HTTP_HOST'])),'urlList'=>$urls))));
                 }else{
-                    return;
+                    $http = wp_remote_post($api,array('headers'=>array('Content-Type'=>'text/json; charset=utf-8'),'body'=>json_encode(array('siteUrl'=>sanitize_url(wp_unslash(get_option('home'))),'urlList'=>$urls))));
                 }
                 if(is_wp_error($http)){
                     return;
@@ -1164,8 +1181,13 @@ class baiduseo_cron{
      public static function baiduseo_quota($key)
     {
          global $wpdb,$baiduseo_wzt_log;
+         $baiduseo_key = apply_filters('baiduseo_dhdfkdksj',1);
         if($baiduseo_wzt_log){
-         $log = baiduseo_zz::pay_money();
+            if($baiduseo_key){
+                $log =1;
+            }else{
+                $log = baiduseo_zz::pay_money();
+            }
         if(!$log){
             return;
         }
@@ -1196,7 +1218,7 @@ class baiduseo_cron{
 	    if(!$wp_rewrite){
 	       $wp_rewrite = new wp_rewrite();
 	    }
-       baiduseo_seo::sitemap(1,1);
+        baiduseo_seo::sitemap(1,1);
     }
     public function baiduseo_silian(){
         baiduseo_seo::silian(1);
@@ -1204,6 +1226,7 @@ class baiduseo_cron{
     public function baiduseo_day(){
          global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
+            
          $log = baiduseo_zz::pay_money();
         if(!$log){
             return;
@@ -1242,13 +1265,15 @@ class baiduseo_cron{
         }
         }
     }
-    public function baiduseo_zz(){
+    public function baiduseo_zz($baiduseo_key){
         global $wpdb,$baiduseo_wzt_log;
         if($baiduseo_wzt_log){
-            $log = baiduseo_zz::pay_money();
-           
-            if(!$log){
-                return;
+            if(!$baiduseo_key){
+                $log = baiduseo_zz::pay_money();
+               
+                if(!$log){
+                    return;
+                }
             }
         global $wp_rewrite;
 	    if(!$wp_rewrite){
@@ -1343,7 +1368,12 @@ class baiduseo_cron{
         if(!$BaiduSEO_tongji || (isset($BaiduSEO_tongji) && $BaiduSEO_tongji['time']<time()) ){
             $wp_version =  get_bloginfo('version');
             $data =  baiduseo_common::baiduseo_url(0);
-        	$url = "https://art.seohnzz.com/api/baiduseo/index?url={$data}&type=1&url1=".md5($data.'seohnzz.com')."&theme_version=".BAIDUSEO_VERSION."&php_version=".PHP_VERSION."&wp_version={$wp_version}";
+            $token = apply_filters('baiduseo_dhdfkdksj',1);
+            if($token){
+                $url = "https://art.seohnzz.com/api/baiduseo/index?url={$data}&type=1&url1=".md5($data.'seohnzz.com')."&theme_version=".BAIDUSEO_VERSION."&php_version=".PHP_VERSION."&wp_version={$wp_version}&token={$token}";
+            }else{
+        	    $url = "https://art.seohnzz.com/api/baiduseo/index?url={$data}&type=1&url1=".md5($data.'seohnzz.com')."&theme_version=".BAIDUSEO_VERSION."&php_version=".PHP_VERSION."&wp_version={$wp_version}";
+            }
         	$defaults = array(
                 'timeout' => 4000,
                 'connecttimeout'=>4000,

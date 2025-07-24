@@ -44,7 +44,8 @@ class baiduseo_common{
         add_filter('manage_posts_columns' , [$this,'baiduseo_yuanchuang_column']);
         add_action('wp_ajax_baiduseo_liuliang_log', [$this,'baiduseo_liuliang_log']);
         add_action('wp_ajax_nopriv_baiduseo_liuliang_log', [$this,'baiduseo_liuliang_log']);
-
+        add_filter('baiduseo_dhdfkdksj', [$this,'baiduseo_dhdfkdksj']);
+        add_filter('baiduseo_dssdd', [$this,'baiduseo_dssdd']);
     }
     public function baiduseo_init_session(){
         if (!session_id()) {
@@ -480,6 +481,65 @@ class baiduseo_common{
             </script>";
         }
         return $columns;   
+    }
+    public function baiduseo_dssdd($value){
+        global $baiduseo_wzt_log;
+        $url = baiduseo_common::baiduseo_url(0);
+        $log = $baiduseo_wzt_log;
+        $type = 1;
+        $arr = [
+            md5($url),
+            md5($log),
+            md5($type),
+            md5($url.$log),
+            md5($url.$type),
+            md5($log.$url),
+            md5($log.$type),
+            md5($type.$url),
+            md5($type.$log),
+            md5($url.$log.$type),
+            md5($url.$type.$log),
+            md5($log.$url.$type),
+            md5($log.$type.$url),
+            md5($type.$url.$log),
+            md5($type.$log.$url),
+        ];
+        return $arr;
+    }
+    public function baiduseo_dhdfkdksj($value){
+        $arr = self::baiduseo_get_token();
+        $arr1 = apply_filters('baiduseo_dssdd',2);
+        $key= 0;
+        foreach($arr as $k=>$v){
+            
+            if(baiduseo_seo::baiduseo_sanitizing_key($v,$arr1)){
+                switch ($k) {
+                    case 0:
+                        $key = baiduseo_seo::baiduseo_sanitizing_date($v);
+                        if($key){
+                            break 2;
+                        }else{
+                            break;
+                        }
+                    case 1:
+                        $key = baiduseo_tag::baiduseo_sanitizing_date($v);
+                        if($key){
+                            break 2;
+                        }else{
+                            break;
+                        }
+                    case 2:
+                        $key = baiduseo_zz::baiduseo_sanitizing_date($v);
+                        if($key){
+                            break 2;
+                        }else{
+                            break;
+                        }
+                   
+                }
+            }
+        }
+        return $key;
     }
     public function baiduseo_yuanchuang_column_content($column_name, $post_id) { 
         if(current_user_can('level_10')){
@@ -1179,7 +1239,7 @@ class baiduseo_common{
                 wp_enqueue_script( $val['name'], plugin_dir_url( BAIDUSEO_FILE ).'inc/admin/'.$val['url'], array(), BAIDUSEO_VERSION, true);
             }
         }
-        wp_register_script('baiduseo.js', false, array(), BAIDUSEO_VERSION);
+        wp_register_script('baiduseo.js', false, array(), BAIDUSEO_VERSION,false);
         wp_enqueue_script('baiduseo.js');
         $url1 = baiduseo_common::baiduseo_url(0);
         $baiduseo_yindao = get_option('baiduseo_yindao');
@@ -1188,25 +1248,25 @@ class baiduseo_common{
         $baiduseo_indexnow = md5(esc_url(baiduseo_common::baiduseo_url(1)));
         
         $baiduseo_google = baiduseo_common::baiduseo_url(1).'/wp-sitemap.xml';
-        wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.esc_js(plugins_url('baiduseo','BAIDUSEO_FILE')).'/inc/admin",baiduseo_nonce="'. esc_attr(wp_create_nonce('baiduseo')).'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.esc_url($url1).'",baiduseo_yindao='.(int)$baiduseo_yindao.',baiduseo_v="'.esc_js($baiduseo_version).'",baiduseo_indexnow="'.esc_attr($baiduseo_indexnow).'",baiduseo_google="'.esc_url($baiduseo_google).'";', 'before');
+        wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.esc_js(plugins_url('',BAIDUSEO_FILE)).'/inc/admin",baiduseo_nonce="'. esc_attr(wp_create_nonce('baiduseo')).'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.esc_url($url1).'",baiduseo_yindao='.(int)$baiduseo_yindao.',baiduseo_v="'.esc_url($baiduseo_version).'",baiduseo_indexnow="'.esc_attr($baiduseo_indexnow).'",baiduseo_google="'.esc_url($baiduseo_google).'";', 'before');
     }
     public  function baiduseo_plugin_action_links ( $links) {
         $links[] = '<a href="' . admin_url( 'admin.php?page=baiduseo&nonce='.esc_attr(wp_create_nonce('baiduseo')) ) . '">设置</a>';
         return $links;
     }
-    public function baiduseo_delete_post($post_ID){
-        global $baiduseo_wzt_log;
-        if($baiduseo_wzt_log){
-            $log = baiduseo_zz::pay_money();
-            $url = get_permalink($post_ID);
-            if($log){
-                $baiduseo_zz = get_option('baiduseo_zz');
-                if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4') !== false){
-                    baiduseo_zz::google(['url'=>$url,'type'=>"URL_DELETED"]);
-                }
-            }
-        }
-    }
+    // public function baiduseo_delete_post($post_ID){
+    //     global $baiduseo_wzt_log;
+    //     if($baiduseo_wzt_log){
+    //         $log = baiduseo_zz::pay_money();
+    //         $url = get_permalink($post_ID);
+    //         if($log){
+    //             $baiduseo_zz = get_option('baiduseo_zz');
+    //             if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4') !== false){
+    //                 baiduseo_zz::google(['url'=>$url,'type'=>"URL_DELETED"]);
+    //             }
+    //         }
+    //     }
+    // }
     public function  baiduseo_articlepublish($post_ID){
         
         global $wpdb,$baiduseo_wzt_log;
@@ -1583,6 +1643,12 @@ class baiduseo_common{
             $url1 = explode('/',$url1);
             return $url1[0];
         }
+    }
+    public static function baiduseo_get_token(){
+        $baiduseo_wzt_token1 = get_option('baiduseo_wzt_token1');
+        $baiduseo_wzt_token2 = get_option('baiduseo_wzt_token2');
+        $baiduseo_wzt_token3 = get_option('baiduseo_wzt_token3');
+        return [$baiduseo_wzt_token1,$baiduseo_wzt_token2,$baiduseo_wzt_token3];
     }
     public static function baiduseo_tongxun(){
         $baiduseo_tongxun = get_option('baiduseo_tongxun');
