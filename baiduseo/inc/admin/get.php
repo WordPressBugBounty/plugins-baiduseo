@@ -438,11 +438,12 @@
                 );
                 $baiduseo_level = get_option('baiduseo_level');
                
-                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION)>(int)str_replace('.','',$level1[2])){
+                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION)>(int)str_replace('.','',$baiduseo_level[2])){
                     $url = 'https://art.seohnzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                     $result = wp_remote_get($url,$defaults);
                     if(!is_wp_error($result)){
                         $level = wp_remote_retrieve_body($result);
+                        
                         $level = json_decode($level,true);
                         
                         $level1 = explode(',',$level['level']);

@@ -14,7 +14,9 @@ class baiduseo_zhizhu{
             if (!empty( $wpdb->collate)) {
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
+            if ( ! function_exists( 'dbDelta' ) ) {
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            }
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_zhizhu'") !=  $wpdb->prefix."baiduseo_zhizhu"){
                 $sql1 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_zhizhu   (
                     id bigint NOT NULL AUTO_INCREMENT,

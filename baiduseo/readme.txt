@@ -1,9 +1,10 @@
 === SEO合集(支持百度/Google/Bing/头条推送) ===
 Donate link: https://www.seoceo.cn
 Tags: 百度, Bing, google, 蜘蛛, sitemap
-Requires at least: 4.8
+Requires at least: 5.3
 Tested up to:  6.8
-Stable tag: 2.1.0
+Stable tag: 2.1.1
+Requires PHP: 7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -171,6 +172,13 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 16.文章原创率检测
 17.文章伪原创
 == Changelog ==
+= 2.1.1 =（2025/08/08）
+*修复当天蜘蛛错位1个小时问题
+*优化数据表的创建
+*修复百度推送日志开启，列表没有调用
+*站长信息页面速度优化
+*添加引导模式和seo合集评分到首页
+*修复评分页面退出引导模式会加载两次页面问题
 = 2.1.0 =（2025/07/24）
 *新增tag生成的链接方式选择
 *tag手机版样式调整
@@ -649,22 +657,15 @@ SEO合集插件是目前WordPress插件市场中功能最完善和最强大的<a
 *robots优化
 = 0.0.7 =
 *修复百度查询
-*
-修复安装报错问题
+*修复安装报错问题
 = 0.0.6 =
 *增加死链查询
 *增加宝塔定时
-
 *增加已收录条数，蜘蛛状态条数
-
 *优化百度查询
-
 *优化批量推送
-
 *优化robots.txt的生成
-
 *修复部分主题冲突问题*修复ID排序问题
-
 *修复站长&熊掌号批量推送限制问题= 0.0.5 =
 *增加网站蜘蛛统计图
 = 0.0.4 =

@@ -10,24 +10,9 @@ class baiduseo_kp{
             if (!empty( $wpdb->collate)) {
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-            // if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp'") !=  $wpdb->prefix."baiduseo_kp"){
-            //     $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_kp   (
-            //         id bigint NOT NULL AUTO_INCREMENT,
-            //         keywords varchar(255) NOT NULL ,
-            //         type bigint NOT NULL DEFAULT 1,
-            //         time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            //         check_time timestamp   NULL ,
-            //         delete_time timestamp  NULL,
-            //         chu bigint NOT NULL DEFAULT 0,
-            //         news  bigint NOT NULL DEFAULT 0,
-            //         status bigint NOT NULL DEFAULT 1,
-            //         high tinyint DEFAULT 0,
-            //         high_time timestamp NULL,
-            //         UNIQUE KEY id (id)
-            //     ) $charset_collate;";
-            //     dbDelta($sql15);
-            // }
+            if ( ! function_exists( 'dbDelta' ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            }
             
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_kp_log'") !=  $wpdb->prefix."baiduseo_kp_log"){
                  $sql16 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_kp_log(

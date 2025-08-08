@@ -10,7 +10,9 @@ class baiduseo_seo{
             if (!empty( $wpdb->collate)) {
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            if ( ! function_exists( 'dbDelta' ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            }
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_ai_lishi'") !=  $wpdb->prefix."baiduseo_ai_lishi"){
                 $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_ai_lishi   (
                     id bigint NOT NULL AUTO_INCREMENT,

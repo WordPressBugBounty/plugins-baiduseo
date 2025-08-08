@@ -10,7 +10,9 @@ class baiduseo_zz{
             if (!empty( $wpdb->collate)) {
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            if ( ! function_exists( 'dbDelta' ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            }
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_zz'") !=  $wpdb->prefix."baiduseo_zz"){
                 $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_zz   (
                     id bigint NOT NULL AUTO_INCREMENT,
@@ -181,13 +183,13 @@ class baiduseo_zz{
                         if(isset($re['response']['code']) && $re['response']['code']>202){
                             
                             if($re['response']['code']=='400'){
-                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'无效的格式']);
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>8,'message'=>'无效的格式']);
                             }elseif($re['response']['code']=='403'){
-                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'根目录没有密钥文件']);
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>8,'message'=>'根目录没有密钥文件']);
                             }elseif($re['response']['code']=='422'){
-                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'URL与密钥不匹配']);
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>8,'message'=>'URL与密钥不匹配']);
                             }elseif($re['response']['code']=='429'){
-                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>8,'message'=>'请求过多']);
+                                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>8,'message'=>'请求过多']);
                             }
                         }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
                              foreach($urls as $k=>$v){
@@ -232,13 +234,13 @@ class baiduseo_zz{
                         if(isset($baiduseo_zz['yandex_log_show']) && $baiduseo_zz['yandex_log_show']){
                             if(isset($re['response']['code']) && $re['response']['code']>202){
                                 if($re['response']['code']=='400'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'无效的格式']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>9,'message'=>'无效的格式']);
                                 }elseif($re['response']['code']=='403'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'根目录没有密钥文件']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>9,'message'=>'根目录没有密钥文件']);
                                 }elseif($re['response']['code']=='422'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'URL与密钥不匹配']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>9,'message'=>'URL与密钥不匹配']);
                                 }elseif($re['response']['code']=='429'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>9,'message'=>'请求过多']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>9,'message'=>'请求过多']);
                                 }
                             }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
                                  foreach($urls as $k=>$v){
@@ -283,13 +285,13 @@ class baiduseo_zz{
                         if(isset($baiduseo_zz['naver_log_show']) && $baiduseo_zz['naver_log_show']){
                             if(isset($re['response']['code']) && $re['response']['code']>202){
                                 if($re['response']['code']=='400'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'无效的格式']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>10,'message'=>'无效的格式']);
                                 }elseif($re['response']['code']=='403'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'根目录没有密钥文件']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>10,'message'=>'根目录没有密钥文件']);
                                 }elseif($re['response']['code']=='422'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'URL与密钥不匹配']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>10,'message'=>'URL与密钥不匹配']);
                                 }elseif($re['response']['code']=='429'){
-                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$url[0],'ts'=>2,'type'=>10,'message'=>'请求过多']);
+                                    $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$urls[0],'ts'=>2,'type'=>10,'message'=>'请求过多']);
                                 }
                             }elseif(isset($re['response']['code']) &&($re['response']['code']==200 || $re['response']['code']==202)){
                                  foreach($urls as $k=>$v){

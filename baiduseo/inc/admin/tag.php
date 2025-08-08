@@ -10,7 +10,9 @@ class baiduseo_tag{
             if (!empty( $wpdb->collate)) {
               $charset_collate .= " COLLATE {$wpdb->collate}";
             }
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            if ( ! function_exists( 'dbDelta' ) ) {
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            }
             if($wpdb->get_var("show tables like '{$wpdb->prefix}baiduseo_neilian'") !=  $wpdb->prefix."baiduseo_neilian"){
                 $sql15 = "CREATE TABLE " . $wpdb->prefix . "baiduseo_neilian   (
                     id bigint NOT NULL AUTO_INCREMENT,
@@ -45,7 +47,6 @@ class baiduseo_tag{
                     size varchar(255) NOT NULL default '',
                     UNIQUE KEY id (id)
                 ) $charset_collate;";
-                // var_dump($sql16);exit;
                 dbDelta($sql16);
             }
         }

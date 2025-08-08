@@ -53,6 +53,15 @@ class baiduseo_post{
         add_action('wp_ajax_baiduseo_pingfen', [$this,'baiduseo_pingfen']);
        
     }
+    public static function baiduseo_generate_short_code($str) {
+        // 先将中文转为UTF-8编码的哈希
+        $hash = md5(trim(urlencode($str)));
+        $num = wp_rand(4,8);
+        $short_code = substr($hash, 0, $num);
+        $short_code = strtr($short_code, ['0'=>'a','1'=>'b','2'=>'c','3'=>'d','4'=>'e','5'=>'f','6'=>'g','7'=>'h','8'=>'i','9'=>'j']);
+        
+        return $short_code;
+    }
     public function baiduseo_pingfen(){
         if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
            $baiduseo_pingfen = get_option('baiduseo_pingfen');
@@ -782,6 +791,7 @@ class baiduseo_post{
                 }
             }
             $sitemap = get_option('seo_baidu_sitemap');
+            
             if($sitemap!==false && !is_array($sitemap)){
                 // $data = $sitemap;
                 $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
@@ -799,9 +809,9 @@ class baiduseo_post{
                 $data['tag_time'] = isset($_POST['tag_time'])?sanitize_text_field(wp_unslash($_POST['tag_time'])):"";
                 $data['other_time'] = isset($_POST['other_time'])?sanitize_text_field(wp_unslash($_POST['other_time'])):"";
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
-                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
-                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
-                // $data['tag_open'] = (int)$_POST['tag_open'];
+                $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:0;
+                $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:0;
+                // $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 
                 update_option('seo_baidu_sitemap',$data);
             }elseif($sitemap!==false && is_array($sitemap)){
@@ -823,7 +833,7 @@ class baiduseo_post{
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
                 $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
                 $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
-                // $data['tag_open'] = (int)$_POST['tag_open'];
+                // $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 
                 update_option('seo_baidu_sitemap',$data);
             }else{
@@ -844,7 +854,7 @@ class baiduseo_post{
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
                 $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
                 $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
-                // $data['tag_open'] = (int)$_POST['tag_open'];
+                // $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 add_option('seo_baidu_sitemap',$data);  
             }
             
@@ -1417,11 +1427,18 @@ class baiduseo_post{
         }
     
         // 5. 预处理标签排序规则（提前确定排序 SQL 片段，避免循环内重复判断）
-        $tag_order_sql = match ($baiduseo_tag['pp'] ?? 0) {
-            1 => 'ORDER BY LENGTH(name) DESC',
-            2 => 'ORDER BY LENGTH(name) ASC',
-            default => ''
-        };
+      $pp = isset($baiduseo_tag['pp'])?$baiduseo_tag['pp']:0;
+        switch ($pp) {
+            case 1:
+                $tag_order_sql = 'ORDER BY LENGTH(name) DESC';
+                break;
+            case 2:
+                $tag_order_sql = 'ORDER BY LENGTH(name) ASC';
+                break;
+            default:
+                $tag_order_sql = '';
+                break;
+        }
         $tags = $wpdb->get_results(
             "SELECT * FROM {$wpdb->prefix}terms 
              {$tag_order_sql} 
@@ -1614,6 +1631,9 @@ class baiduseo_post{
                             $id = $term['term_id'];
                             if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
                                 $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                            }else{
+                                $wpdb->update($wpdb->prefix . 'terms',['slug'=>self::baiduseo_generate_short_code($val)],['term_id'=>$id]);
+                                
                             }
                             $id_1 = $term['term_taxonomy_id'];
                             
@@ -1722,6 +1742,9 @@ class baiduseo_post{
                     //  $id = $wpdb->insert_id;
                     if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
                         $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                    }else{
+                        $wpdb->update($wpdb->prefix . 'terms',['slug'=>self::baiduseo_generate_short_code($keyword)],['term_id'=>$id]);
+                        
                     }
                     // $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
                 
@@ -1833,6 +1856,9 @@ class baiduseo_post{
                                 //  $id = $wpdb->insert_id;
                                 if(!isset($baiduseo_tag_manage['taglink']) || !$baiduseo_tag_manage['taglink']){
                                     $wpdb->update($wpdb->prefix . 'terms',['slug'=>$id],['term_id'=>$id]);
+                                }else{
+                                    $wpdb->update($wpdb->prefix . 'terms',['slug'=>self::baiduseo_generate_short_code($tag[0])],['term_id'=>$id]);
+                                    
                                 }
                                 // $wpdb->insert($wpdb->prefix."term_taxonomy",['term_id'=>$id,'taxonomy'=>'post_tag']);
                             
@@ -2202,6 +2228,7 @@ class baiduseo_post{
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
                 $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
                 $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
+                $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 update_option('seo_baidu_sitemap',$data);
             }elseif($sitemap!==false && is_array($sitemap)){
                 $data = $sitemap;
@@ -2222,6 +2249,7 @@ class baiduseo_post{
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
                 $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
                 $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
+                $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 update_option('seo_baidu_sitemap',$data);
             }else{
                  $data['level1'] = isset($_POST['level1'])?(int)$_POST['level1']:0;
@@ -2241,6 +2269,7 @@ class baiduseo_post{
                 $data['cate_time'] = isset($_POST['cate_time'])?sanitize_text_field(wp_unslash($_POST['cate_time'])):"";
                 $data['sitemap_open'] = isset($_POST['sitemap_open'])?(int)$_POST['sitemap_open']:"";
                 $data['silian_open'] = isset($_POST['silian_open'])?(int)$_POST['silian_open']:"";
+                $data['tag_open'] = isset($_POST['tag_open'])?(int)$_POST['tag_open']:0;
                 add_option('seo_baidu_sitemap',$data);  
             }
             baiduseo_seo::alt(isset($_POST['alt'])?(int)$_POST['alt']:0,isset($_POST['title'])?(int)$_POST['title']:0);

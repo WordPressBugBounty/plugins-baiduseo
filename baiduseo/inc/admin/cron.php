@@ -21,13 +21,8 @@ class baiduseo_cron{
         if(isset($baiduseo_wyc['wyc']) && $baiduseo_wyc['wyc']){
             $this->baiduseo_wyc($baiduseo_key);
         }
-        
         $this->wztkj_linkhh();
-      
-        
-        
         $baiduseo_auto = get_option('baiduseo_zz');
-        
 	    if(isset($baiduseo_auto['pingtai']) && strpos($baiduseo_auto['pingtai'],'1,')!==false){
 	        $today = date_i18n('Y-m-d', current_time('timestamp'));
 	        $baiduseo_bd_chao = get_option('baiduseo_bd_chao');
