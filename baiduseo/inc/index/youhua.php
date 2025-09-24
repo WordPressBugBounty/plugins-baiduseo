@@ -1,36 +1,26 @@
 <?php
 class baiduseo_youhua{
     public function init(){
-        $baiduseo_youhua = get_option('baiduseo_youhua');
-        if(isset($baiduseo_youhua['thumb']) && $baiduseo_youhua['thumb']){
-            $this->baiduseo_thumb();
-        }
-        if(isset($baiduseo_youhua['head_dy']) && $baiduseo_youhua['head_dy']){
-            $this->baiduseo_head_dy();
-        }
-        if(isset($baiduseo_youhua['xml_rpc']) && $baiduseo_youhua['xml_rpc']){
-            $this->baiduseo_xml_rpc();
-        }
-        if(isset($baiduseo_youhua['feed']) && $baiduseo_youhua['feed']){
-            $this->baiduseo_feed();
-        }
-        if(isset($baiduseo_youhua['post_thumb']) && $baiduseo_youhua['post_thumb']){
-            $this->baiduseo_post_thumb();
-        }
-        if(isset($baiduseo_youhua['gravatar']) && $baiduseo_youhua['gravatar']){
-            $this->baiduseo_gravatar();
-        }
-        if(isset($baiduseo_youhua['lan']) && $baiduseo_youhua['lan']){
-            $this->baiduseo_lan();
-        }
-        if(isset($baiduseo_youhua['category']) && $baiduseo_youhua['category']){
-            $this->baiduseo_category();
-        }
-          if(isset($baiduseo_youhua['wp_json']) && $baiduseo_youhua['wp_json']){
-            $this->baiduseo_wp_json();
-        }
-        if(isset($baiduseo_youhua['art_cron']) && $baiduseo_youhua['art_cron']){
-            $this->baiduseo_art_cron();
+        $this->baiduseo_youhua = get_option('baiduseo_youhua', []); // 存储为类属性，避免重复获取
+        if (empty($this->baiduseo_youhua)) return;
+        $function_map = [
+            'thumb'      => 'baiduseo_thumb',
+            'head_dy'    => 'baiduseo_head_dy',
+            'xml_rpc'    => 'baiduseo_xml_rpc',
+            'feed'       => 'baiduseo_feed',
+            'post_thumb' => 'baiduseo_post_thumb',
+            'gravatar'   => 'baiduseo_gravatar',
+            'lan'        => 'baiduseo_lan',
+            'category'   => 'baiduseo_category',
+            'wp_json'    => 'baiduseo_wp_json',
+            'art_cron'   => 'baiduseo_art_cron', 
+        ];
+    
+        // 循环调用对应方法
+        foreach ($function_map as $option_key => $method_name) {
+            if (isset($this->baiduseo_youhua[$option_key]) && $this->baiduseo_youhua[$option_key]) {
+                $this->$method_name(); // 动态调用方法
+            }
         }
     }
     public function baiduseo_bootstrap() {
@@ -64,20 +54,23 @@ class baiduseo_youhua{
     	array_map( 'wp_publish_post', $scheduled_ids );
     }
     public function baiduseo_art_cron(){
-        add_action( 'init', [$this,'baiduseo_bootstrap'] );
         add_filter( 'cron_schedules', [$this,'baiduseo_add_cron_interval'] );
+        add_action( 'plugins_loaded', [$this,'baiduseo_bootstrap'] );
         add_action( 'baiduseo_art_cron',[$this,'baiduseo_cronexec'] );
+        
+        
+        
     }
     public function  baiduseo_wp_json(){
         add_filter('rest_pre_dispatch', [$this,'baiduseo_restrict_rest_api_to_same_origin'], 10, 3);
-        if(isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'wp-sitemap-users') !== false){
+        if(isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI']) &&  strpos(sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'wp-sitemap-users') !== false){
                 echo '<script>window.location.href="/"</script>';
                 exit;
         }
     }
     public function baiduseo_restrict_rest_api_to_same_origin($result, $wp_rest_server, $request ){
           // Check if it's a request to access users endpoint
-        if ( strpos( $request->get_route(), '/wp/v2/users' ) !== false ) {
+        if (is_string($request->get_route()) &&  strpos( $request->get_route(), '/wp/v2/users' ) !== false ) {
             // Check if current user can edit users (typically administrators)
             if ( ! current_user_can( 'edit_users' ) ) {
                 // Return a permission denied error

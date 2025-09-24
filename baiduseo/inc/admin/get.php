@@ -437,8 +437,7 @@
                     'sslverify' => FALSE,
                 );
                 $baiduseo_level = get_option('baiduseo_level');
-               
-                if(!isset($baiduseo_level[2]) || $baiduseo_level[2]<time()-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION)>(int)str_replace('.','',$baiduseo_level[2])){
+                if(!isset($baiduseo_level[4]) || $baiduseo_level[4]<current_time('timestamp')-24*3600 || (int)str_replace('.','',BAIDUSEO_VERSION)>(int)str_replace('.','',$baiduseo_level[2])){
                     $url = 'https://art.seohnzz.com/api/money/level1?url='.baiduseo_common::baiduseo_url(0);
                     $result = wp_remote_get($url,$defaults);
                     if(!is_wp_error($result)){
@@ -451,7 +450,7 @@
                         if(isset($level1[0]) && ($level1[0]==1 || $level1[0]==2)){
                             $level1[2] = $level['version'];
                             $level1[3] = BAIDUSEO_VERSION;
-                            $level1[4] = time();
+                            $level1[4] = current_time('timestamp');
                             update_option('baiduseo_level',$level1);
                             $baiduseo_wzt_log = get_option('baiduseo_wzt_log');
                         }
@@ -710,7 +709,7 @@
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
@@ -779,7 +778,7 @@
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
@@ -880,7 +879,7 @@
                     }elseif(in_array($m,$month_30)){
                        $num  = 30;
                     }
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
@@ -940,7 +939,7 @@
              if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
@@ -1009,7 +1008,7 @@
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
@@ -1171,15 +1170,15 @@
             if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
                 $type = isset($_POST['type'])?(int)$_POST['type']:1;
                 if($type==1){
-                    $timezone_offet = get_option( 'gmt_offset');
+                   
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
                     for($i=0;$i<=23;$i++){
                         if($i>=10){
                             $j=$i+1;
-                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'))-$timezone_offet*3600;
-                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'))-$timezone_offet*3600;
+                            $sta1 = strtotime(current_time('Y-m-d '.$i.':00'));
+                            $end1 = strtotime(current_time('Y-m-d '.$j.':00'));
                             $sta2 = $sta1-24*3600;
                             $end2 = $end1-24*3600;
                             $sta3 = $sta1-24*3600*2;
@@ -1187,15 +1186,15 @@
                         }else{
                             $j=$i+1;
                             
-                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'))-$timezone_offet*3600;
+                            $sta1 = strtotime(current_time('Y-m-d 0'.$i.':00'));
                             $sta2 = $sta1-24*3600;
                             $sta3 = $sta1-24*3600*2;
                             if($j==10){
-                                $end1 = strtotime(current_time('Y-m-d 10:00'))-$timezone_offet*3600;
+                                $end1 = strtotime(current_time('Y-m-d 10:00'));
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }else{
-                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'))-$timezone_offet*3600;
+                                $end1 = strtotime(current_time('Y-m-d 0'.$j.':00'));
                                 $end2 = $end1-24*3600;
                                 $end3 = $end1-24*3600*2;
                             }
@@ -1206,10 +1205,10 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'))-$timezone_offet*3600;
+                    $sta4 = strtotime(current_time('Y-m-d'));
                     $sta5 = $sta4-24*3600;
                     $sta6 = $sta4-24*3600*2;
-                    $end4 = strtotime(current_time('Y-m-d 23:59:59'))-$timezone_offet*3600;
+                    $end4 = strtotime(current_time('Y-m-d 23:59:59'));
                     $end5 = $end4-24*3600;
                     $end6 = $end4-24*3600*2;
                     $arr4 =$wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta4,$end4));
@@ -1243,14 +1242,14 @@
                    echo wp_json_encode(['code'=>1,'data1'=>$data5,'data2'=>$arr4,'data3'=>$arr5,'data4'=>$arr6]);exit;
                 }elseif($type==2){
                     //获取周
-                    $timezone_offet = get_option( 'gmt_offset');
+                    $timezone_offet = 0;
                     $arr1 = [];
                     $arr2 = [];
                     $arr3 = [];
                     $n = current_time('N');
                     for($i=1;$i<=7;$i++){
                         $j=$i+1;
-                        $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600-$timezone_offet*3600;
+                        $sta1 = strtotime(current_time('Y-m-d'))-($n-$i)*24*3600;
                         $sta2 = $sta1-24*3600*7;
                         $sta3 = $sta1-24*3600*14;
                         $end1 = $sta1+24*3600;
@@ -1260,7 +1259,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600-$timezone_offet*3600;
+                    $sta4 = strtotime(current_time('Y-m-d'))-($n-1)*24*3600;
                     $sta5 = $sta4-24*3600*7;
                     $sta6 = $sta4-24*3600*14;
                     $end4 = $sta4+24*3600*7;
@@ -1352,7 +1351,7 @@
                     $arr2 = [];
                     $arr3 = [];
                     for($i=1;$i<=31;$i++){
-                        $sta1 = strtotime(current_time('Y-m-'.$i))-$timezone_offet*3600;
+                        $sta1 = strtotime(current_time('Y-m-'.$i));
                         $end1 = $sta1+24*3600;
                         $sta2 = $sta1-24*3600*($num1+$d);
                         $end2 = $sta2+24*3600;
@@ -1362,7 +1361,7 @@
                         $arr2[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta2,$end2));
                         $arr3[] = $wpdb->query($wpdb->prepare('select id from '.$wpdb->prefix . 'baiduseo_liuliang  where unix_timestamp(time)>%d and  unix_timestamp(time)<%d ',$sta3,$end3));
                     }
-                    $sta4 = strtotime(current_time('Y-m-01'))-$timezone_offet*3600;
+                    $sta4 = strtotime(current_time('Y-m-01'));
                     $sta5 = $sta4-24*3600*$num1;
                     $sta6 = $sta4-24*3600*($num1+$num2);
                     $end4 = $sta4+24*3600*$num;
@@ -2069,7 +2068,7 @@
                 $count = $wpdb->query("SELECT * FROM ".$wpdb->prefix ."wztkj_friends where status1=0 and status2=0 and status3=0 ",ARRAY_A);
                 $post1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."wztkj_friends where status1=0 and status2=0 and status3=0 order by id desc limit %d,30",$start1),ARRAY_A);
                 if(!empty($post1)){
-                         $timezone_offet = get_option( 'gmt_offset');
+                         $timezone_offet = 0;
                        
                         $end = time();
                         
@@ -2114,7 +2113,7 @@
                           $post1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."wztkj_friends where status1=5 or (status1=0 and status2=0) order by id desc limit %d,30",$start1),ARRAY_A);
                      }
                     if(!empty($post1)){
-                         $timezone_offet = get_option( 'gmt_offset');
+                         $timezone_offet = 0;
                        
                         $end = time();
                         
@@ -2158,7 +2157,7 @@
                      }
                      $data = get_option('baiduseo_linkhh');
                     if(!empty($post1)){
-                         $timezone_offet = get_option( 'gmt_offset');
+                         $timezone_offet = 0;
                        
                         $end = time();
                         

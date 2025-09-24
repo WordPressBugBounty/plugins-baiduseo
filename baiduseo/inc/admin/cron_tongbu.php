@@ -48,7 +48,7 @@ class baiduseo_crons{
         $post = $wpdb->get_results("SELECT a.ID FROM ".$wpdb->prefix ."posts  as a  left join ".$wpdb->prefix."postmeta as c on a.ID=c.post_id where c.meta_key='baiduseo'",ARRAY_A);
         if(!empty($post)){
             if($baiduseo_wyc!==false && $baiduseo_wyc['wyc']){
-                $wyc_result = wp_remote_post('https://ceshig.zhengyouyoule.com/api/wyc/wyc_tongbu1',['body'=>['url'=>get_option('siteurl')]]);
+                $wyc_result = wp_remote_post('https://wyc.seohnzz.com/api/wyc/wyc_tongbu1',['body'=>['url'=>get_option('siteurl')]]);
                 $wyc_content = wp_remote_retrieve_body($wyc_result);
                 $wyc_content = json_decode($wyc_content,true);
                 

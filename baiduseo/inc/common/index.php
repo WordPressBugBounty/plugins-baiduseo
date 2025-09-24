@@ -2,25 +2,23 @@
 class baiduseo_common{
     public function init(){
         add_action('wp',[$this,'baiduseo_init_session']);
-        // $baiduseo_zz = get_option('baiduseo_zz');
-        
+        $baiduseo_zz = get_option('baiduseo_zz');
         // //兼容所有文章类型的推送,推送全部计划任务
-        // if(isset($baiduseo_zz['status']) && strpos($baiduseo_zz['status'],'2') !== false){
-        //     $tuisong = explode(',',$baiduseo_zz['post_type']);
+        if(isset($baiduseo_zz['status']) && is_string($baiduseo_zz['status']) && strpos($baiduseo_zz['status'],'1') !== false){
+            $tuisong = explode(',',$baiduseo_zz['post_type']);
             
-        //     foreach($tuisong as $k=>$v){
-        //         add_action('publish_'.$v,[$this,'baiduseo_articlepublish']);
-        //         add_action('publish_future_'.$v,[$this,'baiduseo_articlepublish']);
-        //         add_action('wp_trash_'.$v,[$this,'baiduseo_delete_post'],91);
-        //     }
-        //     if(is_array($tuisong) && !in_array('post',$tuisong)){
-        //         add_action('publish_post',[$this,'baiduseo_articlepublish']);
-        //         add_action('publish_future_post',[$this,'baiduseo_articlepublish']);
-        //     }
-        // }else{
-            add_action('publish_post',[$this,'baiduseo_articlepublish']);
-            add_action('publish_future_post',[$this,'baiduseo_articlepublish']);
-        // }
+            if(is_array($tuisong) && !empty($tuisong)){
+                foreach($tuisong as $k=>$v){
+                    add_action('save_post_'.$v,[$this,'baiduseo_articlepublish_ts'], 10, 3);
+                    // add_action('publish_future_'.$v,[$this,'baiduseo_articlepublish_ts']);
+                    // add_action('wp_trash_'.$v,[$this,'baiduseo_delete_post'],91);
+                }
+            }
+            
+        }
+        add_action('publish_post',[$this,'baiduseo_articlepublish']);
+        add_action('publish_future_post',[$this,'baiduseo_articlepublish']);
+        
         if(is_admin()){
             add_action( 'admin_enqueue_scripts', [$this,'baiduseo_enqueue'] );
             add_filter('plugin_action_links_'.BAIDUSEO_NAME, [$this,'baiduseo_plugin_action_links']);
@@ -644,7 +642,7 @@ class baiduseo_common{
     public function baiduseo_mainpage(){
         
         $baiduseo_zz = get_option('baiduseo_zz');
-        if(isset($baiduseo_zz['toutiao_key']) && $baiduseo_zz['toutiao_key'] &&  isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'3')!==false){
+        if(isset($baiduseo_zz['toutiao_key']) && $baiduseo_zz['toutiao_key'] &&  isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai'])  && strpos($baiduseo_zz['pingtai'],'3')!==false){
             echo '<script>
                   /*seo合集头条推送*/
                 (function(){
@@ -1251,7 +1249,7 @@ class baiduseo_common{
         wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.esc_js(plugins_url('',BAIDUSEO_FILE)).'/inc/admin",baiduseo_nonce="'. esc_attr(wp_create_nonce('baiduseo')).'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.esc_url($url1).'",baiduseo_yindao='.(int)$baiduseo_yindao.',baiduseo_v="'.esc_url($baiduseo_version).'",baiduseo_indexnow="'.esc_attr($baiduseo_indexnow).'",baiduseo_google="'.esc_url($baiduseo_google).'";', 'before');
     }
     public  function baiduseo_plugin_action_links ( $links) {
-        $links[] = '<a href="' . admin_url( 'admin.php?page=baiduseo&nonce='.esc_attr(wp_create_nonce('baiduseo')) ) . '">设置</a>';
+        $links[] = '<a href="' . admin_url( 'admin.php?page=luntan' ) . '">设置</a>';
         return $links;
     }
     // public function baiduseo_delete_post($post_ID){
@@ -1267,11 +1265,88 @@ class baiduseo_common{
     //         }
     //     }
     // }
+    public function baiduseo_articlepublish_ts($post_ID,$post, $update){
+        global $baiduseo_wzt_log;
+        if(!$baiduseo_wzt_log){
+            return;
+        }
+        if (wp_is_post_autosave($post_ID) || wp_is_post_revision($post_ID)) {
+            return;
+        }
+        
+        if ($post->post_status !== 'publish') {
+            return;
+        }
+        
+        global $wpdb;
+        
+        // 直接使用WPDB查询和更新
+        $option_name = 'baiduseo_my_minute_task';
+        
+        // 查询现有数据
+        $result = $wpdb->get_var($wpdb->prepare(
+            "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+            $option_name
+        ));
+        
+        $current_tasks = [];
+        
+        if ($result) {
+            // 反序列化数据
+            $unserialized = unserialize($result);
+            if ($unserialized !== false && is_array($unserialized)) {
+                $current_tasks = $unserialized;
+            } else {
+                // 尝试JSON解码
+                $decoded = json_decode($result, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $current_tasks = $decoded;
+                }
+            }
+        }
+        
+        // 确保是数组
+        if (!is_array($current_tasks)) {
+            $current_tasks = [];
+        }
+        
+        // 检查是否已经存在
+        if (!in_array($post_ID, $current_tasks)) {
+            $current_tasks[] = $post_ID;
+            
+            // 直接插入或更新数据库
+            if ($result) {
+                // 更新现有记录
+                $wpdb->update(
+                    $wpdb->options,
+                    [
+                        'option_value' => serialize($current_tasks),
+                        'autoload' => 'no'
+                    ],
+                    ['option_name' => $option_name],
+                    ['%s', '%s'],
+                    ['%s']
+                );
+            } else {
+                // 插入新记录
+                $wpdb->insert(
+                    $wpdb->options,
+                    [
+                        'option_name' => $option_name,
+                        'option_value' => serialize($current_tasks),
+                        'autoload' => 'no'
+                    ],
+                    ['%s', '%s', '%s']
+                );
+            }
+        }
+    }
     public function  baiduseo_articlepublish($post_ID){
         
         global $wpdb,$baiduseo_wzt_log;
         
         if($baiduseo_wzt_log){
+            
             // $log = baiduseo_zz::pay_money();
             // if($log){
                 // $currnetTime= current_time( 'Y-m-d H:i:s');

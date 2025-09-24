@@ -45,7 +45,7 @@ class baiduseo_seo{
     }
     public static function baiduseo_sanitizing_key($key,$arr){
         foreach ($arr as $item) {
-            if (strpos($key, $item) !== false) {
+            if (is_string($key) && strpos($key, $item) !== false) {
                 return $key;
             }
         }
@@ -1323,7 +1323,7 @@ class baiduseo_seo{
                 foreach($zhizhu as $key=>$val){
                     $url = get_option('home');
                     $url1 = trim($url,'/');
-                    if(strpos($val['address'], $url1) !== false) {
+                    if(is_string($val['address']) && strpos($val['address'], $url1) !== false) {
                         $xml .= "<url>\n";
                         $xml .= "<loc>".htmlspecialchars($val['address'])."</loc>\n";
                         $xml .= "</url>\n";
@@ -1428,7 +1428,7 @@ class baiduseo_seo{
             }elseif(isset($content['status']) && $content['status']==0){
                 return 0;
             }else{
-                $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
+                $url = "https://wyc.seohnzz.com/index/index/pay_money?url={$data}&type=1";
             
                 $result = wp_remote_get($url,$defaults);
                 
@@ -1450,7 +1450,7 @@ class baiduseo_seo{
         }else{
             
         
-            $url = "https://ceshig.zhengyouyoule.com/index/index/pay_money?url={$data}&type=1";
+            $url = "https://wyc.seohnzz.com/index/index/pay_money?url={$data}&type=1";
             
                 $result = wp_remote_get($url,$defaults);
                 

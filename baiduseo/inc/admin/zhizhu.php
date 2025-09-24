@@ -83,38 +83,38 @@ class baiduseo_zhizhu{
         if(isset($_SERVER['HTTP_USER_AGENT'])){
             $type = strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])));
             if(isset($baiduseo_zhizhu['open']) && $baiduseo_zhizhu['open']==1){
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
-                    if (strpos($type, 'googlebot') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'2')!==false){
+                    if (is_string($type) && strpos($type, 'googlebot') !== false){
                         $data_array['name'] ='谷歌';
                     }
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'1')!==false){
-                    if (strpos($type, 'baiduspider') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'1')!==false){
+                    if (is_string($type) &&  strpos($type, 'baiduspider') !== false){
                         $data_array['name'] ='百度';
                     }
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'3')!==false){
-                    if (strpos($type, '360spider') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'3')!==false){
+                    if (is_string($type) && strpos($type, '360spider') !== false){
                         $data_array['name'] ='360';
                     }
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'4')!==false){
-                    if (strpos($type, 'sogou') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'4')!==false){
+                    if (is_string($type) &&  strpos($type, 'sogou') !== false){
                         $data_array['name'] ='搜狗';
                     }
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'5')!==false){
-                    if (strpos($type, 'yisouspider') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'5')!==false){
+                    if (is_string($type) &&  strpos($type, 'yisouspider') !== false){
                         $data_array['name'] ='神马';
                     }   
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'6')!==false){
-                    if (strpos($type, 'bingbot') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'6')!==false){
+                    if (is_string($type) &&  strpos($type, 'bingbot') !== false){
                         $data_array['name'] ='必应';
                     }
                 }
-                if(isset($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'7')!==false){
-                    if (strpos($type, 'bytespider') !== false){
+                if(isset($baiduseo_zhizhu['type']) && is_string($baiduseo_zhizhu['type']) &&  strpos($baiduseo_zhizhu['type'],'7')!==false){
+                    if (is_string($type) &&  strpos($type, 'bytespider') !== false){
                         $data_array['name'] ='头条';
                     }
                 }
@@ -441,66 +441,66 @@ class baiduseo_zhizhu{
             $other1 = [];
         if(isset($baiduseo_zhizhu['type'])){
             if($type==1){
-                if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'1')!==false){
                     $other[] = $baidu;
                     $other1[] = '百度';
                 }
-                if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
                     $other[] = $guge;
                     $other1[] = 'Google';
                 }
-                 if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'3')!==false){
                     $other[] = $a360;
                     $other1[] = '360';
                 }
-                 if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'4')!==false){
                     $other[] = $sougou;
                     $other1[] = '搜狗';
                 }
-                 if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'5')!==false){
                     $other[] = $shenma;
                     $other1[] = '神马';
                 }
-                 if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'6')!==false){
                     $other[] = $biying;
                     $other1[] = 'Bing';
                 }
-                 if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'7')!==false){
                     $other[] = $toutiao;
                     $other1[] = '头条';
                 }
             }elseif($type=='百度'){
-                if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'1')!==false){
                     $other[] = $baidu;
                     $other1[] = '百度';
                 }
             }elseif($type=='谷歌'){
-                 if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+                 if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
                     $other[] = $guge;
                     $other1[] = 'Google';
                 }
             }elseif($type=='360'){
-                if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'3')!==false){
                     $other[] = $a360;
                     $other1[] = '360';
                 }
             }elseif($type=='搜狗'){
-                if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'4')!==false){
                     $other[] = $sougou;
                     $other1[] = '搜狗';
                 }
             }elseif($type=='神马'){
-                if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'5')!==false){
                     $other[] = $shenma;
                     $other1[] = '神马';
                 }
             }elseif($type=='必应'){
-                  if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+                  if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'6')!==false){
                     $other[] = $biying;
                     $other1[] = 'Bing';
                 }
             }elseif($type=='头条'){
-                if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+                if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'7')!==false){
                     $other[] = $toutiao;
                     $other1[] = '头条';
                 }
@@ -579,31 +579,31 @@ class baiduseo_zhizhu{
           if(isset($baiduseo_zhizhu['type'])){
             $other = [];
             $other1 = [];
-            if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+            if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'1')!==false){
                 $other[] = $suoyin_baidu;
                 $other1[] = '百度';
             }
-            if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+            if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
                 $other[] = $suoyin_guge;
                 $other1[] = 'Google';
             }
-             if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'3')!==false){
                 $other[] = $suoyin_360;
                 $other1[] = '360';
             }
-             if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'4')!==false){
                 $other[] = $suoyin_sougou;
                 $other1[] = '搜狗';
             }
-             if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'5')!==false){
                 $other[] = $suoyin_shenma;
                 $other1[] = '神马';
             }
-             if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'6')!==false){
                 $other[] = $suoyin_biying;
                 $other1[] = 'Bing';
             }
-             if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'7')!==false){
                 $other[] = $suoyin_toutiao;
                 $other1[] = '头条';
             }
@@ -727,35 +727,35 @@ class baiduseo_zhizhu{
             $other = [];
             $other1 = [];
             $suoyin = [];
-            if(strpos($baiduseo_zhizhu['type'],'1')!==false){
+            if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'1')!==false){
                 $other[] = $suoyin_baidu2;
                 $other1[] = '百度';
                 $suoyin['baidu'] = $suoyin_baidu1;
             }
-            if(strpos($baiduseo_zhizhu['type'],'2')!==false){
+            if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'2')!==false){
                 $other[] = $suoyin_guge2;
                 $other1[] = 'Google';
             }
-             if(strpos($baiduseo_zhizhu['type'],'3')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'3')!==false){
                 $other[] = $suoyin_3602;
                 $other1[] = '360';
                 // $suoyin['360'] = $suoyin_sougou1;
             }
-             if(strpos($baiduseo_zhizhu['type'],'4')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'4')!==false){
                 $other[] = $suoyin_sougou2;
                 $other1[] = '搜狗';
                 // $suoyin['sougou'] = $suoyin_3601;
             }
-             if(strpos($baiduseo_zhizhu['type'],'5')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'5')!==false){
                 $other[] = $suoyin_shenma2;
                 $other1[] = '神马';
             }
-             if(strpos($baiduseo_zhizhu['type'],'6')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'6')!==false){
                 $other[] = $suoyin_biying2;
                 $other1[] = 'Bing';
                 // $suoyin['bing'] = $suoyin_biying1;
             }
-             if(strpos($baiduseo_zhizhu['type'],'7')!==false){
+             if(is_string($baiduseo_zhizhu['type']) && strpos($baiduseo_zhizhu['type'],'7')!==false){
                 $other[] = $suoyin_toutiao2;
                 $other1[] = '头条';
             }

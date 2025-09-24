@@ -519,7 +519,7 @@ class baiduseo_zz{
                     
                 }else{
                     if(isset($res['not_same_site'])){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                        if(isset($baidu['log']) &&  is_string($baidu['log']) &&  strpos($baidu['log'],'2')!==false){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>2,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -527,7 +527,7 @@ class baiduseo_zz{
                         }
                     }
                     if(isset($res['not_valid'])){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                        if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'2')!==false){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>2,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -536,7 +536,7 @@ class baiduseo_zz{
                     }
                     if(isset($res['success'])){
                         
-                       if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                       if(isset($baidu['log']) && is_string($baidu['log']) &&strpos($baidu['log'],'2')!==false){
                             foreach($urls as $key=>$val){
                                 $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>1,'type'=>2,'message'=>'']);
                             }
@@ -601,7 +601,7 @@ class baiduseo_zz{
                     }
                 }else{
                     if(isset($res['not_same_site'])){
-                        if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                        if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'2')!==false){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>2,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -610,7 +610,7 @@ class baiduseo_zz{
                         echo json_encode(['msg'=>0,'data'=>'推送失败，百度推送链接不正确']);exit;
                     }
                     if(isset($res['not_valid'])){
-                       if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                       if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'2')!==false){
                         foreach($urls as $key=>$val){
                             $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>2,'message'=>'百度推送设置的地址与wordpress设置中的常规设置的链接不匹配']);
                             break;
@@ -620,7 +620,7 @@ class baiduseo_zz{
                     }
                     if(isset($res['success'])){
                         
-                       if(isset($baidu['log']) && strpos($baidu['log'],'2')!==false){
+                       if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'2')!==false){
                             foreach($urls as $key=>$val){
                                 $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>1,'type'=>2,'message'=>'']);
                             }
@@ -809,7 +809,7 @@ class baiduseo_zz{
         $content = wp_remote_retrieve_body($result);
          $res = json_decode($content,true);
         if($res['returnCode']=='200'){
-             if(isset($baidu['log']) && strpos($baidu['log'],'4')!==false){
+             if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'4')!==false){
                 foreach($urls as $key=>$val){
 	                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>1,'type'=>4,'message'=>'']);
 	            }
@@ -826,7 +826,7 @@ class baiduseo_zz{
                 add_option('baiduseo_sm_record',$data);
             }
         }else{
-            if(isset($baidu['log']) && strpos($baidu['log'],'4')!==false){
+            if(isset($baidu['log']) &&is_string($baidu['log']) && strpos($baidu['log'],'4')!==false){
                 if($res['returnCode']==201){
                     foreach($urls as $key=>$val){
     	                $wpdb->insert($wpdb->prefix . 'baiduseo_zz',['time'=>$currnetTime,'link'=>$val,'ts'=>2,'type'=>4,'message'=>'token不合法']);

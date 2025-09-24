@@ -1035,7 +1035,7 @@ class baiduseo_post{
         if(!is_wp_error($result)){
             $content = wp_remote_retrieve_body($result);
            
-            if(strpos($content,md5(baiduseo_common::baiduseo_url(0))) !== false){ 
+            if(is_string($content) && strpos($content,md5(baiduseo_common::baiduseo_url(0))) !== false){ 
              echo json_encode(['code'=>1]);exit;
             }else{
              echo json_encode(['code'=>0]);exit;
@@ -1053,11 +1053,12 @@ class baiduseo_post{
             $data['hhtype'] = isset($_POST['hhtype'])?(int)$_POST['hhtype']:0;
             $data['hhtj'] = isset($_POST['hhtj'])?(int)$_POST['hhtj']:0;
             if(isset($_POST['level']) ){
-                $data['level'] = array_map('intval',explode(',',$_POST['level']));
+                $data['level'] = array_map('intval',explode(',',sanitize_text_field(wp_unslash($_POST['level']))));
             }
             if(isset($_POST['cate'])){
-                $data['cate'] = array_map('intval',explode(',',$_POST['cate']));
+                $data['cate'] = array_map('intval',explode(',',sanitize_text_field(wp_unslash($_POST['cate']))));
             }
+            
             $data['ystype'] = isset($_POST['ystype'])?(int)$_POST['ystype']:0;
             $data['kqtype'] = isset($_POST['kqtype'])?(int)$_POST['kqtype']:0;
             $data['yswidth'] = isset($_POST['yswidth'])?sanitize_text_field(wp_unslash($_POST['yswidth'])):'';
@@ -1091,37 +1092,37 @@ class baiduseo_post{
             //查询选择推送的方式
               
                     
-            if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'1')!==false){
+            if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) &&  strpos($baiduseo_zz['pingtai'],'1')!==false){
                 baiduseo_zz::bdts($urls);
             }
-            if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'2')!==false){
+            if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'2')!==false){
                 baiduseo_zz::bing($urls);
             }
-            if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4')!==false){
+            if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'4')!==false){
         
                 baiduseo_zz::google($url);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'5')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'5')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,6);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'6')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'6')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,6);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'7')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'7')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,7);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'8')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'8')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,8);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'9')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'9')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,9);
             }
-              if(isset($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'10')!==false){
+              if(isset($baiduseo_zz['pingtai']) && is_string($baiduseo_zz['pingtai']) && strpos($baiduseo_zz['pingtai'],'10')!==false){
         
                 baiduseo_zz::indexnow($urls,0,0,10);
             }
@@ -1147,7 +1148,7 @@ class baiduseo_post{
     public function baiduseo_neilian_delete(){
       
         if(isset($_POST['nonce']) && isset($_POST['action']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])),'baiduseo')){
-            $dele = isset($_POST['dele'])?array_map('intval',wp_unslash(explode(',',$_POST['dele']))):[];
+            $dele = isset($_POST['dele'])?array_map('intval',explode(',',sanitize_text_field(wp_unslash($_POST['dele'])))):[];
             if(!empty($dele) && is_array($dele)){
                 global $wpdb;
                 foreach($dele as $key=>$val){
@@ -1256,7 +1257,7 @@ class baiduseo_post{
                 $post = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix ."posts  where ID=%d ",$id),ARRAY_A);
                 
                 foreach($post as $ke=>$va){
-                    $url = 'https://ceshig.zhengyouyoule.com/api/wyc/wyc_50';
+                    $url = 'https://wyc.seohnzz.com/api/wyc/wyc_50';
                     $va['url'] = get_option('siteurl');
                     $result = wp_remote_post($url,['body'=>$va]);
                     $post_extend = get_post_meta( $id, 'baiduseo', true );
@@ -1348,7 +1349,7 @@ class baiduseo_post{
                 add_post_meta($id,'baiduseo',['status'=>2,'tjtime'=>$current_time] );
             }
             $content = get_post($id)->post_content;
-            $url = 'https://ceshig.zhengyouyoule.com/api/wyc/wp_wyc?id='.$id.'&content='.$content.'&url='.get_option('siteurl').'&like=9';
+            $url = 'https://wyc.seohnzz.com/api/wyc/wp_wyc?id='.$id.'&content='.$content.'&url='.get_option('siteurl').'&like=9';
             $result = wp_remote_get($url,$defaults);
             if(!is_wp_error($result)){
                  $result = wp_remote_retrieve_body($result);
@@ -1358,7 +1359,7 @@ class baiduseo_post{
                      echo json_encode(['msg'=>0,'data'=>'当日服务器压力大，请明天再试']);exit;
                  }
             }else{
-                $result = wp_remote_post('https://ceshig.zhengyouyoule.com/api/wyc/wp_wyc',['body'=>['id'=>$id,'content'=>$content,'url'=>get_option('siteurl'),'like'=>9],'headers'=>[
+                $result = wp_remote_post('https://wyc.seohnzz.com/api/wyc/wp_wyc',['body'=>['id'=>$id,'content'=>$content,'url'=>get_option('siteurl'),'like'=>9],'headers'=>[
                     'timeout' =>4000,
                     'connecttimeout'=>4000,
                     'redirection' => 3,
@@ -1428,26 +1429,43 @@ class baiduseo_post{
     
         // 5. 预处理标签排序规则（提前确定排序 SQL 片段，避免循环内重复判断）
       $pp = isset($baiduseo_tag['pp'])?$baiduseo_tag['pp']:0;
-        switch ($pp) {
-            case 1:
-                $tag_order_sql = 'ORDER BY LENGTH(name) DESC';
-                break;
-            case 2:
-                $tag_order_sql = 'ORDER BY LENGTH(name) ASC';
-                break;
-            default:
-                $tag_order_sql = '';
-                break;
-        }
+        $order_by = '';
+    
+    switch ($pp) {
+        case 1:
+            $order_by = 'LENGTH(name) DESC';
+            break;
+        case 2:
+            $order_by = 'LENGTH(name) ASC';
+            break;
+        default:
+            $order_by = '';
+            break;
+    }
+    
+    // 构建基础查询
+    $query = "
+        SELECT * FROM {$wpdb->prefix}terms 
+        WHERE term_id IN (
+            SELECT term_id FROM {$wpdb->prefix}term_taxonomy 
+            WHERE taxonomy = 'post_tag'
+        )
+    ";
+    
+    // 如果有排序条件，添加到查询中
+    if (!empty($order_by)) {
+        $query .= " ORDER BY %s";
+    }
+    
+    // 使用prepare方法预处理查询
+    if (!empty($order_by)) {
         $tags = $wpdb->get_results(
-            "SELECT * FROM {$wpdb->prefix}terms 
-             {$tag_order_sql} 
-             WHERE term_id IN (
-                 SELECT term_id FROM {$wpdb->prefix}term_taxonomy 
-                 WHERE taxonomy = 'post_tag'
-             )", 
+            $wpdb->prepare($query, $order_by),
             ARRAY_A
         );
+    } else {
+        $tags = $wpdb->get_results($query, ARRAY_A);
+    }
     
         // 6. 循环处理文章标签
         $processed_count = 0;
@@ -2148,6 +2166,7 @@ class baiduseo_post{
                 'naver_log_show'=>isset($_POST['naver_log_show'])?(int)$_POST['naver_log_show']:0,  
                 'yep_log'=>isset($_POST['yep_log'])?(int)$_POST['yep_log']:0,
                 'yep_log_show'=>isset($_POST['yep_log_show'])?(int)$_POST['yep_log_show']:0,
+                'status'=>sanitize_text_field(wp_unslash($_POST['status'])),
                 
             ];
             if($indexnow_key){
