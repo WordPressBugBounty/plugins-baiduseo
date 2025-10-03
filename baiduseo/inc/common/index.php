@@ -1249,7 +1249,7 @@ class baiduseo_common{
         wp_add_inline_script('baiduseo.js', 'var baiduseo_wztkj_url="'.esc_js(plugins_url('',BAIDUSEO_FILE)).'/inc/admin",baiduseo_nonce="'. esc_attr(wp_create_nonce('baiduseo')).'",baiduseo_ajax="'.esc_url(admin_url('admin-ajax.php')).'",baiduseo_tag ="'.esc_url(admin_url('edit-tags.php?taxonomy=post_tag')).'",baiduseo_url="'.esc_url($url1).'",baiduseo_yindao='.(int)$baiduseo_yindao.',baiduseo_v="'.esc_url($baiduseo_version).'",baiduseo_indexnow="'.esc_attr($baiduseo_indexnow).'",baiduseo_google="'.esc_url($baiduseo_google).'";', 'before');
     }
     public  function baiduseo_plugin_action_links ( $links) {
-        $links[] = '<a href="' . admin_url( 'admin.php?page=luntan' ) . '">设置</a>';
+        $links[] = '<a href="' . admin_url( 'admin.php?page=baiduseo&nonce='.esc_attr(wp_create_nonce('baiduseo')) ) . '">设置</a>';
         return $links;
     }
     // public function baiduseo_delete_post($post_ID){
